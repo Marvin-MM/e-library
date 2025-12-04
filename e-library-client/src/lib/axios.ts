@@ -3,7 +3,7 @@ import { useAuthStore, getRefreshToken } from "@/stores/authStore";
 import { toast } from "sonner";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://e-library-xbt1.onrender.com/api/v1";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
