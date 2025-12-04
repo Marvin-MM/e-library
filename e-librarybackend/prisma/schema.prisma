@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  STAFF
+  ADMIN
+}
+
+enum ResourceCategory {
+  BOOK
+  JOURNAL
+  PAPER
+  MAGAZINE
+  THESIS
+  OTHER
+}
+
+enum AccessType {
+  VIEW_ONLY
+  DOWNLOADABLE
+}
+
+enum RequestStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
+model User {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  name            String
+  hashedPassword  String
+  role            Role      @default(STUDENT)
+  emailVerified   Boolean   @default(false)
+  verificationToken String?
+  resetToken      String?
+  resetTokenExpiry DateTime?
+  refreshToken    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  uploadedResources Resource[]     @relation("UploadedBy")
+  downloadLogs      DownloadLog[]
+  searchLogs        SearchLog[]
+  requests          Request[]
+  auditLogs         AuditLog[]     @relation("PerformedBy")
+
+  @@index([email])
+  @@index([role])
+}
+
+model Resource {
+  id            String           @id @default(uuid())
+  title         String
+  authors       String[]
+  description   String?
+  category      ResourceCategory
+  department    String
+  publicationYear Int?
+  cloudinaryId  String?
+  cloudinaryUrl String?
+  coverImageId  String?
+  coverImageUrl String?
+  fileType      String?
+  fileSize      Int?
+  accessType    AccessType       @default(DOWNLOADABLE)
+  tags          String[]
+  viewCount     Int              @default(0)
+  downloadCount Int              @default(0)
+  isActive      Boolean          @default(true)
+  uploadedById  String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  uploadedBy    User             @relation("UploadedBy", fields: [uploadedById], references: [id])
+  courses       CourseResource[]
+  downloadLogs  DownloadLog[]
+
+  @@index([title])
+  @@index([category])
+  @@index([department])
+  @@index([tags])
+  @@index([uploadedById])
+  @@index([createdAt])
+}
+
+model Course {
+  id         String   @id @default(uuid())
+  code       String   @unique
+  name       String
+  department String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  resources  CourseResource[]
+
+  @@index([department])
+}
+
+model CourseResource {
+  id         String   @id @default(uuid())
+  courseId   String
+  resourceId String
+  createdAt  DateTime @default(now())
+
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, resourceId])
+}
+
+model DownloadLog {
+  id         String   @id @default(uuid())
+  userId     String
+  resourceId String
+  ipAddress  String?
+  userAgent  String?
+  timestamp  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([resourceId])
+  @@index([timestamp])
+}
+
+model SearchLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  query     String
+  filters   Json?
+  resultsCount Int   @default(0)
+  timestamp DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([query])
+  @@index([timestamp])
+  @@index([userId])
+}
+
+model Request {
+  id          String        @id @default(uuid())
+  userId      String
+  title       String
+  authors     String?
+  reason      String
+  status      RequestStatus @default(OPEN)
+  adminReply  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  entity      String
+  entityId    String?
+  action      String
+  performedById String
+  meta        Json?
+  ipAddress   String?
+  timestamp   DateTime @default(now())
+
+  performedBy User     @relation("PerformedBy", fields: [performedById], references: [id])
+
+  @@index([entity])
+  @@index([action])
+  @@index([performedById])
+  @@index([timestamp])
+}
+
+model Analytics {
+  id              String   @id @default(uuid())
+  date            DateTime @db.Date
+  totalDownloads  Int      @default(0)
+  totalSearches   Int      @default(0)
+  totalViews      Int      @default(0)
+  topSearchTerms  Json?
+  topResources    Json?
+  usersByRole     Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([date])
+  @@index([date])
+}
+
+model BlacklistedToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([expiresAt])
+}
