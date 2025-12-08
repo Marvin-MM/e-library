@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const LOCAL_DB_URL = "postgresql://postgres:postgres@localhost:5432/mdriven-hackathon";
-const NEON_DB_URL = "postgresql://neondb_owner:npg_aCedFTI1w2NO@ep-billowing-frog-a4bl3cvu-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require";
+const NEON_DB_URL = "";
 const DUMP_FILE = "pg_backup.dump";
 
 if (!LOCAL_DB_URL || !NEON_DB_URL) {
