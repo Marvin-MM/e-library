@@ -219,7 +219,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-60 bg-card/50 backdrop-blur-xl border-r shadow-2xl lg:shadow-none transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-card/50 backdrop-blur-xl border-r shadow-2xl lg:shadow-none transform transition-transform duration-300 ease-in-out lg:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -367,7 +367,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <div className="lg:pl-60 min-h-screen flex flex-col transition-all duration-300">
+      <div className="lg:pl-64 min-h-screen flex flex-col transition-all duration-300">
         {/* Header */}
         <header className="sticky top-0 z-30 h-16 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
           <div className="flex h-full items-center gap-4 px-4 sm:px-8">

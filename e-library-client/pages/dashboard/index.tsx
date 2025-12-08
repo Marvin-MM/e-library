@@ -71,13 +71,13 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="flex items-center gap-2 mb-4 flex-wrap"
+              className="flex items-center gap-2 mb-4 flex-wrap justify-center"
             >
-              <Badge className="gap-1 px-3 py-1 bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm">
+              <Badge className="gap-1 px-2 py-0.5 bg-gray-500 hover:bg-white/30 border-white/30 backdrop-blur-sm text-[9px]">
                 <Sparkles className="h-3 w-3" />
-                Enhanced with AI Discovery
+                Enhanced AI Discovery
               </Badge>
-              <Badge className="gap-1 px-3 py-1 bg-white/20 hover:bg-white/30 border-white/30 backdrop-blur-sm">
+              <Badge className="gap-1 px-2 py-0.5 bg-gray-500 hover:bg-white/30 border-white/30 backdrop-blur-sm text-[9px]">
                 <Globe className="h-3 w-3" />
                 5+ Million Resources
               </Badge>
@@ -87,7 +87,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4"
+              className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4"
             >
               Welcome back, {user?.name}
             </motion.h1>
@@ -96,7 +96,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg mb-8 max-w-2xl"
+              className="text-base md:text-lg mb-8 max-w-2xl"
             >
               Access millions of free academic resources from open access repositories worldwide. 
               Search, discover, and learn with our integrated academic discovery platform.
@@ -125,7 +125,7 @@ export default function DashboardPage() {
                         }
                       }}
                       onClick={() => setSearchModalOpen(true)}
-                      className="pl-14 pr-32 h-16 text-base border-0 shadow-none focus-visible:ring-0 rounded-2xl"
+                      className="pl-14 pr-32 h-14 md:h-16 text-sm md:text-base border-0 shadow-none focus-visible:ring-0 rounded-2xl"
                     />
                     <div className="absolute right-2 top-1/2 -translate-y-1/2">
                       <Button 
@@ -135,9 +135,9 @@ export default function DashboardPage() {
                           }
                         }}
                         disabled={searchQuery.trim().length < 2}
-                        className="h-12 px-6 rounded-full"
+                        className="h-12 md:h-16 px-4 md:px-6 rounded-full"
                       >
-                        <Search className="h-4 w-4 mr-2" />
+                        <Search className="h-4 w-4 mr-1 md:mr-2" />
                         Search
                       </Button>
                     </div>
@@ -146,7 +146,7 @@ export default function DashboardPage() {
               </Card>
 
               {/* Quick Search Tags */}
-              <div className="flex flex-wrap gap-2 mt-4">
+              <div className="flex flex-wrap gap-2 mt-4 justify-center">
                 <span className="text-sm">Try:</span>
                 {["Machine Learning", "Climate Change", "African History", "Renewable Energy", "Public Health"].map((tag) => (
                   <Badge
@@ -174,7 +174,7 @@ export default function DashboardPage() {
           >
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-2xl font-bold flex items-center gap-2">
+                <h3 className="text-xl md:text-2xl font-bold flex items-center gap-2">
                   <Globe className="h-6 w-6 text-primary" />
                   Academic Sources
                 </h3>
@@ -224,7 +224,7 @@ export default function DashboardPage() {
                     <Clock className="h-6 w-6 text-blue-500" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl">Latest Resources</CardTitle>
+                    <CardTitle className="text-lg md:text-2xl">Latest Resources</CardTitle>
                     <CardDescription>Recently added</CardDescription>
                   </div>
                 </div>
