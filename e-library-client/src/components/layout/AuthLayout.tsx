@@ -60,11 +60,8 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
           transition={{ duration: 0.4 }}
           className="w-full max-w-md space-y-8"
         >
-          <div className="lg:hidden flex items-center gap-2 justify-center mb-8">
-            <div className="p-2 bg-primary rounded-lg">
-              <BookOpen className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xl font-bold">ResourceHub</span>
+          <div className="lg:hidden flex items-center justify-center">
+            <img src="/vu-logo.png" alt="VU Logo" className="h-36 w-36 object-contain" />
           </div>
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
