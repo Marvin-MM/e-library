@@ -24,12 +24,12 @@ export default function AuditLogsPage() {
   const router = useRouter();
   const { isAdmin } = useRole();
   const [page, setPage] = useState(1);
-  const [action, setAction] = useState("");
+  const [action, setAction] = useState("all");
 
   const { data, isLoading } = useAuditLogs({
     page,
     limit: 20,
-    action: action || undefined,
+    action: action === "all" ? undefined : action,
   });
 
   const logs = data?.data || [];
@@ -75,7 +75,7 @@ export default function AuditLogsPage() {
                   <SelectValue placeholder="All Actions" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Actions</SelectItem>
+                  <SelectItem value="all">All Actions</SelectItem>
                   <SelectItem value="CREATE">Create</SelectItem>
                   <SelectItem value="UPDATE">Update</SelectItem>
                   <SelectItem value="DELETE">Delete</SelectItem>
@@ -187,7 +187,7 @@ export default function AuditLogsPage() {
               <ScrollText className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No audit logs</h3>
               <p className="text-muted-foreground text-center max-w-sm">
-                {action ? "No logs found for this action type." : "No activity has been recorded yet."}
+                {action !== "all" ? "No logs found for this action type." : "No activity has been recorded yet."}
               </p>
             </CardContent>
           </Card>

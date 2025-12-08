@@ -26,3 +26,12 @@ export const courseIdSchema = z.object({
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
 export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
 export type CourseQueryInput = z.infer<typeof courseQuerySchema>;
+
+export const courseResourcesQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(20),
+  search: z.string().max(100).optional(),
+  category: z.enum(['BOOK', 'JOURNAL', 'PAPER', 'MAGAZINE', 'THESIS', 'OTHER']).optional(),
+});
+
+export type CourseResourcesQueryInput = z.infer<typeof courseResourcesQuerySchema>;

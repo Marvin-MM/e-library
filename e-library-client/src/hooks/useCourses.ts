@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { coursesApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryClient";
 import { toast } from "sonner";
-import type { CreateCourseData } from "@/types/api";
+import type { CreateCourseData, ResourceFilters } from "@/types/api";
 
 export function useCourses(filters?: { page?: number; limit?: number; search?: string }) {
   return useQuery({
@@ -24,6 +24,15 @@ export function useCourse(id: string) {
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useCourseResources(courseId: string, filters?: ResourceFilters) {
+  return useQuery({
+    queryKey: queryKeys.courses.resources(courseId, filters as any),
+    queryFn: () => coursesApi.getResources(courseId, filters),
+    enabled: !!courseId,
+    staleTime: 60 * 1000,
   });
 }
 

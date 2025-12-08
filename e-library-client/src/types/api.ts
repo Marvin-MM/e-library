@@ -87,6 +87,7 @@ export interface Resource {
   publicationYear?: number;
   accessType: 'VIEW_ONLY' | 'DOWNLOADABLE';
   tags: string[];
+  type?: ResourceType; // Added
   fileType?: string;
   fileSize?: number;
   cloudinaryUrl?: string;

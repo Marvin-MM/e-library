@@ -7,6 +7,7 @@ import {
   updateCourseSchema,
   courseQuerySchema,
   courseIdSchema,
+  courseResourcesQuerySchema,
 } from './course.validators.js';
 
 const router = Router();
@@ -26,6 +27,13 @@ router.get(
   '/:id',
   validate(courseIdSchema, 'params'),
   courseController.findById.bind(courseController)
+);
+
+router.get(
+  '/:id/resources',
+  validate(courseIdSchema, 'params'),
+  validate(courseResourcesQuerySchema, 'query'),
+  courseController.getResources.bind(courseController)
 );
 
 router.post(

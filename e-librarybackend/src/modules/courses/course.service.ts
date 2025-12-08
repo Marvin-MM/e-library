@@ -1,7 +1,7 @@
 import prisma from '../../config/database.js';
 import { NotFoundError, ConflictError } from '../../shared/errors/AppError.js';
 import { logger } from '../../shared/utils/logger.js';
-import type { CreateCourseInput, UpdateCourseInput, CourseQueryInput } from './course.validators.js';
+import type { CreateCourseInput, UpdateCourseInput, CourseQueryInput, CourseResourcesQueryInput } from './course.validators.js';
 
 export class CourseService {
   async create(data: CreateCourseInput, userId: string) {
@@ -208,6 +208,62 @@ export class CourseService {
     });
 
     return departments.map(d => d.department);
+  }
+
+  async getResources(courseId: string, query: CourseResourcesQueryInput) {
+    const course = await prisma.course.findUnique({
+      where: { id: courseId },
+    });
+
+    if (!course) {
+      throw new NotFoundError('Course not found');
+    }
+
+    const page = query.page;
+    const limit = query.limit;
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+      courseId,
+    };
+
+    if (query.search || query.category) {
+      where.resource = {};
+      if (query.search) {
+        where.resource.OR = [
+          { title: { contains: query.search, mode: 'insensitive' } },
+          { description: { contains: query.search, mode: 'insensitive' } },
+        ];
+      }
+      if (query.category) {
+        where.resource.category = query.category;
+      }
+    }
+
+    const [resources, total] = await Promise.all([
+      prisma.courseResource.findMany({
+        where,
+        include: {
+          resource: true,
+        },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.courseResource.count({ where }),
+    ]);
+
+    return {
+      data: resources.map(r => r.resource),
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1,
+      },
+    };
   }
 }
 

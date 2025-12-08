@@ -119,6 +119,22 @@ export default function SignupPage() {
           Sign in
         </Link>
       </div>
+      
+      {/* Footer */}
+      <div className="mt-8 pt-6 border-t border-border/50">
+        <div className="text-center space-y-2">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Victoria University. All rights reserved.
+          </p>
+          <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+            <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>
+            <span>•</span>
+            <Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link>
+            <span>•</span>
+            <Link href="#" className="hover:text-primary transition-colors">Contact</Link>
+          </div>
+        </div>
+      </div>
     </AuthLayout>
   );
 }

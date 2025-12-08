@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="en" suppressHydrationWarning>
       <Head>
         <meta charSet="utf-8" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="https://vu.ac.ug/favicon.png" />
         <meta name="theme-color" content="#3b82f6" />
       </Head>
       <body className="min-h-screen bg-background font-sans antialiased">

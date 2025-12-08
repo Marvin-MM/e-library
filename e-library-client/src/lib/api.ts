@@ -363,6 +363,13 @@ export const coursesApi = {
     const response = await api.delete<ApiResponse>(`/courses/${id}`);
     return response.data;
   },
+
+  getResources: async (id: string, filters?: ResourceFilters) => {
+    const response = await api.get<PaginatedResponse<Resource>>(`/courses/${id}/resources`, {
+      params: filters,
+    });
+    return response.data;
+  },
 };
 
 export const requestsApi = {

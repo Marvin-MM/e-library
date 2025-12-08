@@ -25,7 +25,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { ClipboardList, Plus, Loader2 } from "lucide-react";
+import {
+  ClipboardList,
+  Loader2,
+  GitPullRequest,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  MessageSquare,
+  Calendar,
+  User,
+  FileText,
+  Send,
+} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createRequestSchema, type CreateRequestFormData } from "@/schemas/requests";
@@ -50,11 +63,10 @@ export default function RequestsPage() {
   });
 
   const onSubmit = (data: CreateRequestFormData) => {
-    // Map frontend field names to backend field names
     const requestData = {
       title: data.title,
       authors: data.authors || undefined,
-      reason: data.reason, // Changed from description to reason
+      reason: data.reason,
       category: data.category,
     };
 
@@ -66,124 +78,189 @@ export default function RequestsPage() {
     });
   };
 
-  const getStatusVariant = (status: string) => {
+  const getStatusConfig = (status: string) => {
     switch (status) {
       case "RESOLVED":
-        return "default";
+        return {
+          variant: "default" as const,
+          icon: CheckCircle2,
+          className: "bg-green-500/15 text-green-700 dark:text-green-400 hover:bg-green-500/25 border-green-200 dark:border-green-900",
+          iconColor: "text-green-600 dark:text-green-400",
+        };
       case "REJECTED":
-        return "destructive";
+        return {
+          variant: "destructive" as const,
+          icon: XCircle,
+          className: "bg-red-500/15 text-red-700 dark:text-red-400 hover:bg-red-500/25 border-red-200 dark:border-red-900",
+          iconColor: "text-red-600 dark:text-red-400",
+        };
       case "IN_PROGRESS":
-        return "secondary";
+        return {
+          variant: "secondary" as const,
+          icon: Clock,
+          className: "bg-yellow-500/15 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-500/25 border-yellow-200 dark:border-yellow-900",
+          iconColor: "text-yellow-600 dark:text-yellow-400",
+        };
       default:
-        return "outline";
+        return {
+          variant: "outline" as const,
+          icon: AlertCircle,
+          className: "bg-blue-500/15 text-blue-700 dark:text-blue-400 hover:bg-blue-500/25 border-blue-200 dark:border-blue-900",
+          iconColor: "text-blue-600 dark:text-blue-400",
+        };
     }
   };
 
   return (
     <DashboardLayout title="My Requests">
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row gap-4 justify-between">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">My Requests</h2>
-            <p className="text-muted-foreground">
-              Track your resource requests and their status
+      <div className="space-y-8 pb-8">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-8 rounded-3xl">
+          <div className="space-y-2">
+            <h2 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+              My Requests
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl">
+              Track the status of your resource requests or submit a new one.
             </p>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button size="lg" className="shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
+                <GitPullRequest className="mr-2 h-5 w-5" />
                 New Request
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Create New Request</DialogTitle>
-                <DialogDescription>
+            <DialogContent className="sm:max-w-xl rounded-3xl p-0 overflow-hidden gap-0">
+              <DialogHeader className="p-6 pb-4 bg-muted/30">
+                <DialogTitle className="text-2xl flex items-center gap-2">
+                  <GitPullRequest className="h-6 w-6 text-primary" />
+                  Create New Request
+                </DialogTitle>
+                <DialogDescription className="text-base">
                   Request a resource that you need. Our team will review and fulfill it.
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    placeholder="What resource do you need?"
-                    {...register("title")}
-                    className={errors.title ? "border-destructive" : ""}
-                  />
-                  {errors.title && (
-                    <p className="text-sm text-destructive">{errors.title.message}</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="authors">Authors (Optional)</Label>
-                  <Input
-                    id="authors"
-                    placeholder="e.g., John Doe, Jane Smith"
-                    {...register("authors")}
-                    className={errors.authors ? "border-destructive" : ""}
-                  />
-                  {errors.authors && (
-                    <p className="text-sm text-destructive">{errors.authors.message}</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="reason">Reason/Description</Label>
-                  <Textarea
-                    id="reason"
-                    placeholder="Describe what you're looking for in detail..."
-                    rows={4}
-                    {...register("reason")}
-                    className={errors.reason ? "border-destructive" : ""}
-                  />
-                  {errors.reason && (
-                    <p className="text-sm text-destructive">{errors.reason.message}</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Category (Optional)</Label>
-                  <Select onValueChange={(value) => setValue("category", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categoryOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={isPending}>
-                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Submit Request
-                  </Button>
-                </DialogFooter>
-              </form>
+
+              <div className="p-6">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="title" className="text-base font-medium">
+                      Resource Title <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="title"
+                      placeholder="e.g., Introduction to Algorithms, 4th Edition"
+                      {...register("title")}
+                      className={`h-12 rounded-xl text-base ${errors.title ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                    />
+                    {errors.title && (
+                      <p className="text-sm text-destructive flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {errors.title.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="authors" className="text-base font-medium">
+                      Authors <span className="text-muted-foreground font-normal text-sm">(Optional)</span>
+                    </Label>
+                    <Input
+                      id="authors"
+                      placeholder="e.g., Cormen, Leiserson, Rivest, Stein"
+                      {...register("authors")}
+                      className={`h-12 rounded-xl text-base ${errors.authors ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                    />
+                    {errors.authors && (
+                      <p className="text-sm text-destructive flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {errors.authors.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="category" className="text-base font-medium">
+                      Category <span className="text-muted-foreground font-normal text-sm">(Optional)</span>
+                    </Label>
+                    <Select onValueChange={(value) => setValue("category", value as any)}>
+                      <SelectTrigger className="h-12 rounded-xl text-base">
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categoryOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="reason" className="text-base font-medium">
+                      Reason / Description <span className="text-destructive">*</span>
+                    </Label>
+                    <Textarea
+                      id="reason"
+                      placeholder="Describe why you need this resource or provide additional details (ISBN, Edition, etc.)..."
+                      rows={4}
+                      {...register("reason")}
+                      className={`rounded-xl text-base resize-none ${errors.reason ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                    />
+                    {errors.reason && (
+                      <p className="text-sm text-destructive flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {errors.reason.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="pt-4 flex gap-3 justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setDialogOpen(false)}
+                      className="rounded-xl h-11 px-6"
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={isPending} className="rounded-xl h-11 px-6 shadow-md">
+                      {isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="mr-2 h-4 w-4" />
+                          Submit Request
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
-        
+
+        {/* Requests List */}
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="grid gap-6">
             {[...Array(3)].map((_, i) => (
-              <Card key={i}>
+              <Card key={i} className="rounded-3xl border-none shadow-sm overflow-hidden">
                 <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <Skeleton className="h-10 w-10 rounded" />
-                    <div className="flex-1">
-                      <Skeleton className="h-5 w-3/4 mb-2" />
-                      <Skeleton className="h-4 w-1/2" />
+                  <div className="flex items-start gap-6">
+                    <Skeleton className="h-16 w-16 rounded-2xl" />
+                    <div className="flex-1 space-y-4">
+                      <div className="space-y-2">
+                        <Skeleton className="h-6 w-1/3" />
+                        <Skeleton className="h-4 w-1/4" />
+                      </div>
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-2/3" />
                     </div>
                   </div>
                 </CardContent>
@@ -191,75 +268,121 @@ export default function RequestsPage() {
             ))}
           </div>
         ) : requests && requests.length > 0 ? (
-          <div className="space-y-4">
-            {requests.map((request, index) => (
-              <motion.div
-                key={request.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                      <div className="p-2 bg-primary/10 rounded-lg shrink-0">
-                        <ClipboardList className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-                          <h3 className="font-semibold">{request.title}</h3>
-                          <div className="flex gap-2">
-                            <Badge variant={getStatusVariant(request.status)}>
-                              {request.status.replace("_", " ")}
-                            </Badge>
+          <div className="grid gap-6">
+            {requests.map((request, index) => {
+              const statusConfig = getStatusConfig(request.status);
+              const StatusIcon = statusConfig.icon;
+
+              return (
+                <motion.div
+                  key={request.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Card className="group rounded-3xl border-muted-foreground/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="flex flex-col md:flex-row">
+                        {/* Status Strip/Icon */}
+                        <div className={`p-6 md:w-24 flex items-center justify-center bg-muted/30 border-b md:border-b-0 md:border-r border-border/50`}>
+                          <div className={`p-3 rounded-2xl ${statusConfig.className} bg-opacity-10`}>
+                            <StatusIcon className={`h-8 w-8 ${statusConfig.iconColor}`} />
                           </div>
                         </div>
-                        
-                        {request.authors && (
-                          <p className="text-sm text-muted-foreground mb-1">
-                            <strong>Authors:</strong> {request.authors}
-                          </p>
-                        )}
-                        
-                        <p className="text-muted-foreground text-sm line-clamp-2 mb-2">
-                          <strong>Reason:</strong> {request.reason}
-                        </p>
-                        
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          {request.category && <span>{request.category}</span>}
-                          <span>Created {formatDate(request.createdAt)}</span>
-                          {request.resolvedAt && (
-                            <span>Resolved {formatDate(request.resolvedAt)}</span>
+
+                        {/* Content */}
+                        <div className="flex-1 p-6 md:p-8 space-y-6">
+                          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-3 flex-wrap">
+                                <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                                  {request.title}
+                                </h3>
+                                <Badge
+                                  variant="outline"
+                                  className={`${statusConfig.className} border bg-transparent`}
+                                >
+                                  {request.status.replace("_", " ")}
+                                </Badge>
+                              </div>
+                              {request.authors && (
+                                <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                                  <User className="h-3.5 w-3.5" />
+                                  {request.authors}
+                                </p>
+                              )}
+                            </div>
+                            <div className="text-xs text-muted-foreground whitespace-nowrap flex items-center gap-1.5 bg-muted/50 px-3 py-1 rounded-full w-fit">
+                              <Calendar className="h-3.5 w-3.5" />
+                              Requested {formatDate(request.createdAt)}
+                            </div>
+                          </div>
+
+                          <div className="space-y-4">
+                            <div className="bg-muted/30 p-4 rounded-2xl space-y-2">
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                                <FileText className="h-3.5 w-3.5" />
+                                Reason
+                              </p>
+                              <p className="text-sm text-foreground/90 leading-relaxed">
+                                {request.reason}
+                              </p>
+                            </div>
+
+                            {/* Metadata Footer */}
+                            <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                              {request.category && (
+                                <Badge variant="secondary" className="text-xs font-normal">
+                                  {request.category}
+                                </Badge>
+                              )}
+                              {request.resolvedAt && (
+                                <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium">
+                                  <CheckCircle2 className="h-3.5 w-3.5" />
+                                  Resolved {formatDate(request.resolvedAt)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Admin Reply */}
+                          {request.adminReply && (
+                            <div className="mt-4 p-5 bg-primary/5 rounded-2xl border border-primary/10">
+                              <div className="flex items-center gap-2 mb-2 text-primary font-semibold text-sm">
+                                <MessageSquare className="h-4 w-4" />
+                                Admin Reply
+                              </div>
+                              <p className="text-sm text-foreground/80 leading-relaxed">
+                                {request.adminReply}
+                              </p>
+                            </div>
                           )}
                         </div>
-                        
-                        {request.adminReply && (
-                          <div className="mt-3 p-3 bg-muted rounded-lg">
-                            <p className="text-sm font-medium mb-1">Admin Reply:</p>
-                            <p className="text-sm text-muted-foreground">{request.adminReply}</p>
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         ) : (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <ClipboardList className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No requests yet</h3>
-              <p className="text-muted-foreground text-center max-w-sm mb-4">
-                You haven&apos;t made any resource requests yet. Create one to get started.
-              </p>
-              <Button onClick={() => setDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Request
-              </Button>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center py-20 text-center"
+          >
+            <div className="bg-muted/30 p-8 rounded-full mb-6">
+              <ClipboardList className="h-20 w-20 text-muted-foreground/40" />
+            </div>
+            <h3 className="text-2xl font-bold mb-3">No requests yet</h3>
+            <p className="text-muted-foreground max-w-md mb-8 text-lg">
+              You haven&apos;t made any resource requests yet. Need something specific? Let us know!
+            </p>
+            <Button onClick={() => setDialogOpen(true)} size="lg" className="rounded-xl shadow-lg hover:shadow-xl transition-all px-8 h-12 text-base">
+              <GitPullRequest className="mr-2 h-5 w-5" />
+              Create Your First Request
+            </Button>
+          </motion.div>
         )}
       </div>
     </DashboardLayout>

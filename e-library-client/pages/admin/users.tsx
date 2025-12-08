@@ -51,7 +51,7 @@ export default function AdminUsersPage() {
   const { isAdmin, user: currentUser } = useRole();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
@@ -61,7 +61,7 @@ export default function AdminUsersPage() {
     page,
     limit: 20,
     search: search || undefined,
-    role: roleFilter || undefined,
+    role: roleFilter === "all" ? undefined : roleFilter,
   });
   const { mutate: updateRole, isPending: updatingRole } = useUpdateUserRole();
   const { mutate: deleteUser, isPending: deletingUser } = useDeleteUser();
@@ -154,7 +154,7 @@ export default function AdminUsersPage() {
                   <SelectValue placeholder="All Roles" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Roles</SelectItem>
+                  <SelectItem value="all">All Roles</SelectItem>
                   <SelectItem value="ADMIN">Admin</SelectItem>
                   <SelectItem value="STAFF">Staff</SelectItem>
                   <SelectItem value="STUDENT">Student</SelectItem>
@@ -290,7 +290,7 @@ export default function AdminUsersPage() {
               <Users className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No users found</h3>
               <p className="text-muted-foreground text-center max-w-sm">
-                {search || roleFilter
+                {search || roleFilter !== "all"
                   ? "Try adjusting your filters."
                   : "There are no users yet."}
               </p>

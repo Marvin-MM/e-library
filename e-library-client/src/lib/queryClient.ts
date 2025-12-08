@@ -45,6 +45,8 @@ export const queryKeys = {
     all: ["courses"] as const,
     list: (filters?: Record<string, unknown>) => ["courses", "list", filters] as const,
     detail: (id: string) => ["courses", id] as const,
+    resources: (id: string, filters?: Record<string, unknown>) =>
+      ["courses", id, "resources", filters] as const,
   },
   requests: {
     all: ["requests"] as const,

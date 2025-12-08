@@ -14,6 +14,7 @@ import searchRoutes from './modules/search/search.routes.js';
 import requestRoutes from './modules/requests/request.routes.js';
 import adminRoutes from './modules/admin/admin.routes.js';
 import courseRoutes from './modules/courses/course.routes.js';
+import discoveryRoutes from './modules/discovery/discovery.routes.js';
 
 const app: Application = express();
 
@@ -92,6 +93,7 @@ apiRouter.use('/search', searchRoutes);
 apiRouter.use('/requests', requestRoutes);
 apiRouter.use('/courses', courseRoutes);
 apiRouter.use('/admin', adminRoutes);
+apiRouter.use('/discovery', discoveryRoutes);
 
 app.use(`/api/${config.apiVersion}`, apiRouter);
 

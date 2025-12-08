@@ -42,6 +42,20 @@ export class CourseController {
     }
   }
 
+  async getResources(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const validatedQuery = (req as any).validated?.query ?? req.query;
+      const result = await courseService.getResources(req.params.id, validatedQuery as any);
+      res.json({
+        success: true,
+        data: result.data,
+        pagination: result.pagination,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async update(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const course = await courseService.update(req.params.id, req.body, req.user!.userId);
