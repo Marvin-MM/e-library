@@ -30,6 +30,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import LatestDissertationsSection from "@/components/LatestDissertationsSection";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -216,7 +217,7 @@ export default function DashboardPage() {
           </motion.div>
 
           {/* Latest Resources */}
-          <Card className="rounded-2xl">
+          {/*<Card className="rounded-2xl">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -287,7 +288,8 @@ export default function DashboardPage() {
                 </div>
               )}
             </CardContent>
-          </Card>
+          </Card> */}
+          <LatestDissertationsSection />
         </div>
 
         {/* Right Column - Trending & Requests */}
