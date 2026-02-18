@@ -11,6 +11,7 @@ import {
   resetPasswordSchema,
   verifyEmailSchema,
   changePasswordSchema,
+  updateProfileSchema,
 } from './auth.validators.js';
 
 const router = Router();
@@ -65,6 +66,14 @@ router.get(
   '/me',
   authenticate,
   authController.getProfile.bind(authController)
+);
+
+router.patch(
+  '/me',
+  authenticate,
+  strictRateLimiter,
+  validate(updateProfileSchema),
+  authController.updateProfile.bind(authController)
 );
 
 router.post(

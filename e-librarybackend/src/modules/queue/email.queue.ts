@@ -1,6 +1,6 @@
 import { Queue, Worker, Job } from 'bullmq';
 import { getRedisClient, isRedisConnected } from '../../config/redis.js';
-import { sendEmail, EmailOptions } from '../email/email.service.js';
+import { sendEmailWithProvider, EmailOptions } from '../email/email.provider.js';
 import { config } from '../../config/index.js';
 import { logger } from '../../shared/utils/logger.js';
 
@@ -26,9 +26,9 @@ interface RequestStatusEmailData {
   adminReply?: string;
 }
 
-interface GenericEmailData extends EmailOptions {}
+interface GenericEmailData extends EmailOptions { }
 
-type EmailJobData = 
+type EmailJobData =
   | { type: 'verification'; data: VerificationEmailData }
   | { type: 'passwordReset'; data: PasswordResetEmailData }
   | { type: 'requestStatus'; data: RequestStatusEmailData }
@@ -69,7 +69,7 @@ const processEmailJob = async (job: Job<EmailJobData>): Promise<void> => {
     switch (type) {
       case 'verification': {
         const verificationUrl = `${config.frontendUrl}/verify-email?token=${data.token}`;
-        await sendEmail({
+        await sendEmailWithProvider({
           to: data.to,
           subject: 'Verify Your Email - Victoria University E-Library',
           html: `
@@ -88,7 +88,7 @@ const processEmailJob = async (job: Job<EmailJobData>): Promise<void> => {
 
       case 'passwordReset': {
         const resetUrl = `${config.frontendUrl}/reset-password?token=${data.token}`;
-        await sendEmail({
+        await sendEmailWithProvider({
           to: data.to,
           subject: 'Password Reset Request - Victoria University E-Library',
           html: `
@@ -106,7 +106,7 @@ const processEmailJob = async (job: Job<EmailJobData>): Promise<void> => {
       }
 
       case 'requestStatus': {
-        await sendEmail({
+        await sendEmailWithProvider({
           to: data.to,
           subject: `Resource Request Update - ${data.status} - Victoria University E-Library`,
           html: `
@@ -123,7 +123,7 @@ const processEmailJob = async (job: Job<EmailJobData>): Promise<void> => {
       }
 
       case 'generic': {
-        await sendEmail(data);
+        await sendEmailWithProvider(data);
         break;
       }
 

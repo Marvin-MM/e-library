@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useSearchResults, useSearchSuggestions } from "@/hooks/useSearch";
 import {
   Dialog,
@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { motion, AnimatePresence } from "framer-motion";
+
 import {
   Search,
   FileText,
@@ -121,7 +121,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[85vh] overflow-y-auto rounded-3">
           <DialogHeader>
             <DialogTitle>Search</DialogTitle>
             <DialogDescription>
@@ -130,14 +130,14 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
           </DialogHeader>
 
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="mt-2">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="local" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-2 rounded-xl">
+              <TabsTrigger value="local" className="flex items-center gap-2 rounded-xl">
                 <FileText className="h-4 w-4" />
-                Local Resources
+                Campus Resources
               </TabsTrigger>
-              <TabsTrigger 
-                value="discovery" 
-                className="flex items-center gap-2"
+              <TabsTrigger
+                value="discovery"
+                className="flex items-center gap-2 rounded-xl"
               >
                 <Globe className="h-4 w-4" />
                 Academic Discovery
@@ -169,48 +169,42 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
 
               {debouncedQuery.length >= 2 && (
                 <>
-                  <AnimatePresence>
-                    {!loadingSuggestions && suggestions && suggestions.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                      >
-                        <div className="space-y-2">
-                          <h4 className="text-sm font-semibold text-muted-foreground">
-                            Quick suggestions
-                          </h4>
-                          <div className="flex flex-wrap gap-2">
-                            {suggestions.slice(0, 6).map((suggestion) => {
-                              const Icon = getIconForType(suggestion.type);
-                              return (
-                                <Button
-                                  key={suggestion.id}
-                                  variant="outline"
-                                  size="sm"
-                                  className="gap-2"
-                                  onClick={() => {
-                                    if (suggestion.type === "resource") {
-                                      onOpenChange(false);
-                                      router.push(`/resources/${suggestion.id}`);
-                                    } else if (suggestion.type === "course") {
-                                      onOpenChange(false);
-                                      router.push(`/courses/${suggestion.id}`);
-                                    }
-                                  }}
-                                >
-                                  <Icon className="h-4 w-4" />
-                                  <span className="truncate max-w-[200px]">
-                                    {suggestion.title}
-                                  </span>
-                                </Button>
-                              );
-                            })}
-                          </div>
+                  {!loadingSuggestions && suggestions && suggestions.length > 0 && (
+                    <div>
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-semibold text-muted-foreground">
+                          Quick suggestions
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {suggestions.slice(0, 6).map((suggestion) => {
+                            const Icon = getIconForType(suggestion.type);
+                            return (
+                              <Button
+                                key={suggestion.id}
+                                variant="outline"
+                                size="sm"
+                                className="gap-2"
+                                onClick={() => {
+                                  if (suggestion.type === "resource") {
+                                    onOpenChange(false);
+                                    router.push(`/resources/${suggestion.id}`);
+                                  } else if (suggestion.type === "course") {
+                                    onOpenChange(false);
+                                    router.push(`/courses/${suggestion.id}`);
+                                  }
+                                }}
+                              >
+                                <Icon className="h-4 w-4" />
+                                <span className="truncate max-w-[200px]">
+                                  {suggestion.title}
+                                </span>
+                              </Button>
+                            );
+                          })}
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -218,10 +212,9 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                         {loadingResults
                           ? "Searching..."
                           : results?.data?.length
-                          ? `${results.pagination.total} result${
-                              results.pagination.total !== 1 ? "s" : ""
+                            ? `${results.pagination.total} result${results.pagination.total !== 1 ? "s" : ""
                             } found`
-                          : "No results found"}
+                            : "No results found"}
                       </h4>
                     </div>
 
@@ -261,11 +254,8 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                         <>
                           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {results.data.map((resource, index) => (
-                              <motion.div
+                              <div
                                 key={resource.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.05 }}
                               >
                                 <Card
                                   className="h-full hover:shadow-md transition-shadow cursor-pointer group"
@@ -294,7 +284,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                                     </div>
                                   </CardContent>
                                 </Card>
-                              </motion.div>
+                              </div>
                             ))}
                           </div>
 
@@ -342,8 +332,8 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                                 <ExternalLink className="h-4 w-4" />
                                 Request This Resource
                               </Button>
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 onClick={() => setActiveTab("discovery")}
                                 className="gap-2"
                               >
@@ -384,11 +374,11 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                     </span>
                   </div>
                 </div>
-                
+
                 <Globe className="h-16 w-16 text-primary mx-auto mb-6" />
                 <h3 className="text-xl font-bold mb-3">Search Millions of Academic Resources</h3>
                 <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                  Access millions of free academic papers, articles, and books from 
+                  Access millions of free academic papers, articles, and books from
                   open access repositories worldwide. All resources are completely free.
                 </p>
 
@@ -401,7 +391,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                     {sourcesData?.data?.map((source) => {
                       const Icon = getSourceIcon(source.id);
                       return (
-                        <div 
+                        <div
                           key={source.id}
                           className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
                         >
@@ -413,19 +403,19 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                         </div>
                       );
                     }) || (
-                      <>
-                        {["OpenAlex", "CORE", "DOAJ", "ERIC", "DOAB"].map((name) => (
-                          <div 
-                            key={name}
-                            className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
-                          >
-                            <Skeleton className="h-6 w-6 mb-2 rounded-full" />
-                            <Skeleton className="h-3 w-16 mb-2" />
-                            <Skeleton className="h-2 w-12" />
-                          </div>
-                        ))}
-                      </>
-                    )}
+                        <>
+                          {["OpenAlex", "CORE", "DOAJ", "ERIC", "DOAB"].map((name) => (
+                            <div
+                              key={name}
+                              className="flex flex-col items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                            >
+                              <Skeleton className="h-6 w-6 mb-2 rounded-full" />
+                              <Skeleton className="h-3 w-16 mb-2" />
+                              <Skeleton className="h-2 w-12" />
+                            </div>
+                          ))}
+                        </>
+                      )}
                   </div>
                 </div>
 
@@ -440,7 +430,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                       readOnly
                     />
                   </div>
-                  <Button 
+                  <Button
                     onClick={() => setShowDiscoveryModal(true)}
                     className="w-full h-12 text-lg"
                   >

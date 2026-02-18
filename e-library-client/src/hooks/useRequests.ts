@@ -84,6 +84,28 @@ export function useUpdateRequest(id: string) {
   });
 }
 
+export function useRespondToRequest(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: UpdateRequestData) => {
+      const response = await requestsApi.respond(id, data);
+      if (!response.success) {
+        throw new Error(response.message || "Failed to respond to request");
+      }
+      return response.data!;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(queryKeys.requests.detail(id), data);
+      queryClient.invalidateQueries({ queryKey: queryKeys.requests.all });
+      toast.success("Response sent successfully!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to send response");
+    },
+  });
+}
+
 export function useDeleteRequest() {
   const queryClient = useQueryClient();
 

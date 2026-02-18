@@ -55,6 +55,15 @@ router.put(
   requestController.update.bind(requestController)
 );
 
+// Admin respond to request with structured access information
+router.post(
+  '/:id/respond',
+  authenticate,
+  authorize('ADMIN'),
+  validate(requestIdSchema, 'params'),
+  requestController.respond.bind(requestController)
+);
+
 router.delete(
   '/:id',
   authenticate,
@@ -63,3 +72,4 @@ router.delete(
 );
 
 export default router;
+

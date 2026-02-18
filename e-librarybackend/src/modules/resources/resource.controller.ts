@@ -12,11 +12,23 @@ export class ResourceController {
 
       const file = files?.file?.[0];
       const coverImage = files?.coverImage?.[0];
+      const uploaderRole = req.user!.role as 'ADMIN' | 'STAFF';
 
-      const resource = await resourceService.create(req.body as any, file, coverImage, req.user!.userId);
+      const resource = await resourceService.create(
+        req.body as any,
+        file,
+        coverImage,
+        req.user!.userId,
+        uploaderRole
+      );
+
+      const message = uploaderRole === 'ADMIN'
+        ? 'Resource created and published successfully'
+        : 'Resource created and submitted for approval';
+
       res.status(201).json({
         success: true,
-        message: 'Resource created successfully',
+        message,
         data: resource,
       });
     } catch (error) {
@@ -24,10 +36,11 @@ export class ResourceController {
     }
   }
 
-  async findAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async findAll(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const validatedQuery = (req as any).validated?.query ?? req.query;
-      const result = await resourceService.findAll(validatedQuery as any);
+      const isAdmin = req.user?.role === 'ADMIN';
+      const result = await resourceService.findAll(validatedQuery as any, isAdmin);
       res.json({
         success: true,
         data: result.data,
@@ -122,6 +135,71 @@ export class ResourceController {
       res.json({
         success: true,
         data: resources,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  // Admin approval endpoints
+  async getPendingResources(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { page, limit } = req.query;
+      const result = await resourceService.getPendingResources({
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+      });
+      res.json({
+        success: true,
+        data: result.data,
+        pagination: result.pagination,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async approveResource(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { note } = req.body;
+      const resource = await resourceService.approveResource(
+        req.params.id,
+        req.user!.userId,
+        note
+      );
+      res.json({
+        success: true,
+        message: 'Resource approved successfully',
+        data: resource,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async rejectResource(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { reason } = req.body;
+      const resource = await resourceService.rejectResource(
+        req.params.id,
+        req.user!.userId,
+        reason
+      );
+      res.json({
+        success: true,
+        message: 'Resource rejected',
+        data: resource,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getApprovalStats(_req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const stats = await resourceService.getApprovalStats();
+      res.json({
+        success: true,
+        data: stats,
       });
     } catch (error) {
       next(error);

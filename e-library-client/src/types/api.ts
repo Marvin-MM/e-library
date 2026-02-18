@@ -3,6 +3,7 @@ export type UserRole = "ADMIN" | "STAFF" | "STUDENT";
 export interface User {
   id: string;
   email: string;
+  name: string;
   firstName: string;
   lastName: string;
   role: UserRole;
@@ -51,17 +52,19 @@ export interface ApiResponse<T = unknown> {
   errors?: Record<string, string[]>;
 }
 
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
 export interface PaginatedResponse<T> {
   success: boolean;
   data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  };
+  pagination: PaginationMeta;
 }
 
 export interface CreateResourceData {
@@ -71,10 +74,16 @@ export interface CreateResourceData {
   department: string;
   authors: string[];
   publicationYear?: number;
-  accessType: 'VIEW_ONLY' | 'DOWNLOADABLE';
+  accessType: 'VIEW_ONLY' | 'DOWNLOADABLE' | 'CAMPUS_ONLY';
+  physicalLocation?: string;
+  shelfNumber?: string;
+  availabilityNotes?: string;
+  copies?: number;
+  isbn?: string;
+  issn?: string;
   tags?: string[];
   courseIds?: string[];
-  file: File;
+  file?: File;
 }
 
 export interface Resource {
@@ -85,7 +94,13 @@ export interface Resource {
   department: string;
   authors: string[];
   publicationYear?: number;
-  accessType: 'VIEW_ONLY' | 'DOWNLOADABLE';
+  accessType: 'VIEW_ONLY' | 'DOWNLOADABLE' | 'CAMPUS_ONLY';
+  physicalLocation?: string;
+  shelfNumber?: string;
+  availabilityNotes?: string;
+  copies?: number;
+  isbn?: string;
+  issn?: string;
   tags: string[];
   type?: ResourceType; // Added
   fileType?: string;
@@ -120,6 +135,106 @@ export interface ResourceFilters {
   sortOrder?: "asc" | "desc";
 }
 
+export interface RequestResponse {
+  id: string;
+  requestId: string;
+  adminId: string;
+  message: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// --- Analytics Types ---
+
+export interface AnalyticsOverview {
+  totalUsers: number;
+  totalResources: number;
+  totalDownloads: number;
+  activeUsers: number; // Last 30 days
+}
+
+export interface DateTrend {
+  date: string;
+  count: number;
+}
+
+export interface ResourceTrend {
+  resourceId: string;
+  title: string;
+  count: number;
+}
+
+export interface ItemCount {
+  item: string;
+  count: number;
+}
+
+export interface UserRoleDistribution {
+  role: string;
+  count: number;
+}
+
+export interface ResourceCategoryDistribution {
+  category: string;
+  count: number;
+}
+
+export interface RequestStats {
+  total: number;
+  pending: number;
+  resolved: number;
+  rejected: number;
+  avgResolutionTime: number; // hours
+}
+
+export interface AnalyticsReport {
+  overview: AnalyticsOverview;
+  downloads: DateTrend[];
+  users: DateTrend[];
+  topResources: ResourceTrend[];
+  topSearchTerms: ItemCount[];
+  requestStats: RequestStats;
+}
+
+// --- Notification Types ---
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: 'SYSTEM' | 'REQUEST_UPDATE' | 'RESOURCE_ADDED' | 'ACCOUNT';
+  title: string;
+  message: string;
+  read: boolean;
+  data?: Record<string, any>;
+  createdAt: string;
+}
+
+export interface NotificationListResponse {
+  data: Notification[];
+  pagination: PaginationMeta;
+  unreadCount: number;
+}
+
+// --- Admin Settings Types ---
+
+export interface SystemSetting {
+  key: string;
+  value: any;
+  description?: string;
+  type: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'JSON';
+  isPublic: boolean;
+  updatedAt: string;
+}
+
+export interface EmailSettings {
+  provider: 'resend' | 'nodemailer' | 'console';
+  fromEmail: string;
+  resendApiKey?: string; // Masked
+  smtpHost?: string;
+  smtpPort?: number;
+  smtpUser?: string;
+}
+
 export interface Course {
   id: string;
   name: string;
@@ -144,9 +259,14 @@ export interface ResourceRequest {
   title: string;
   authors?: string; // Add this
   reason: string; // Changed from description
-  category?: string;
+  category?: RequestCategory;
+  priority: RequestPriority;
+  dueDate?: string;
   status: string;
   adminReply?: string; // Changed from adminNotes
+  accessInstructions?: string;
+  externalSourceUrl?: string;
+  fulfilledResourceId?: string;
   userId: string;
   user?: User;
   createdAt: string;
@@ -158,16 +278,22 @@ export interface CreateRequestData {
   title: string;
   authors?: string; // Add this
   reason: string; // Changed from description
-  category?: string;
+  category?: RequestCategory;
+  priority?: RequestPriority;
+  dueDate?: string;
 }
 
 export interface UpdateRequestData {
   status?: string;
   adminReply?: string;
+  accessInstructions?: string;
+  externalSourceUrl?: string;
+  fulfilledResourceId?: string;
 }
 
 export type RequestStatus = "PENDING" | "IN_PROGRESS" | "RESOLVED" | "REJECTED";
 export type RequestPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+export type RequestCategory = "BOOK" | "JOURNAL" | "PAPER" | "THESIS" | "EQUIPMENT" | "OTHER";
 
 export interface AuditLog {
   id: string;

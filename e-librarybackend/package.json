@@ -27,6 +27,8 @@
   "author": "Victoria University",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.972.0",
+    "@aws-sdk/s3-request-presigner": "^3.972.0",
     "@prisma/client": "^6.19.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/compression": "^1.8.1",
@@ -56,6 +58,7 @@
     "pino-pretty": "^13.1.3",
     "prisma": "^6.19.0",
     "rate-limit-redis": "^4.3.1",
+    "resend": "^6.8.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "uuid": "^13.0.0",

@@ -43,7 +43,7 @@ import {
   Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { toast } from "sonner";
 
 interface DiscoverySearchModalProps {
@@ -98,7 +98,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
         };
         return acc;
       }, {} as Record<string, any>);
-      
+
       Object.entries(statuses).forEach(([source, status]) => {
         setSourceStatus(source, status);
       });
@@ -385,8 +385,8 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
                       )}
                     </Badge>
                   )) || (
-                    <Skeleton className="h-8 w-20" />
-                  )}
+                      <Skeleton className="h-8 w-20" />
+                    )}
                 </div>
               </div>
               <div className="text-sm text-muted-foreground">
@@ -444,125 +444,119 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
               ) : searchData?.data && searchData.data.length > 0 ? (
                 <>
                   <ScrollArea className="h-[400px] pr-4">
-                    <AnimatePresence>
-                      <div className="space-y-4">
-                        {searchData.data.map((result, index) => (
-                          <motion.div
-                            key={`${result.id}-${index}`}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ delay: index * 0.05 }}
-                          >
-                            <Card className="hover:shadow-lg transition-shadow border-l-4" 
-                              style={{ borderLeftColor: getSourceColor(result.source).split(" ")[1] }}>
-                              <CardHeader className="pb-3">
-                                <div className="flex justify-between items-start">
-                                  <div className="flex-1">
-                                    <CardTitle className="text-lg line-clamp-2 mb-2">
-                                      {result.title}
-                                    </CardTitle>
-                                    <CardDescription className="flex items-center gap-3 flex-wrap">
-                                      {result.authors && result.authors.length > 0 && (
-                                        <span className="flex items-center gap-1">
-                                          <User className="h-3 w-3" />
-                                          <span className="text-xs">
-                                            {result.authors.slice(0, 2).join(", ")}
-                                            {result.authors.length > 2 && " et al."}
-                                          </span>
+                    <div className="space-y-4">
+                      {searchData.data.map((result, index) => (
+                        <div
+                          key={`${result.id}-${index}`}
+                        >
+                          <Card className="hover:shadow-lg transition-shadow border-l-4"
+                            style={{ borderLeftColor: getSourceColor(result.source).split(" ")[1] }}>
+                            <CardHeader className="pb-3">
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <CardTitle className="text-lg line-clamp-2 mb-2">
+                                    {result.title}
+                                  </CardTitle>
+                                  <CardDescription className="flex items-center gap-3 flex-wrap">
+                                    {result.authors && result.authors.length > 0 && (
+                                      <span className="flex items-center gap-1">
+                                        <User className="h-3 w-3" />
+                                        <span className="text-xs">
+                                          {result.authors.slice(0, 2).join(", ")}
+                                          {result.authors.length > 2 && " et al."}
                                         </span>
-                                      )}
-                                      {result.publishedDate && (
-                                        <span className="flex items-center gap-1">
-                                          <Calendar className="h-3 w-3" />
-                                          <span className="text-xs">{result.publishedDate}</span>
-                                        </span>
-                                      )}
-                                      <Badge
-                                        variant="outline"
-                                        className={cn(
-                                          "capitalize",
-                                          getSourceColor(result.source).replace("text-", "border-")
-                                        )}
-                                      >
-                                        {getSourceIcon(result.source)}
-                                        <span className="ml-1">{result.source}</span>
-                                      </Badge>
-                                    </CardDescription>
-                                  </div>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="pb-3">
-                                {result.abstract && (
-                                  <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
-                                    {result.abstract}
-                                  </p>
-                                )}
-                                {result.subjects && result.subjects.length > 0 && (
-                                  <div className="flex flex-wrap gap-1 mb-3">
-                                    {result.subjects.slice(0, 4).map((subject, idx) => (
-                                      <Badge key={idx} variant="secondary" className="text-xs">
-                                        {subject}
-                                      </Badge>
-                                    ))}
-                                    {result.subjects.length > 4 && (
-                                      <Badge variant="outline" className="text-xs">
-                                        +{result.subjects.length - 4} more
-                                      </Badge>
+                                      </span>
                                     )}
-                                  </div>
-                                )}
-                              </CardContent>
-                              <CardFooter className="pt-3 border-t flex justify-between">
-                                <div className="text-sm text-muted-foreground">
-                                  {result.doi && (
-                                    <span className="flex items-center gap-1">
-                                      <Link className="h-3 w-3" />
-                                      DOI: {result.doi}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="flex gap-2">
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => handleCopyCitation(result)}
-                                  >
-                                    <FileText className="h-4 w-4 mr-1" />
-                                    Cite
-                                  </Button>
-                                  {result.pdfUrl && (
-                                    <Button
-                                      size="sm"
-                                      variant="default"
-                                      onClick={() => handleDownload(result)}
+                                    {result.publishedDate && (
+                                      <span className="flex items-center gap-1">
+                                        <Calendar className="h-3 w-3" />
+                                        <span className="text-xs">{result.publishedDate}</span>
+                                      </span>
+                                    )}
+                                    <Badge
+                                      variant="outline"
+                                      className={cn(
+                                        "capitalize",
+                                        getSourceColor(result.source).replace("text-", "border-")
+                                      )}
                                     >
-                                      <Download className="h-4 w-4 mr-1" />
-                                      PDF
-                                    </Button>
+                                      {getSourceIcon(result.source)}
+                                      <span className="ml-1">{result.source}</span>
+                                    </Badge>
+                                  </CardDescription>
+                                </div>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="pb-3">
+                              {result.abstract && (
+                                <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
+                                  {result.abstract}
+                                </p>
+                              )}
+                              {result.subjects && result.subjects.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mb-3">
+                                  {result.subjects.slice(0, 4).map((subject, idx) => (
+                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                      {subject}
+                                    </Badge>
+                                  ))}
+                                  {result.subjects.length > 4 && (
+                                    <Badge variant="outline" className="text-xs">
+                                      +{result.subjects.length - 4} more
+                                    </Badge>
                                   )}
+                                </div>
+                              )}
+                            </CardContent>
+                            <CardFooter className="pt-3 border-t flex justify-between">
+                              <div className="text-sm text-muted-foreground">
+                                {result.doi && (
+                                  <span className="flex items-center gap-1">
+                                    <Link className="h-3 w-3" />
+                                    DOI: {result.doi}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleCopyCitation(result)}
+                                >
+                                  <FileText className="h-4 w-4 mr-1" />
+                                  Cite
+                                </Button>
+                                {result.pdfUrl && (
                                   <Button
                                     size="sm"
-                                    variant="outline"
-                                    onClick={() => handleViewDetails(result)}
+                                    variant="default"
+                                    onClick={() => handleDownload(result)}
                                   >
-                                    <ExternalLink className="h-4 w-4 mr-1" />
-                                    View
+                                    <Download className="h-4 w-4 mr-1" />
+                                    PDF
                                   </Button>
-                                </div>
-                              </CardFooter>
-                            </Card>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </AnimatePresence>
+                                )}
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleViewDetails(result)}
+                                >
+                                  <ExternalLink className="h-4 w-4 mr-1" />
+                                  View
+                                </Button>
+                              </div>
+                            </CardFooter>
+                          </Card>
+                        </div>
+                      ))}
+                    </div>
                   </ScrollArea>
 
                   {/* Pagination */}
                   {searchData.pagination.totalPages > 1 && (
                     <div className="flex items-center justify-between pt-4 mt-4 border-t">
                       <div className="text-sm text-muted-foreground">
-                        Page {page} of {searchData.pagination.totalPages} • 
+                        Page {page} of {searchData.pagination.totalPages} •
                         Showing {searchData.data.length} of {searchData.pagination.total.toLocaleString()} results
                       </div>
                       <div className="flex gap-2">

@@ -130,7 +130,7 @@ body {
 
 .animate-gradient {
   background-size: 400%;
-  animation: gradient 8s ease infinite;
+  animation: gradient 1s ease infinite;
 }
 
 @keyframes gradient {

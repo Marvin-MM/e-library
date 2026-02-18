@@ -70,7 +70,7 @@ export function useCreateResource() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: CreateResourceData) => {
+    mutationFn: async (data: FormData) => {
       const response = await resourcesApi.create(data);
       if (!response.success) {
         throw new Error(response.message || "Failed to create resource");

@@ -46,7 +46,7 @@ export class AuthController {
   async logout(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const accessToken = req.headers.authorization?.split(' ')[1] || '';
-      const { refreshToken } = req.body;
+      const { refreshToken } = req.body || {};
       await authService.logout(req.user!.userId, accessToken, refreshToken);
       res.json({
         success: true,
@@ -99,6 +99,19 @@ export class AuthController {
       const user = await authService.getProfile(req.user!.userId);
       res.json({
         success: true,
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateProfile(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = await authService.updateProfile(req.user!.userId, req.body);
+      res.json({
+        success: true,
+        message: 'Profile updated successfully',
         data: user,
       });
     } catch (error) {

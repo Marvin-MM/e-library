@@ -103,7 +103,7 @@ export const resourceTypeOptions = [
 ] as const;
 
 export const resourceCategoryEnum = z.enum(['BOOK', 'JOURNAL', 'PAPER', 'MAGAZINE', 'THESIS', 'OTHER']);
-export const accessTypeEnum = z.enum(['VIEW_ONLY', 'DOWNLOADABLE']);
+export const accessTypeEnum = z.enum(['VIEW_ONLY', 'DOWNLOADABLE', 'CAMPUS_ONLY']);
 
 export const categoryOptions = [
   { value: "BOOK", label: "Book" },
@@ -132,17 +132,53 @@ export const createResourceSchema = z.object({
     .min(1800)
     .max(new Date().getFullYear() + 1)
     .optional(),
-  accessType: accessTypeEnum.default('DOWNLOADABLE'),
-  tags: z.array(z.string()).default([]),
-  courseIds: z.array(z.string()).default([]),
-  file: z
-    .custom<File>()
-    .refine((file) => file instanceof File, "Please select a file")
-    .refine((file) => file.size <= MAX_FILE_SIZE, "File size must be less than 50MB")
-    .refine(
-      (file) => ACCEPTED_FILE_TYPES.includes(file.type),
-      "File type not supported. Only PDF, EPUB, DOC, DOCX, PPT, and PPTX files are allowed."
-    ),
+  accessType: accessTypeEnum,
+  tags: z.array(z.string()),
+  courseIds: z.array(z.string()),
+
+  // Physical location fields (required for CAMPUS_ONLY)
+  physicalLocation: z.string().max(200).optional(),
+  shelfNumber: z.string().max(50).optional(),
+  availabilityNotes: z.string().max(500).optional(),
+  copies: z.coerce.number().int().min(0).optional(),
+  isbn: z.string().max(20).optional(),
+  issn: z.string().max(20).optional(),
+
+  file: z.custom<File>().optional(),
+}).superRefine((data, ctx) => {
+  // Validate File
+  if (data.accessType !== 'CAMPUS_ONLY') {
+    if (!data.file || !(data.file instanceof File)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please select a file",
+        path: ["file"],
+      });
+    } else if (data.file.size > MAX_FILE_SIZE) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "File size must be less than 50MB",
+        path: ["file"],
+      });
+    } else if (!ACCEPTED_FILE_TYPES.includes(data.file.type)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "File type not supported. Only PDF, EPUB, DOC, DOCX, PPT, and PPTX files are allowed.",
+        path: ["file"],
+      });
+    }
+  }
+
+  // Validate Physical Location
+  if (data.accessType === 'CAMPUS_ONLY') {
+    if (!data.physicalLocation || data.physicalLocation.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Physical location is required for Campus Only resources",
+        path: ["physicalLocation"],
+      });
+    }
+  }
 });
 
 export type CreateResourceFormData = z.infer<typeof createResourceSchema>;

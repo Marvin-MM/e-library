@@ -8,21 +8,18 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['res.cloudinary.com', 'd89563aefaa5.ngrok-free.app'],
-  },
-  async headers() {
-    return [
+    remotePatterns: [
       {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate',
-          },
-        ],
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
       },
-    ];
+      {
+        protocol: 'https',
+        hostname: 'd89563aefaa5.ngrok-free.app',
+      },
+    ],
   },
+
 };
 
 module.exports = nextConfig;

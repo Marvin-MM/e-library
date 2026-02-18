@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { motion } from "framer-motion";
+
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
@@ -13,12 +13,12 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
     <div className="min-h-screen flex">
       <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary/90 to-primary items-center justify-center p-12"
-           style={{
-             backgroundImage: 'url("https://s3.us-east-1.amazonaws.com/victoria-university-elearning/website/images/gallery/9c0cab63-6a96-427c-bfd1-b0d81cea9f47.jpg")',
-             backgroundSize: 'cover',
-             backgroundPosition: 'center',
-             backgroundRepeat: 'no-repeat'
-           }}>
+        style={{
+          backgroundImage: 'url("https://s3.us-east-1.amazonaws.com/victoria-university-elearning/website/images/gallery/9c0cab63-6a96-427c-bfd1-b0d81cea9f47.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}>
         <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary"></div>
         <div className="relative max-w-md text-white space-y-6 z-10">
           <div className="flex items-center gap-3">
@@ -54,10 +54,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
         </div>
       </div>
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+        <div
           className="w-full max-w-md space-y-8"
         >
           <div className="lg:hidden flex items-center justify-center">
@@ -68,7 +65,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
             {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
           </div>
           {children}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

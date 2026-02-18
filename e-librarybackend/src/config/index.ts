@@ -28,12 +28,24 @@ export const config = {
     apiSecret: process.env.CLOUDINARY_API_SECRET || '',
   },
 
+  s3: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+    region: process.env.AWS_REGION || 'us-east-1',
+    bucket: process.env.AWS_S3_BUCKET || 'e-library-resources',
+  },
+
   email: {
+    provider: (process.env.EMAIL_PROVIDER || 'nodemailer') as 'nodemailer' | 'resend',
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587', 10),
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
     from: process.env.EMAIL_FROM || 'Victoria University E-Library <noreply@vu.edu>',
+  },
+
+  resend: {
+    apiKey: process.env.RESEND_API_KEY || '',
   },
 
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -49,3 +61,4 @@ export const config = {
 } as const;
 
 export type Config = typeof config;
+

@@ -38,7 +38,7 @@ export class RequestController {
       const result = isAdmin
         ? await requestService.findAll(validatedQuery as any, undefined, true)
         : await requestService.findUserRequests(req.user!.userId, validatedQuery as any);
-      
+
       res.json({
         success: true,
         data: result.data,
@@ -99,6 +99,30 @@ export class RequestController {
       next(error);
     }
   }
+
+  async respond(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const request = await requestService.respondToRequest(
+        req.params.id,
+        {
+          status: req.body.status,
+          adminReply: req.body.adminReply,
+          accessInstructions: req.body.accessInstructions,
+          externalSourceUrl: req.body.externalSourceUrl,
+          fulfilledResourceId: req.body.fulfilledResourceId,
+        },
+        req.user!.userId
+      );
+      res.json({
+        success: true,
+        message: 'Request responded to successfully',
+        data: request,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const requestController = new RequestController();
+

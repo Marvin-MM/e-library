@@ -79,6 +79,87 @@ export class AdminController {
       next(error);
     }
   }
+
+  async suspendUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { reason } = req.body;
+      const user = await adminService.suspendUser(req.params.id, reason, req.user!.userId);
+      res.json({
+        success: true,
+        message: 'User suspended successfully',
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async unsuspendUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = await adminService.unsuspendUser(req.params.id, req.user!.userId);
+      res.json({
+        success: true,
+        message: 'User unsuspended successfully',
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getSuspendedUsers(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const users = await adminService.getSuspendedUsers();
+      res.json({
+        success: true,
+        data: users,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async bulkUpdateRoles(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userIds, role } = req.body;
+      const result = await adminService.bulkUpdateRoles(userIds, role, req.user!.userId);
+      res.json({
+        success: true,
+        message: `${result.updated} users updated`,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async bulkDeleteUsers(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userIds } = req.body;
+      const result = await adminService.bulkDeleteUsers(userIds, req.user!.userId);
+      res.json({
+        success: true,
+        message: `${result.deleted} users deleted`,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async exportUsers(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const validatedQuery = (req as any).validated?.query ?? req.query;
+      const result = await adminService.exportUsers(validatedQuery as any);
+      res.json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const adminController = new AdminController();
+

@@ -237,12 +237,24 @@ export const useAuthStore = create<AuthState>()(
       isLoading: true,
       isHydrated: false,
 
-      setUser: (user) =>
+      setUser: (user) => {
+        if (user?.role) {
+          Cookies.set("user_role", user.role, {
+            expires: 7,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
+          });
+        } else if (user === null) {
+          Cookies.remove("user_role", { path: "/" });
+        }
+
         set({
           user,
           isAuthenticated: !!user,
           isLoading: false,
-        }),
+        });
+      },
 
       setAccessToken: (token) =>
         set({
@@ -260,8 +272,13 @@ export const useAuthStore = create<AuthState>()(
           expires: 7, // 7 days
           secure: process.env.NODE_ENV === "production",
           sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax", // lax for localhost
-          path: "/",
         });
+
+        // Set role cookie for middleware
+        if (accessToken) {
+          // We can't easily decode JWT here without a library, but usually we have element 'user' in the store method args?
+          // Wait, setTokens doesn't take 'user'. Let's look at setUser.
+        }
 
         // Verify cookie was set
         const storedToken = Cookies.get("refreshToken");

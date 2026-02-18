@@ -5,10 +5,18 @@ import { BadRequestError, UnauthorizedError, NotFoundError, ConflictError } from
 import { logger } from '../../shared/utils/logger.js';
 import { emailQueue } from '../queue/email.queue.js';
 import { RoleType } from '../../shared/types/index.js';
-import type { SignupInput, LoginInput, ForgotPasswordInput, ResetPasswordInput } from './auth.validators.js';
+import { validatePassword, checkPasswordStrength } from '../../shared/utils/passwordStrength.js';
+import { checkAccountLockout, recordFailedLogin, recordSuccessfulLogin } from '../../shared/utils/accountLockout.js';
+import type { SignupInput, LoginInput, ForgotPasswordInput, ResetPasswordInput, UpdateProfileInput } from './auth.validators.js';
 
 export class AuthService {
   async signup(data: SignupInput) {
+    // Validate password strength
+    const passwordValidation = validatePassword(data.password);
+    if (!passwordValidation.valid) {
+      throw new BadRequestError(passwordValidation.message || 'Password does not meet requirements');
+    }
+
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email.toLowerCase() },
     });
@@ -49,26 +57,52 @@ export class AuthService {
     return user;
   }
 
-  async login(data: LoginInput) {
+  async login(data: LoginInput, ipAddress?: string, userAgent?: string) {
+    // Check account lockout first
+    const lockoutStatus = await checkAccountLockout(data.email.toLowerCase());
+    if (!lockoutStatus.allowed) {
+      throw new UnauthorizedError(lockoutStatus.message || 'Account is locked');
+    }
+
     const user = await prisma.user.findUnique({
       where: { email: data.email.toLowerCase() },
     });
 
     if (!user) {
+      // Record failed attempt even for non-existent users (prevent enumeration)
+      await recordFailedLogin(data.email.toLowerCase(), ipAddress, userAgent);
       logger.warn('Login attempt with non-existent email', { email: data.email });
       throw new UnauthorizedError('Invalid email or password');
+    }
+
+    // Check if user is suspended
+    if (user.suspendedAt) {
+      throw new UnauthorizedError(`Account is suspended: ${user.suspendedReason || 'Contact administrator'}`);
     }
 
     const isPasswordValid = await comparePassword(data.password, user.hashedPassword);
 
     if (!isPasswordValid) {
-      logger.warn('Login attempt with invalid password', { userId: user.id });
-      throw new UnauthorizedError('Invalid email or password');
+      const result = await recordFailedLogin(data.email.toLowerCase(), ipAddress, userAgent);
+      logger.warn('Login attempt with invalid password', { userId: user.id, remainingAttempts: result.remainingAttempts });
+
+      if (!result.allowed) {
+        throw new UnauthorizedError(result.message || 'Account locked due to too many failed attempts');
+      }
+
+      throw new UnauthorizedError(
+        result.remainingAttempts !== undefined && result.remainingAttempts <= 2
+          ? `Invalid email or password. ${result.remainingAttempts} attempts remaining.`
+          : 'Invalid email or password'
+      );
     }
 
     if (!user.emailVerified) {
       throw new UnauthorizedError('Please verify your email before logging in');
     }
+
+    // Record successful login and reset failed attempts
+    await recordSuccessfulLogin(user.id, ipAddress, userAgent);
 
     const tokens = generateTokenPair(user.id, user.email, user.role as RoleType);
 
@@ -152,7 +186,7 @@ export class AuthService {
 
   async logout(userId: string, accessToken: string, refreshToken?: string) {
     const expiration = getTokenExpiration(accessToken);
-    
+
     await prisma.$transaction(async (tx) => {
       if (expiration) {
         await tx.blacklistedToken.create({
@@ -285,6 +319,36 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async updateProfile(userId: string, data: UpdateProfileInput) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: data.name,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        emailVerified: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    logger.info('Profile updated', { userId });
+
+    return updatedUser;
   }
 
   async changePassword(userId: string, currentPassword: string, newPassword: string) {

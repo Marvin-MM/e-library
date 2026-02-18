@@ -334,6 +334,267 @@ export class AdminService {
 
     return { message: 'User deleted successfully' };
   }
+
+  /**
+   * Suspend a user account
+   */
+  async suspendUser(id: string, reason: string, adminId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    if (user.id === adminId) {
+      throw new BadRequestError('Cannot suspend your own account');
+    }
+
+    if (user.role === 'ADMIN') {
+      throw new BadRequestError('Cannot suspend admin accounts');
+    }
+
+    if (user.suspendedAt) {
+      throw new BadRequestError('User is already suspended');
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const updatedUser = await tx.user.update({
+        where: { id },
+        data: {
+          suspendedAt: new Date(),
+          suspendedReason: reason,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          suspendedAt: true,
+          suspendedReason: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          entity: 'User',
+          entityId: id,
+          action: 'SUSPEND',
+          performedById: adminId,
+          meta: { reason },
+        },
+      });
+
+      return updatedUser;
+    });
+
+    logger.info('User suspended', { userId: id, adminId, reason });
+
+    return updated;
+  }
+
+  /**
+   * Unsuspend a user account
+   */
+  async unsuspendUser(id: string, adminId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    if (!user.suspendedAt) {
+      throw new BadRequestError('User is not suspended');
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const updatedUser = await tx.user.update({
+        where: { id },
+        data: {
+          suspendedAt: null,
+          suspendedReason: null,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          suspendedAt: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          entity: 'User',
+          entityId: id,
+          action: 'UNSUSPEND',
+          performedById: adminId,
+          meta: { previousReason: user.suspendedReason },
+        },
+      });
+
+      return updatedUser;
+    });
+
+    logger.info('User unsuspended', { userId: id, adminId });
+
+    return updated;
+  }
+
+  /**
+   * Bulk update user roles
+   */
+  async bulkUpdateRoles(userIds: string[], newRole: string, adminId: string) {
+    if (!userIds.length) {
+      throw new BadRequestError('No users specified');
+    }
+
+    // Filter out admin's own ID
+    const filteredIds = userIds.filter(id => id !== adminId);
+
+    if (filteredIds.length === 0) {
+      throw new BadRequestError('Cannot change your own role');
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const updated = await tx.user.updateMany({
+        where: {
+          id: { in: filteredIds },
+          role: { not: 'ADMIN' }, // Don't change other admins
+        },
+        data: { role: newRole as any },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          entity: 'User',
+          entityId: null,
+          action: 'BULK_UPDATE_ROLE',
+          performedById: adminId,
+          meta: { userIds: filteredIds, newRole, count: updated.count },
+        },
+      });
+
+      return updated;
+    });
+
+    logger.info('Bulk role update', { adminId, count: result.count, newRole });
+
+    return { updated: result.count };
+  }
+
+  /**
+   * Bulk delete users (non-admin only)
+   */
+  async bulkDeleteUsers(userIds: string[], adminId: string) {
+    if (!userIds.length) {
+      throw new BadRequestError('No users specified');
+    }
+
+    // Filter out admin's own ID and other admins
+    const users = await prisma.user.findMany({
+      where: {
+        id: { in: userIds },
+        role: { not: 'ADMIN' },
+      },
+      select: { id: true },
+    });
+
+    const idsToDelete = users.map(u => u.id).filter(id => id !== adminId);
+
+    if (idsToDelete.length === 0) {
+      throw new BadRequestError('No eligible users to delete');
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const deleted = await tx.user.deleteMany({
+        where: { id: { in: idsToDelete } },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          entity: 'User',
+          entityId: null,
+          action: 'BULK_DELETE',
+          performedById: adminId,
+          meta: { userIds: idsToDelete, count: deleted.count },
+        },
+      });
+
+      return deleted;
+    });
+
+    logger.info('Bulk user delete', { adminId, count: result.count });
+
+    return { deleted: result.count };
+  }
+
+  /**
+   * Export users data as JSON
+   */
+  async exportUsers(query: UserQueryInput) {
+    const where: Record<string, unknown> = {};
+
+    if (query.role) where.role = query.role;
+    if (query.search) {
+      where.OR = [
+        { name: { contains: query.search, mode: 'insensitive' } },
+        { email: { contains: query.search, mode: 'insensitive' } },
+      ];
+    }
+
+    const users = await prisma.user.findMany({
+      where: where as any,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        emailVerified: true,
+        suspendedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            uploadedResources: true,
+            downloadLogs: true,
+            requests: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return {
+      exportedAt: new Date().toISOString(),
+      totalRecords: users.length,
+      data: users,
+    };
+  }
+
+  /**
+   * Get suspended users
+   */
+  async getSuspendedUsers() {
+    const users = await prisma.user.findMany({
+      where: { suspendedAt: { not: null } },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        suspendedAt: true,
+        suspendedReason: true,
+      },
+      orderBy: { suspendedAt: 'desc' },
+    });
+
+    return users;
+  }
 }
 
 export const adminService = new AdminService();
+

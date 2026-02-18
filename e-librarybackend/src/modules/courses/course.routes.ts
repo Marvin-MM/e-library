@@ -39,7 +39,7 @@ router.get(
 router.post(
   '/',
   authenticate,
-  authorize('STAFF', 'ADMIN'),
+  authorize('ADMIN'),
   validate(createCourseSchema),
   courseController.create.bind(courseController)
 );
@@ -47,7 +47,7 @@ router.post(
 router.put(
   '/:id',
   authenticate,
-  authorize('STAFF', 'ADMIN'),
+  authorize('ADMIN'),
   validate(courseIdSchema, 'params'),
   validate(updateCourseSchema),
   courseController.update.bind(courseController)
@@ -60,5 +60,9 @@ router.delete(
   validate(courseIdSchema, 'params'),
   courseController.delete.bind(courseController)
 );
+
+// Import and mount course unit routes
+// import courseUnitRoutes from './course-unit.routes.js';
+// router.use('/', courseUnitRoutes);
 
 export default router;
