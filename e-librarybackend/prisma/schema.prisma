@@ -55,6 +55,7 @@ enum RequestCategory {
   THESIS
   EQUIPMENT
   OTHER
+  PHYSICAL_BOOK
 }
 
 enum ApprovalStatus {
@@ -111,6 +112,8 @@ model User {
   auditLogs         AuditLog[]     @relation("PerformedBy")
   notifications     Notification[]
   favorites         Favorite[]
+  borrowRecords     BorrowRecord[] @relation("UserBorrows")
+  processedReturns  BorrowRecord[] @relation("ProcessedReturns")
 
   @@index([email])
   @@index([role])
@@ -387,4 +390,86 @@ model LoginAttempt {
   @@index([email])
   @@index([createdAt])
   @@index([success])
+}
+
+// ─────────────────────────────────────────────
+// Physical Catalog & Borrowing
+// ─────────────────────────────────────────────
+
+enum BorrowStatus {
+  ACTIVE
+  RETURNED
+  OVERDUE
+}
+
+/// Physical book in the library catalog (not a digital resource)
+model Book {
+  id          String   @id @default(uuid())
+  title       String
+  author      String
+  description String?
+  isbn        String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  inventory     Inventory[]
+  borrowRecords BorrowRecord[]
+
+  @@index([title])
+  @@index([author])
+}
+
+/// A physical library branch / campus location
+model Campus {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  inventory     Inventory[]
+  borrowRecords BorrowRecord[]
+}
+
+/// Per-campus stock level for a physical book
+model Inventory {
+  id              String   @id @default(uuid())
+  bookId          String
+  campusId        String
+  totalCopies     Int      @default(0)
+  availableCopies Int      @default(0)
+  shelfLocation   String?
+  updatedAt       DateTime @updatedAt
+
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  campus Campus @relation(fields: [campusId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, campusId])
+  @@index([bookId])
+  @@index([campusId])
+  @@index([availableCopies])
+}
+
+/// Borrow record tracks each borrowing lifecycle
+model BorrowRecord {
+  id           String       @id @default(uuid())
+  userId       String
+  bookId       String
+  campusId     String
+  status       BorrowStatus @default(ACTIVE)
+  borrowedAt   DateTime     @default(now())
+  dueDate      DateTime
+  returnedAt   DateTime?
+  returnedById String?
+
+  user       User   @relation("UserBorrows", fields: [userId], references: [id], onDelete: Cascade)
+  book       Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  campus     Campus @relation(fields: [campusId], references: [id], onDelete: Cascade)
+  returnedBy User?  @relation("ProcessedReturns", fields: [returnedById], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([campusId])
 }

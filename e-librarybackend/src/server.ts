@@ -5,6 +5,7 @@ import { getRedisClient, closeRedisConnection } from './config/redis.js';
 import prisma from './config/database.js';
 import { startEmailWorker, stopEmailWorker } from './modules/queue/email.queue.js';
 import { startAnalyticsWorker, stopAnalyticsWorker } from './modules/queue/analytics.queue.js';
+import { startCatalogWorker, stopCatalogWorker, scheduleCatalogJobs } from './modules/queue/catalog.queue.js';
 
 const startServer = async () => {
   try {
@@ -20,6 +21,8 @@ const startServer = async () => {
     try {
       startEmailWorker();
       startAnalyticsWorker();
+      startCatalogWorker();
+      await scheduleCatalogJobs.scheduleOverdueCheck();
       logger.info('Background workers initialized');
     } catch (error) {
       logger.warn('Failed to start background workers', { error });
@@ -43,6 +46,7 @@ const startServer = async () => {
         try {
           await stopEmailWorker();
           await stopAnalyticsWorker();
+          await stopCatalogWorker();
           logger.info('Background workers stopped');
         } catch (error) {
           logger.error('Error stopping workers', { error });

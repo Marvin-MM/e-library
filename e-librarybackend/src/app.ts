@@ -20,6 +20,7 @@ import discoveryRoutes from './modules/discovery/discovery.routes.js';
 import notificationRoutes from './modules/notifications/notifications.routes.js';
 import analyticsRoutes from './modules/analytics/analytics.routes.js';
 import courseUnitRoutes from './modules/courses/course-unit.routes.js';
+import catalogRoutes from './modules/catalog/catalog.routes.js';
 
 const app: Application = express();
 
@@ -100,6 +101,7 @@ app.get('/', (_req, res) => {
       notifications: `/api/${config.apiVersion}/notifications`,
       discovery: `/api/${config.apiVersion}/discovery`,
       analytics: `/api/${config.apiVersion}/analytics`,
+      catalog: `/api/${config.apiVersion}/catalog`,
     },
     healthChecks: {
       comprehensive: '/health',
@@ -121,6 +123,7 @@ apiRouter.use('/discovery', discoveryRoutes);
 apiRouter.use('/notifications', notificationRoutes);
 apiRouter.use('/analytics', analyticsRoutes);
 apiRouter.use('/units', courseUnitRoutes);
+apiRouter.use('/catalog', catalogRoutes);
 
 app.use(`/api/${config.apiVersion}`, apiRouter);
 
