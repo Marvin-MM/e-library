@@ -5,7 +5,8 @@ import { AuthenticatedRequest } from '../../shared/types/index.js';
 export class AuthController {
   async signup(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const user = await authService.signup(req.body);
+      const body = (req as any).validated?.body ?? req.body;
+      const user = await authService.signup(body);
       res.status(201).json({
         success: true,
         message: 'Registration successful. Please check your email to verify your account.',
@@ -18,7 +19,8 @@ export class AuthController {
 
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const result = await authService.login(req.body);
+      const body = (req as any).validated?.body ?? req.body;
+      const result = await authService.login(body, req.ip, req.headers['user-agent']);
       res.json({
         success: true,
         message: 'Login successful',
@@ -31,7 +33,8 @@ export class AuthController {
 
   async refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { refreshToken } = req.body;
+      const body = (req as any).validated?.body ?? req.body;
+      const { refreshToken } = body;
       const result = await authService.refreshTokens(refreshToken);
       res.json({
         success: true,
@@ -59,7 +62,8 @@ export class AuthController {
 
   async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { token } = req.body;
+      const body = (req as any).validated?.body ?? req.body;
+      const { token } = body;
       const result = await authService.verifyEmail(token);
       res.json({
         success: true,
@@ -72,7 +76,8 @@ export class AuthController {
 
   async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const result = await authService.forgotPassword(req.body);
+      const body = (req as any).validated?.body ?? req.body;
+      const result = await authService.forgotPassword(body);
       res.json({
         success: true,
         message: result.message,
@@ -84,7 +89,8 @@ export class AuthController {
 
   async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const result = await authService.resetPassword(req.body);
+      const body = (req as any).validated?.body ?? req.body;
+      const result = await authService.resetPassword(body);
       res.json({
         success: true,
         message: result.message,
@@ -108,7 +114,8 @@ export class AuthController {
 
   async updateProfile(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const user = await authService.updateProfile(req.user!.userId, req.body);
+      const body = (req as any).validated?.body ?? req.body;
+      const user = await authService.updateProfile(req.user!.userId, body);
       res.json({
         success: true,
         message: 'Profile updated successfully',
@@ -121,7 +128,8 @@ export class AuthController {
 
   async changePassword(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { currentPassword, newPassword } = req.body;
+      const body = (req as any).validated?.body ?? req.body;
+      const { currentPassword, newPassword } = body;
       const result = await authService.changePassword(req.user!.userId, currentPassword, newPassword);
       res.json({
         success: true,
@@ -134,7 +142,8 @@ export class AuthController {
 
   async resendVerification(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { email } = req.body;
+      const body = (req as any).validated?.body ?? req.body;
+      const { email } = body;
       const result = await authService.resendVerificationEmail(email);
       res.json({
         success: true,

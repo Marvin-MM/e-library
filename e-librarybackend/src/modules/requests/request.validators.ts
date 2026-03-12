@@ -13,6 +13,14 @@ export const updateRequestSchema = z.object({
   adminReply: z.string().max(2000).optional(),
 });
 
+export const respondRequestSchema = z.object({
+  status: z.enum(['RESOLVED', 'REJECTED']),
+  adminReply: z.string().min(1, 'Admin reply is required').max(2000),
+  accessInstructions: z.string().max(2000).optional(),
+  externalSourceUrl: z.string().url('Must be a valid URL').optional(),
+  fulfilledResourceId: z.string().uuid().optional(),
+});
+
 export const requestQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
@@ -29,3 +37,4 @@ export const requestIdSchema = z.object({
 export type CreateRequestInput = z.infer<typeof createRequestSchema>;
 export type UpdateRequestInput = z.infer<typeof updateRequestSchema>;
 export type RequestQueryInput = z.infer<typeof requestQuerySchema>;
+export type RespondRequestInput = z.infer<typeof respondRequestSchema>;

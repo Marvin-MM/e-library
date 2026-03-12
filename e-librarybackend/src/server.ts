@@ -1,10 +1,10 @@
 import app from './app.js';
 import { config } from './config/index.js';
 import { logger } from './shared/utils/logger.js';
-import { getRedisClient, closeRedisConnection } from './config/redis.js';
+import { getRedisClient, closeRedisConnection, waitForRedis } from './config/redis.js';
 import prisma from './config/database.js';
 import { startEmailWorker, stopEmailWorker } from './modules/queue/email.queue.js';
-import { startAnalyticsWorker, stopAnalyticsWorker } from './modules/queue/analytics.queue.js';
+import { startAnalyticsWorker, stopAnalyticsWorker, scheduleAnalytics } from './modules/queue/analytics.queue.js';
 import { startCatalogWorker, stopCatalogWorker, scheduleCatalogJobs } from './modules/queue/catalog.queue.js';
 
 const startServer = async () => {
@@ -13,6 +13,7 @@ const startServer = async () => {
 
     try {
       getRedisClient();
+      await waitForRedis();
       logger.info('Redis client initialized');
     } catch (error) {
       logger.warn('Redis connection failed, running without Redis features', { error });
@@ -23,6 +24,8 @@ const startServer = async () => {
       startAnalyticsWorker();
       startCatalogWorker();
       await scheduleCatalogJobs.scheduleOverdueCheck();
+      await scheduleAnalytics.scheduleDailyAggregation();
+      await scheduleAnalytics.scheduleTokenCleanup();
       logger.info('Background workers initialized');
     } catch (error) {
       logger.warn('Failed to start background workers', { error });

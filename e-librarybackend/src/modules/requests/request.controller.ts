@@ -102,15 +102,10 @@ export class RequestController {
 
   async respond(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
+      const validatedBody = (req as any).validated?.body ?? req.body;
       const request = await requestService.respondToRequest(
         req.params.id,
-        {
-          status: req.body.status,
-          adminReply: req.body.adminReply,
-          accessInstructions: req.body.accessInstructions,
-          externalSourceUrl: req.body.externalSourceUrl,
-          fulfilledResourceId: req.body.fulfilledResourceId,
-        },
+        validatedBody,
         req.user!.userId
       );
       res.json({

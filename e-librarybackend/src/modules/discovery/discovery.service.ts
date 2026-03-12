@@ -3,7 +3,8 @@ import { OATDClient } from './sources/oatd.client.js';
 import { AGRISClient } from './sources/agris.client.js';
 import { NotFoundError } from '../../shared/errors/AppError.js';
 import type { DiscoverySearchQuery, DiscoveryResult } from './types.js';
-import { prisma } from '../../config/database.js';
+import { logger } from '../../shared/utils/logger.js';
+import { getRedisClient, isRedisConnected } from '../../config/redis.js';
 import { COREClient } from './sources/core.client.js';
 import { OpenAlexClient } from './sources/openalex.client.js';
 import { DOAJClient } from './sources/doaj.client.js';
@@ -11,14 +12,15 @@ import { ERICClient } from './sources/eric.client.js';
 import { DOABClient } from './sources/doab.client.js';
 import { GoogleScholarClient } from './sources/google-scholar.client.js';
 
+const CACHE_TTL = 600; // 10 minutes — external API results change slowly
+
 const clients = {
   openalex: new OpenAlexClient(),
   core: new COREClient(),
-  doaj: new DOAJClient(),      // Added
-  eric: new ERICClient(),      // Added
-  doab: new DOABClient(),      // Added
+  doaj: new DOAJClient(),
+  eric: new ERICClient(),
+  doab: new DOABClient(),
   googleScholar: new GoogleScholarClient(), // Requires SERPAPI_KEY
-  // Note: OATD and AGRIS are commented out but can be re-added
   // oatd: new OATDClient(),
   // agris: new AGRISClient(),
 } as const;
@@ -33,74 +35,33 @@ export class DiscoveryService {
       const result = await clients[source].search(query);
       return result;
     } catch (error) {
-      console.error(`Search failed for ${source}:`, error);
+      logger.warn(`Discovery search failed for source: ${source}`, { error });
       return { results: [], total: 0 };
     }
   }
-
-  //   async search(query: DiscoverySearchQuery) {
-  //     const { q, source, page = 1, limit = 20 } = query;
-
-  //     if (!q || q.trim().length < 2) {
-  //       throw new Error('Search query must be at least 2 characters');
-  //     }
-
-  //     const sourcesToSearch = source
-  //       ? Array.isArray(source)
-  //         ? source
-  //         : [source]
-  //       : (Object.keys(clients) as (keyof typeof clients)[]);
-
-  //     const searches = sourcesToSearch.map((src) => this.searchSource(src, { ...query, page, limit }));
-
-  //     const results = await Promise.allSettled(searches);
-
-  //     let allResults: DiscoveryResult[] = [];
-  //     let total = 0;
-
-  //     results.forEach((res, idx) => {
-  //       if (res.status === 'fulfilled') {
-  //         allResults.push(...res.value.results);
-  //         total += res.value.total;
-  //       }
-  //     });
-
-  //     // Sort by relevance (simple: title match first)
-  //     allResults.sort((a, b) => {
-  //       const aMatch = a.title.toLowerCase().includes(q.toLowerCase()) ? -1 : 0;
-  //       const bMatch = b.title.toLowerCase().includes(q.toLowerCase()) ? -1 : 0;
-  //       return aMatch - bMatch || a.title.localeCompare(b.title);
-  //     });
-
-  //     const paginated = allResults.slice((page - 1) * limit, page * limit);
-
-  //     return {
-  //       data: paginated,
-  //       pagination: {
-  //         total,
-  //         page,
-  //         limit,
-  //         totalPages: Math.ceil(allResults.length / limit),
-  //         sources: sourcesToSearch,
-  //       },
-  //     };
-  //   }
 
   // Update the search method in discovery.service.ts
   async search(query: DiscoverySearchQuery) {
     const { q, source, page = 1, limit = 20 } = query;
 
-    if (!q || q.trim().length < 2) {
-      throw new Error('Search query must be at least 2 characters');
+    // Build a cache key that captures the complete query shape
+    const cacheKey = `discovery:search:${JSON.stringify({ q, source, page, limit })}`;
+
+    if (isRedisConnected()) {
+      const cached = await getRedisClient().get(cacheKey);
+      if (cached) {
+        logger.debug('Discovery cache hit', { cacheKey });
+        return JSON.parse(cached);
+      }
     }
 
     const sourcesToSearch = source
       ? Array.isArray(source)
-        ? source
-        : [source]
+        ? (source as (keyof typeof clients)[])
+        : [source as keyof typeof clients]
       : (Object.keys(clients) as (keyof typeof clients)[]);
 
-    console.log(`Searching sources: ${sourcesToSearch.join(', ')}`);
+    logger.info(`Discovery search across sources: ${sourcesToSearch.join(', ')}`, { q, page, limit });
 
     const searches = sourcesToSearch.map((src) =>
       this.searchSource(src, { ...query, page, limit })
@@ -109,16 +70,14 @@ export class DiscoveryService {
     const results = await Promise.allSettled(searches);
 
     let allResults: DiscoveryResult[] = [];
-    let total = 0;
 
     results.forEach((res, idx) => {
       const sourceName = sourcesToSearch[idx];
       if (res.status === 'fulfilled') {
-        console.log(`${sourceName}: Found ${res.value.results.length} results, total ${res.value.total}`);
+        logger.debug(`Discovery source ${sourceName}: ${res.value.results.length} results`);
         allResults.push(...res.value.results);
-        total += res.value.total;
       } else {
-        console.warn(`${sourceName}: Failed - ${res.reason}`);
+        logger.warn(`Discovery source ${sourceName} failed`, { reason: res.reason });
       }
     });
 
@@ -154,7 +113,7 @@ export class DiscoveryService {
     const endIdx = startIdx + limit;
     const paginated = uniqueResults.slice(startIdx, endIdx);
 
-    return {
+    const response = {
       data: paginated,
       pagination: {
         total: uniqueResults.length,
@@ -164,6 +123,14 @@ export class DiscoveryService {
         sources: sourcesToSearch,
       },
     };
+
+    if (isRedisConnected()) {
+      getRedisClient().setex(cacheKey, CACHE_TTL, JSON.stringify(response)).catch(err =>
+        logger.warn('Failed to cache discovery result', { err })
+      );
+    }
+
+    return response;
   }
 
   private removeDuplicates(results: DiscoveryResult[]): DiscoveryResult[] {

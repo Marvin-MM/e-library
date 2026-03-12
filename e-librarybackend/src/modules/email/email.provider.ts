@@ -37,6 +37,7 @@ const providers: Record<EmailProviderType, EmailProvider> = {
 };
 
 let currentProvider: EmailProviderType = config.email.provider as EmailProviderType || 'nodemailer';
+let isFallbackEnabled: boolean = true;
 
 /**
  * Get the current email provider type
@@ -52,6 +53,14 @@ export const setEmailProvider = (provider: EmailProviderType): void => {
     }
     currentProvider = provider;
     logger.info('Email provider changed', { provider });
+};
+
+/**
+ * Set the email fallback status
+ */
+export const setFallbackEnabled = (enabled: boolean): void => {
+    isFallbackEnabled = enabled;
+    logger.info('Email fallback configuration changed', { enabled });
 };
 
 /**
@@ -71,6 +80,11 @@ export const sendEmailWithProvider = async (options: EmailOptions): Promise<bool
         return await provider.send(options);
     } catch (error) {
         logger.error(`Email send failed with ${currentProvider}`, { error });
+
+        if (!isFallbackEnabled) {
+            logger.warn('Email fallback is disabled. Throwing error...', { currentProvider });
+            throw new Error(`Email provider ${currentProvider} failed and fallback is disabled.`);
+        }
 
         // Try fallback to the other provider
         const fallbackProviderName: EmailProviderType = currentProvider === 'nodemailer' ? 'resend' : 'nodemailer';

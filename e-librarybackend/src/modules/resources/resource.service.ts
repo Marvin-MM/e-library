@@ -1,4 +1,5 @@
 import prisma from '../../config/database.js';
+import sharp from 'sharp';
 import { uploadBuffer, generateDownloadUrl as generateCloudinaryDownloadUrl, deleteFile, UploadResult } from '../../config/cloudinary.js';
 import { uploadToS3, generateS3DownloadUrl, deleteFromS3, isS3Configured, S3UploadResult } from '../../config/s3.js';
 import { NotFoundError, ForbiddenError, BadRequestError } from '../../shared/errors/AppError.js';
@@ -10,7 +11,7 @@ const CACHE_TTL = 300;
 
 type AccessTypeValue = 'VIEW_ONLY' | 'DOWNLOADABLE' | 'CAMPUS_ONLY';
 type ResourceCategoryValue = 'BOOK' | 'JOURNAL' | 'PAPER' | 'MAGAZINE' | 'THESIS' | 'OTHER';
-type ResourceTypeValue = 'BOOK' | 'JOURNAL' | 'THESIS' | 'MAGAZINE' | 'MODULE_NOTES' | 'PAST_PAPER' | 'LECTURE_SLIDE' | 'LAB_MANUAL' | 'ASSIGNMENT' | 'OTHER';
+type ResourceTypeValue = 'BOOK' | 'JOURNAL' | 'THESIS' | 'DISSERTATION' | 'MAGAZINE' | 'MODULE_NOTES' | 'PAST_PAPER' | 'LECTURE_SLIDE' | 'LAB_MANUAL' | 'ASSIGNMENT' | 'OTHER';
 type ApprovalStatusValue = 'PENDING' | 'APPROVED' | 'REJECTED';
 type CampusLocationValue = 'MAIN_CAMPUS' | 'MARKET_PLAZA' | 'ONLINE';
 type SortByField = 'createdAt' | 'title' | 'downloadCount' | 'viewCount';
@@ -76,6 +77,10 @@ export class ResourceService {
   ) {
     const accessType = (data.accessType || 'DOWNLOADABLE') as AccessTypeValue;
 
+    if (data.resourceType === 'DISSERTATION' && uploaderRole !== 'ADMIN') {
+      throw new ForbiddenError('Only admins can upload dissertations');
+    }
+
     // Validation for CAMPUS_ONLY resources
     if (accessType === 'CAMPUS_ONLY') {
       if (!data.physicalLocation) {
@@ -109,7 +114,11 @@ export class ResourceService {
         logger.info('File uploaded to S3', { key: s3Result.key, size: s3Result.size });
       } else {
         // Upload images and other files to Cloudinary
-        cloudinaryResult = await uploadBuffer(file.buffer, 'e-library/resources', {
+        let uploadBufferData = file.buffer;
+        if (file.mimetype.startsWith('image/')) {
+          uploadBufferData = await sharp(file.buffer).webp({ quality: 80 }).toBuffer();
+        }
+        cloudinaryResult = await uploadBuffer(uploadBufferData, 'e-library/resources', {
           resource_type: 'auto',
           public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, '')}`,
         });
@@ -119,7 +128,8 @@ export class ResourceService {
 
     // Cover images always go to Cloudinary
     if (coverImage) {
-      coverResult = await uploadBuffer(coverImage.buffer, 'e-library/resources/covers', {
+      const coverBufferData = await sharp(coverImage.buffer).webp({ quality: 80 }).toBuffer();
+      coverResult = await uploadBuffer(coverBufferData, 'e-library/resources/covers', {
         resource_type: 'image',
         public_id: `${Date.now()}-cover-${coverImage.originalname.replace(/\.[^/.]+$/, '')}`,
       });

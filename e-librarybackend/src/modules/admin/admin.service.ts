@@ -148,6 +148,7 @@ export class AdminService {
       return updated;
     });
 
+    await this.invalidateCache();
     logger.info('User role updated', { userId: id, adminId, newRole: data.role });
 
     return updatedUser;
@@ -250,6 +251,12 @@ export class AdminService {
     return metrics;
   }
 
+  private async invalidateCache() {
+    if (isRedisConnected()) {
+      await getRedisClient().del('admin:metrics');
+    }
+  }
+
   async getAuditLogs(query: AuditLogQueryInput) {
     const { page, limit, entity, action, performedById, startDate, endDate } = query;
 
@@ -330,6 +337,7 @@ export class AdminService {
       });
     });
 
+    await this.invalidateCache();
     logger.info('User deleted', { userId: id, adminId });
 
     return { message: 'User deleted successfully' };
@@ -481,6 +489,7 @@ export class AdminService {
       return updated;
     });
 
+    await this.invalidateCache();
     logger.info('Bulk role update', { adminId, count: result.count, newRole });
 
     return { updated: result.count };
@@ -527,6 +536,7 @@ export class AdminService {
       return deleted;
     });
 
+    await this.invalidateCache();
     logger.info('Bulk user delete', { adminId, count: result.count });
 
     return { deleted: result.count };
@@ -548,6 +558,7 @@ export class AdminService {
 
     const users = await prisma.user.findMany({
       where: where as any,
+      take: 10000,
       select: {
         id: true,
         email: true,

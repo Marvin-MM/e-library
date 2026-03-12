@@ -2,7 +2,7 @@ import prisma from '../../config/database.js';
 import { NotFoundError, ForbiddenError } from '../../shared/errors/AppError.js';
 import { logger } from '../../shared/utils/logger.js';
 import { emailQueue } from '../queue/email.queue.js';
-import type { CreateRequestInput, UpdateRequestInput, RequestQueryInput } from './request.validators.js';
+import type { CreateRequestInput, UpdateRequestInput, RequestQueryInput, RespondRequestInput } from './request.validators.js';
 
 type RequestStatusType = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'REJECTED';
 type RequestPriorityType = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
@@ -60,8 +60,8 @@ export class RequestService {
       data.priority === 'HIGH' ? '🟠 HIGH' :
         data.priority === 'LOW' ? '🟢 LOW' : '🟡 MEDIUM';
 
-    for (const admin of admins) {
-      await emailQueue.addGenericEmail({
+    Promise.all(admins.map(admin => 
+      emailQueue.addGenericEmail({
         to: admin.email,
         subject: `[${priorityLabel}] New Resource Request: ${request.title}`,
         html: `
@@ -76,8 +76,10 @@ export class RequestService {
           <p><strong>Requested by:</strong> ${request.user.name} (${request.user.email})</p>
           <p>Please review and respond to this request.</p>
         `,
-      });
-    }
+      }).catch(err => {
+        logger.warn('Failed to send admin notification for request', { err, adminEmail: admin.email });
+      })
+    ));
 
     logger.info('Resource request created', { requestId: request.id, userId, priority: data.priority });
 
@@ -106,20 +108,13 @@ export class RequestService {
   }
 
   async findAll(query: RequestQueryInput, userId?: string, isAdmin: boolean = false) {
-    const rawPage = (query as any).page ?? 1;
-    const rawLimit = (query as any).limit ?? 20;
-
-    const page = Number.isFinite(Number(rawPage)) && Number(rawPage) > 0
-      ? Math.floor(Number(rawPage))
-      : 1;
-    const limit = Number.isFinite(Number(rawLimit)) && Number(rawLimit) > 0
-      ? Math.floor(Number(rawLimit))
-      : 20;
+    const page = query.page || 1;
+    const limit = query.limit || 20;
 
     const { status, userId: filterUserId } = query;
 
-    const sortBy = (query as any).sortBy ?? 'createdAt';
-    const sortOrder = (query as any).sortOrder ?? 'desc';
+    const sortBy = query.sortBy ?? 'createdAt';
+    const sortOrder = query.sortOrder ?? 'desc';
 
     const where: Record<string, unknown> = {};
 
@@ -127,9 +122,10 @@ export class RequestService {
     if (isAdmin && filterUserId) where.userId = filterUserId;
     if (!isAdmin && userId) where.userId = userId;
 
-    const orderBy: Record<string, string> = {
-      [sortBy]: sortOrder,
-    };
+    const orderBy = [
+      { [sortBy]: sortOrder },
+      { id: 'asc' }
+    ];
 
     const skip = (page - 1) * limit;
 
@@ -210,12 +206,14 @@ export class RequestService {
     });
 
     if (data.status && data.status !== request.status) {
-      await emailQueue.addRequestStatusEmail({
+      emailQueue.addRequestStatusEmail({
         to: request.user.email,
         name: request.user.name,
         requestTitle: request.title,
         status: data.status,
         adminReply: data.adminReply,
+      }).catch(err => {
+        logger.warn('Failed to send request status email', { err });
       });
     }
 
@@ -229,13 +227,7 @@ export class RequestService {
    */
   async respondToRequest(
     id: string,
-    response: {
-      status: 'RESOLVED' | 'REJECTED';
-      adminReply: string;
-      accessInstructions?: string;
-      externalSourceUrl?: string;
-      fulfilledResourceId?: string;
-    },
+    response: RespondRequestInput,
     adminId: string
   ) {
     const request = await prisma.request.findUnique({
@@ -321,7 +313,7 @@ export class RequestService {
       }
     }
 
-    await emailQueue.addGenericEmail({
+    emailQueue.addGenericEmail({
       to: request.user.email,
       subject: `Request Update: ${request.title} - ${response.status}`,
       html: `
@@ -332,6 +324,8 @@ export class RequestService {
         ${accessSection}
         <p>Thank you for using the E-Library.</p>
       `,
+    }).catch(err => {
+      logger.warn('Failed to send request response email', { err });
     });
 
     logger.info('Request responded to', { requestId: id, adminId, status: response.status });

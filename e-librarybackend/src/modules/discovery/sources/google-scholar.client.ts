@@ -12,6 +12,7 @@
  */
 
 import type { DiscoverySearchQuery, DiscoveryResult } from '../types.js';
+import { logger } from '../../../shared/utils/logger.js';
 
 interface SerpAPIScholarResult {
     title: string;
@@ -53,7 +54,7 @@ export class GoogleScholarClient {
 
     async search(query: DiscoverySearchQuery): Promise<{ results: DiscoveryResult[]; total: number }> {
         if (!this.apiKey) {
-            console.warn('SERPAPI_KEY not configured - Google Scholar search disabled');
+            logger.warn('SERPAPI_KEY not configured - Google Scholar search disabled');
             return { results: [], total: 0 };
         }
 
@@ -78,7 +79,7 @@ export class GoogleScholarClient {
             const data = await response.json() as SerpAPIResponse;
 
             if (data.error) {
-                console.error('SerpAPI error:', data.error);
+                logger.warn('SerpAPI returned error', { error: data.error });
                 return { results: [], total: 0 };
             }
 
@@ -111,7 +112,7 @@ export class GoogleScholarClient {
 
             return { results, total };
         } catch (error) {
-            console.error('Google Scholar search failed:', error);
+            logger.warn('Google Scholar search failed', { error });
             return { results: [], total: 0 };
         }
     }

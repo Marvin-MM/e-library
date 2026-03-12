@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { BaseDiscoverySource } from './base.source.js';
 import type { DiscoveryResult, DiscoverySearchQuery } from '../types.js';
+import { logger } from '../../../shared/utils/logger.js';
 
 export class COREClient extends BaseDiscoverySource {
   name = 'core' as const;
@@ -51,12 +52,12 @@ export class COREClient extends BaseDiscoverySource {
 
       // Handle rate limit or other errors
       if (response.status === 429) {
-        console.warn('CORE API rate limit exceeded');
+        logger.warn('CORE API rate limit exceeded');
         return { results: [], total: 0 };
       }
 
       if (response.status === 403) {
-        console.warn('CORE API access forbidden - check API key');
+        logger.warn('CORE API access forbidden - check API key');
         return { results: [], total: 0 };
       }
 
@@ -88,18 +89,15 @@ export class COREClient extends BaseDiscoverySource {
         total: response.data.totalHits || 0,
       };
     } catch (error: any) {
-      // Don't throw, just return empty results
-      console.error(`CORE API error: ${error.message}`);
+      logger.warn('CORE API error', { message: error.message });
       if (error.response?.status === 429) {
-        console.warn('CORE rate limit hit - consider adding API key');
+        logger.warn('CORE rate limit hit - consider adding API key');
       }
       return { results: [], total: 0 };
     }
   }
 
   async harvest(): Promise<void> {
-    // Optional background harvest implementation
-    // Could be used to periodically fetch new records
-    console.log(`${this.name}: Harvest not implemented`);
+    logger.debug(`${this.name}: Harvest not implemented`);
   }
 }

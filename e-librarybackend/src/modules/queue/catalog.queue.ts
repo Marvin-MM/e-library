@@ -1,5 +1,5 @@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      import { Queue, Worker, Job } from 'bullmq';
-import { getRedisClient } from '../../config/redis.js';
+import { Queue, Worker, Job } from 'bullmq';
+import { getRedisClient, isRedisConnected } from '../../config/redis.js';
 import prisma from '../../config/database.js';
 import { notificationsService } from '../notifications/notifications.service.js';
 import { logger } from '../../shared/utils/logger.js';
@@ -10,6 +10,11 @@ interface CatalogJobData {
 let catalogQueue: Queue<CatalogJobData> | null = null;
 let catalogWorker: Worker<CatalogJobData> | null = null;
 const getCatalogQueue = (): Queue<CatalogJobData> | null => {
+  if (!isRedisConnected()) {
+    logger.warn('Redis not connected, catalog queue disabled');
+    return null;
+  }
+
   if (!catalogQueue) {
     catalogQueue = new Queue<CatalogJobData>(QUEUE_NAME, {
       connection: getRedisClient(),
@@ -85,6 +90,11 @@ const processCatalogJob = async (job: Job<CatalogJobData>): Promise<void> => {
   }
 };
 export const startCatalogWorker = (): void => {
+  if (!isRedisConnected()) {
+    logger.warn('Redis not connected, catalog worker not started');
+    return;
+  }
+
   if (!catalogWorker) {
     catalogWorker = new Worker<CatalogJobData>(QUEUE_NAME, processCatalogJob, {
       connection: getRedisClient(),
@@ -95,6 +105,9 @@ export const startCatalogWorker = (): void => {
     });
     catalogWorker.on('failed', (job, error) => {
       logger.error('Catalog job failed', { jobId: job?.id, error: error.message });
+    });
+    catalogWorker.on('error', (error) => {
+      logger.error('Catalog worker error', { error: error.message });
     });
     logger.info('Catalog worker started');
   }

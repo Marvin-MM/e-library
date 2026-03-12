@@ -1,5 +1,5 @@
 import { Queue, Worker, Job } from 'bullmq';
-import { getRedisClient } from '../../config/redis.js';
+import { getRedisClient, isRedisConnected } from '../../config/redis.js';
 import prisma from '../../config/database.js';
 import { logger } from '../../shared/utils/logger.js';
 
@@ -14,6 +14,11 @@ let analyticsQueue: Queue<AnalyticsJobData> | null = null;
 let analyticsWorker: Worker<AnalyticsJobData> | null = null;
 
 const getAnalyticsQueue = (): Queue<AnalyticsJobData> | null => {
+  if (!isRedisConnected()) {
+    logger.warn('Redis not connected, analytics queue disabled');
+    return null;
+  }
+
   if (!analyticsQueue) {
     analyticsQueue = new Queue<AnalyticsJobData>(QUEUE_NAME, {
       connection: getRedisClient(),
@@ -135,11 +140,16 @@ const processAnalyticsJob = async (job: Job<AnalyticsJobData>): Promise<void> =>
 };
 
 export const startAnalyticsWorker = (): void => {
+  if (!isRedisConnected()) {
+    logger.warn('Redis not connected, analytics worker not started');
+    return;
+  }
+
   if (!analyticsWorker) {
     const connection = getRedisClient();
     analyticsWorker = new Worker<AnalyticsJobData>(QUEUE_NAME, processAnalyticsJob, {
       connection,
-      concurrency: 3,
+      concurrency: 1, // analytics jobs are heavy DB aggregations — sequential is safer
     });
 
     analyticsWorker.on('completed', (job) => {
@@ -148,6 +158,10 @@ export const startAnalyticsWorker = (): void => {
 
     analyticsWorker.on('failed', (job, error) => {
       logger.error('Analytics job failed', { jobId: job?.id, error: error.message });
+    });
+
+    analyticsWorker.on('error', (error) => {
+      logger.error('Analytics worker error', { error: error.message });
     });
 
     logger.info('Analytics worker started');
@@ -166,17 +180,42 @@ export const stopAnalyticsWorker = async (): Promise<void> => {
 };
 
 export const scheduleAnalytics = {
-  scheduleDailyAggregation: async (date?: string): Promise<void> => {
+  /**
+   * Registers a daily analytics aggregation at 02:00.
+   * BullMQ upsertJobScheduler is idempotent — safe to call on every server start.
+   */
+  scheduleDailyAggregation: async (): Promise<void> => {
     const queue = getAnalyticsQueue();
     if (queue) {
-      await queue.add('daily_aggregation', { type: 'daily_aggregation', date });
+      await queue.upsertJobScheduler(
+        'daily-analytics-aggregation',
+        { pattern: '0 2 * * *' }, // every day at 02:00
+        {
+          name: 'daily_aggregation',
+          data: { type: 'daily_aggregation' },
+          opts: { removeOnComplete: 10, removeOnFail: 20 },
+        }
+      );
+      logger.info('Daily analytics aggregation scheduler registered (02:00)');
     }
   },
 
+  /**
+   * Registers a daily token cleanup at 03:00.
+   */
   scheduleTokenCleanup: async (): Promise<void> => {
     const queue = getAnalyticsQueue();
     if (queue) {
-      await queue.add('cleanup_tokens', { type: 'cleanup_tokens' });
+      await queue.upsertJobScheduler(
+        'daily-token-cleanup',
+        { pattern: '0 3 * * *' }, // every day at 03:00
+        {
+          name: 'cleanup_tokens',
+          data: { type: 'cleanup_tokens' },
+          opts: { removeOnComplete: 10, removeOnFail: 20 },
+        }
+      );
+      logger.info('Daily token cleanup scheduler registered (03:00)');
     }
   },
 };

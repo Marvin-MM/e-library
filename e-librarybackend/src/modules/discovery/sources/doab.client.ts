@@ -3,6 +3,7 @@ import axios from 'axios';
 import { BaseDiscoverySource } from './base.source.js';
 import type { DiscoveryResult, DiscoverySearchQuery } from '../types.js';
 import { XMLParser } from 'fast-xml-parser';
+import { logger } from '../../../shared/utils/logger.js';
 
 export class DOABClient extends BaseDiscoverySource {
   name = 'doab' as const;
@@ -57,7 +58,7 @@ export class DOABClient extends BaseDiscoverySource {
         total: response.data?.total || 0,
       };
     } catch (error: any) {
-      console.error(`DOAB API error: ${error.message}, trying OAI-PMH fallback`);
+      logger.warn('DOAB API error, trying OAI-PMH fallback', { message: error.message });
       return await this.oaiPmhSearch(q, page, limit);
     }
   }
@@ -117,14 +118,12 @@ export class DOABClient extends BaseDiscoverySource {
         total: records.length,
       };
     } catch (error: any) {
-      console.error(`DOAB OAI-PMH error: ${error.message}`);
+      logger.warn('DOAB OAI-PMH error', { message: error.message });
       return { results: [], total: 0 };
     }
   }
 
   async harvest(): Promise<void> {
-    // Optional background harvest implementation
-    // Could be used to periodically fetch new records
-    console.log(`${this.name}: Harvest not implemented`);
+    logger.debug(`${this.name}: Harvest not implemented`);
   }
 }

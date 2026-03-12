@@ -32,6 +32,7 @@ router.post(
 
 router.post(
   '/refresh',
+  authRateLimiter,
   validate(refreshTokenSchema),
   authController.refresh.bind(authController)
 );
@@ -79,6 +80,7 @@ router.patch(
 router.post(
   '/change-password',
   authenticate,
+  strictRateLimiter,
   validate(changePasswordSchema),
   authController.changePassword.bind(authController)
 );

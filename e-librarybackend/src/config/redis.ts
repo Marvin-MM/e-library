@@ -46,4 +46,28 @@ export const isRedisConnected = (): boolean => {
   return redis?.status === 'ready';
 };
 
+export const waitForRedis = async (): Promise<void> => {
+  const client = getRedisClient();
+  if (client.status === 'ready') return;
+  return new Promise((resolve, reject) => {
+    const onReady = () => {
+      client.removeListener('error', onError);
+      resolve();
+    };
+    const onError = (err: any) => {
+      client.removeListener('ready', onReady);
+      reject(err);
+    };
+    client.once('ready', onReady);
+    client.once('error', onError);
+    
+    // Also resolve on timeout so the server doesn't hang indefinitely without Redis
+    setTimeout(() => {
+      client.removeListener('ready', onReady);
+      client.removeListener('error', onError);
+      resolve();
+    }, 5000);
+  });
+};
+
 export default getRedisClient;

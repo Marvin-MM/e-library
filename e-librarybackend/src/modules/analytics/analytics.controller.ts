@@ -13,10 +13,10 @@ export class AnalyticsController {
 
     async getDownloadTrends(req: Request, res: Response, next: NextFunction) {
         try {
-            const { startDate, endDate } = req.query;
+            const validatedQuery = (req as any).validated?.query ?? req.query;
             const trends = await analyticsService.getDownloadTrends({
-                startDate: startDate ? new Date(startDate as string) : undefined,
-                endDate: endDate ? new Date(endDate as string) : undefined,
+                startDate: validatedQuery.startDate ? new Date(validatedQuery.startDate) : undefined,
+                endDate: validatedQuery.endDate ? new Date(validatedQuery.endDate) : undefined,
             });
             res.json({ success: true, data: trends });
         } catch (error) {
@@ -26,10 +26,10 @@ export class AnalyticsController {
 
     async getUserTrends(req: Request, res: Response, next: NextFunction) {
         try {
-            const { startDate, endDate } = req.query;
+            const validatedQuery = (req as any).validated?.query ?? req.query;
             const trends = await analyticsService.getUserTrends({
-                startDate: startDate ? new Date(startDate as string) : undefined,
-                endDate: endDate ? new Date(endDate as string) : undefined,
+                startDate: validatedQuery.startDate ? new Date(validatedQuery.startDate) : undefined,
+                endDate: validatedQuery.endDate ? new Date(validatedQuery.endDate) : undefined,
             });
             res.json({ success: true, data: trends });
         } catch (error) {
@@ -39,8 +39,8 @@ export class AnalyticsController {
 
     async getTopResources(req: Request, res: Response, next: NextFunction) {
         try {
-            const limit = req.query.limit ? Number(req.query.limit) : 10;
-            const resources = await analyticsService.getTopResources(limit);
+            const limit = (req as any).validated?.query?.limit ?? req.query.limit ?? 10;
+            const resources = await analyticsService.getTopResources(Number(limit));
             res.json({ success: true, data: resources });
         } catch (error) {
             next(error);
@@ -49,8 +49,8 @@ export class AnalyticsController {
 
     async getTopSearchTerms(req: Request, res: Response, next: NextFunction) {
         try {
-            const limit = req.query.limit ? Number(req.query.limit) : 20;
-            const terms = await analyticsService.getTopSearchTerms(limit);
+            const limit = (req as any).validated?.query?.limit ?? req.query.limit ?? 20;
+            const terms = await analyticsService.getTopSearchTerms(Number(limit));
             res.json({ success: true, data: terms });
         } catch (error) {
             next(error);
@@ -86,10 +86,10 @@ export class AnalyticsController {
 
     async generateReport(req: Request, res: Response, next: NextFunction) {
         try {
-            const { startDate, endDate } = req.query;
+            const validatedQuery = (req as any).validated?.query ?? req.query;
             const report = await analyticsService.generateReport({
-                startDate: startDate ? new Date(startDate as string) : undefined,
-                endDate: endDate ? new Date(endDate as string) : undefined,
+                startDate: validatedQuery.startDate ? new Date(validatedQuery.startDate) : undefined,
+                endDate: validatedQuery.endDate ? new Date(validatedQuery.endDate) : undefined,
             });
             res.json({ success: true, data: report });
         } catch (error) {

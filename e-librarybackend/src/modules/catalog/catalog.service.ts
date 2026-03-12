@@ -21,7 +21,9 @@ export class CatalogService {
   // Books: Public
   // ─────────────────────────────────────────────────────────────────────────
   async getBooks(query: BookQueryInput) {
-    const { page, limit, search, campusId, availableOnly } = query;
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const { search, campusId, availableOnly } = query;
     const skip = (page - 1) * limit;
     const where: Record<string, any> = {};
     if (search) {
@@ -46,7 +48,7 @@ export class CatalogService {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
         include: {
           inventory: {
             include: { campus: true },
@@ -130,24 +132,22 @@ export class CatalogService {
       return borrow;
     });
     // 5. Notify user
-    try {
-      await notificationsService.createNotification({
-        userId,
-        type: 'success',
-        title: 'Book Borrowed Successfully',
-        message: `You borrowed "${record.book.title}" from ${record.campus.name}. Due date: ${record.dueDate.toDateString()}.`,
-        data: { borrowId: record.id, bookId, campusId, dueDate: record.dueDate.toISOString() },
-      });
-    } catch (err) {
+    notificationsService.createNotification({
+      userId,
+      type: 'success',
+      title: 'Book Borrowed Successfully',
+      message: `You borrowed "${record.book.title}" from ${record.campus.name}. Due date: ${record.dueDate.toDateString()}.`,
+      data: { borrowId: record.id, bookId, campusId, dueDate: record.dueDate.toISOString() },
+    }).catch(err => {
       logger.warn('Failed to send borrow notification', { err });
-    }
+    });
     logger.info('Book borrowed', { userId, bookId, campusId, dueDate: record.dueDate });
     return record;
   }
   async getMyBorrows(userId: string) {
     const records = await prisma.borrowRecord.findMany({
       where: { userId },
-      orderBy: { borrowedAt: 'desc' },
+      orderBy: [{ borrowedAt: 'desc' }, { id: 'asc' }],
       include: {
         book: true,
         campus: true,
@@ -283,6 +283,7 @@ async createCampus(data: CreateCampusInput, adminId: string) {
       const existing = await tx.inventory.findUnique({
         where: { bookId_campusId: { bookId, campusId } },
       });
+      let upsertedRecord;
       if (existing) {
         // Ensure totalCopies >= currently borrowed
         const borrowed = existing.totalCopies - existing.availableCopies;
@@ -292,26 +293,29 @@ async createCampus(data: CreateCampusInput, adminId: string) {
           );
         }
         const newAvailable = totalCopies - borrowed;
-        return tx.inventory.update({
+        upsertedRecord = await tx.inventory.update({
           where: { bookId_campusId: { bookId, campusId } },
           data: { totalCopies, availableCopies: newAvailable, shelfLocation },
           include: { book: true, campus: true },
         });
       } else {
-        return tx.inventory.create({
+        upsertedRecord = await tx.inventory.create({
           data: { bookId, campusId, totalCopies, availableCopies: totalCopies, shelfLocation },
           include: { book: true, campus: true },
         });
       }
-    });
-    await prisma.auditLog.create({
-      data: {
-        entity: 'Inventory',
-        entityId: result.id,
-        action: 'UPSERT',
-        performedById: adminId,
-        meta: { bookId, campusId, totalCopies, shelfLocation },
-      },
+      
+      await tx.auditLog.create({
+        data: {
+          entity: 'Inventory',
+          entityId: upsertedRecord.id,
+          action: 'UPSERT',
+          performedById: adminId,
+          meta: { bookId, campusId, totalCopies, shelfLocation },
+        },
+      });
+      
+      return upsertedRecord;
     });
     return result;
   }
@@ -319,7 +323,9 @@ async createCampus(data: CreateCampusInput, adminId: string) {
   // Borrow Records: Admin / Staff
   // ─────────────────────────────────────────────────────────────────────────
   async getBorrowRecords(query: BorrowRecordQueryInput) {
-    const { page, limit, status, overdue, campusId, userId, startDate, endDate } = query;
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const { status, overdue, campusId, userId, startDate, endDate } = query;
     const skip = (page - 1) * limit;
     const where: Record<string, any> = {};
     if (status) where.status = status;
@@ -341,7 +347,7 @@ async createCampus(data: CreateCampusInput, adminId: string) {
         where,
         skip,
         take: limit,
-        orderBy: { borrowedAt: 'desc' },
+        orderBy: [{ borrowedAt: 'desc' }, { id: 'asc' }],
         include: {
           user: { select: { id: true, name: true, email: true } },
           book: true,
@@ -390,17 +396,15 @@ async createCampus(data: CreateCampusInput, adminId: string) {
       return { updated, borrow };
     });
     // Notify user
-    try {
-      await notificationsService.createNotification({
-        userId: result.borrow.userId,
-        type: 'info',
-        title: 'Book Returned',
-        message: `"${result.borrow.book.title}" has been marked as returned. Thank you!`,
-        data: { borrowId, bookId: result.borrow.bookId },
-      });
-    } catch (err) {
+    notificationsService.createNotification({
+      userId: result.borrow.userId,
+      type: 'info',
+      title: 'Book Returned',
+      message: `"${result.borrow.book.title}" has been marked as returned. Thank you!`,
+      data: { borrowId, bookId: result.borrow.bookId },
+    }).catch(err => {
       logger.warn('Failed to send return notification', { err });
-    }
+    });
     logger.info('Book return processed', { borrowId, librarianId });
     return result.updated;
   }

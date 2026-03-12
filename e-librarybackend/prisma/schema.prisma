@@ -69,6 +69,7 @@ enum ResourceType {
   BOOK // Admin: Library books
   JOURNAL // Admin: Academic journals
   THESIS // Admin: Theses/dissertations
+  DISSERTATION // Admin: Dissertations only uploaded by admin
   MAGAZINE // Admin: Magazines/periodicals
   MODULE_NOTES // Staff: Lecture notes for course units
   PAST_PAPER // Staff: Past exam papers

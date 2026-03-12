@@ -2,7 +2,9 @@
 import { Router, Response, NextFunction } from 'express';
 import { courseUnitService } from './course-unit.service.js';
 import { authenticate, authorize } from '../../shared/middleware/auth.js';
+import { validate } from '../../shared/middleware/validate.js';
 import { AuthenticatedRequest } from '../../shared/types/index.js';
+import { createCourseUnitSchema, updateCourseUnitSchema, courseUnitQuerySchema, courseUnitParamsSchema } from './course-unit.validators.js';
 
 const router = Router();
 
@@ -10,49 +12,54 @@ const router = Router();
  * GET /courses/:courseId/units
  * Get all units for a course (public)
  */
-router.get('/:courseId/units', async (req, res, next) => {
-    try {
-        const { page, limit, search } = req.query;
-        const result = await courseUnitService.findByCourse(req.params.courseId, {
-            page: page ? Number(page) : undefined,
-            limit: limit ? Number(limit) : undefined,
-            search: search as string | undefined,
-        });
-        res.json({ success: true, ...result });
-    } catch (error) {
-        next(error);
+router.get(
+    '/:courseId/units',
+    validate(courseUnitParamsSchema, 'params'),
+    validate(courseUnitQuerySchema, 'query'),
+    async (req: any, res, next) => {
+        try {
+            const result = await courseUnitService.findByCourse(req.params.courseId, req.validated.query);
+            res.json({ success: true, ...result });
+        } catch (error) {
+            next(error);
+        }
     }
-});
+);
 
 /**
  * GET /courses/units/:unitId
  * Get a specific course unit with its resources
  */
-router.get('/units/:unitId', async (req, res, next) => {
-    try {
-        const unit = await courseUnitService.findById(req.params.unitId);
-        res.json({ success: true, data: unit });
-    } catch (error) {
-        next(error);
+router.get(
+    '/units/:unitId',
+    validate(courseUnitParamsSchema, 'params'),
+    async (req, res, next) => {
+        try {
+            const unit = await courseUnitService.findById(req.params.unitId);
+            res.json({ success: true, data: unit });
+        } catch (error) {
+            next(error);
+        }
     }
-});
+);
 
 /**
  * GET /courses/units/:unitId/resources
  * Get resources for a specific course unit
  */
-router.get('/units/:unitId/resources', async (req, res, next) => {
-    try {
-        const { page, limit } = req.query;
-        const result = await courseUnitService.getResources(req.params.unitId, {
-            page: page ? Number(page) : undefined,
-            limit: limit ? Number(limit) : undefined,
-        });
-        res.json({ success: true, ...result });
-    } catch (error) {
-        next(error);
+router.get(
+    '/units/:unitId/resources',
+    validate(courseUnitParamsSchema, 'params'),
+    validate(courseUnitQuerySchema, 'query'),
+    async (req: any, res, next) => {
+        try {
+            const result = await courseUnitService.getResources(req.params.unitId, req.validated.query);
+            res.json({ success: true, ...result });
+        } catch (error) {
+            next(error);
+        }
     }
-});
+);
 
 /**
  * POST /courses/:courseId/units
@@ -62,11 +69,13 @@ router.post(
     '/:courseId/units',
     authenticate,
     authorize('STAFF', 'ADMIN'),
-    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    validate(courseUnitParamsSchema, 'params'),
+    validate(createCourseUnitSchema, 'body'),
+    async (req: any, res: Response, next: NextFunction) => {
         try {
             const unit = await courseUnitService.create(
                 req.params.courseId,
-                req.body,
+                req.validated.body,
                 req.user!.userId
             );
             res.status(201).json({
@@ -88,11 +97,13 @@ router.put(
     '/units/:unitId',
     authenticate,
     authorize('STAFF', 'ADMIN'),
-    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    validate(courseUnitParamsSchema, 'params'),
+    validate(updateCourseUnitSchema, 'body'),
+    async (req: any, res: Response, next: NextFunction) => {
         try {
             const unit = await courseUnitService.update(
                 req.params.unitId,
-                req.body,
+                req.validated.body,
                 req.user!.userId
             );
             res.json({
@@ -114,6 +125,7 @@ router.delete(
     '/units/:unitId',
     authenticate,
     authorize('ADMIN'),
+    validate(courseUnitParamsSchema, 'params'),
     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         try {
             const result = await courseUnitService.delete(

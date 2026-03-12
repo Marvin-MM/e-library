@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { analyticsController } from './analytics.controller.js';
 import { authenticate, authorize } from '../../shared/middleware/auth.js';
+import { validate } from '../../shared/middleware/validate.js';
+import { analyticsDateRangeSchema, analyticsLimitSchema } from './analytics.validators.js';
 
 const router = Router();
 
@@ -12,12 +14,28 @@ router.use(authorize('ADMIN'));
 router.get('/overview', analyticsController.getOverview.bind(analyticsController));
 
 // Trend data
-router.get('/trends/downloads', analyticsController.getDownloadTrends.bind(analyticsController));
-router.get('/trends/users', analyticsController.getUserTrends.bind(analyticsController));
+router.get(
+    '/trends/downloads',
+    validate(analyticsDateRangeSchema, 'query'),
+    analyticsController.getDownloadTrends.bind(analyticsController)
+);
+router.get(
+    '/trends/users',
+    validate(analyticsDateRangeSchema, 'query'),
+    analyticsController.getUserTrends.bind(analyticsController)
+);
 
 // Top items
-router.get('/top/resources', analyticsController.getTopResources.bind(analyticsController));
-router.get('/top/search-terms', analyticsController.getTopSearchTerms.bind(analyticsController));
+router.get(
+    '/top/resources',
+    validate(analyticsLimitSchema, 'query'),
+    analyticsController.getTopResources.bind(analyticsController)
+);
+router.get(
+    '/top/search-terms',
+    validate(analyticsLimitSchema, 'query'),
+    analyticsController.getTopSearchTerms.bind(analyticsController)
+);
 
 // Distributions
 router.get('/distribution/users-by-role', analyticsController.getUsersByRole.bind(analyticsController));
@@ -27,6 +45,10 @@ router.get('/distribution/resources-by-category', analyticsController.getResourc
 router.get('/requests', analyticsController.getRequestStats.bind(analyticsController));
 
 // Comprehensive report
-router.get('/report', analyticsController.generateReport.bind(analyticsController));
+router.get(
+    '/report',
+    validate(analyticsDateRangeSchema, 'query'),
+    analyticsController.generateReport.bind(analyticsController)
+);
 
 export default router;

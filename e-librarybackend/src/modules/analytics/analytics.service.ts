@@ -78,6 +78,15 @@ export class AnalyticsService {
         const endDate = range.endDate || new Date();
         const startDate = range.startDate || new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000);
 
+        const cacheKey = `analytics:trends:downloads:${startDate.toISOString()}:${endDate.toISOString()}`;
+
+        if (isRedisConnected()) {
+            const cached = await getRedisClient().get(cacheKey);
+            if (cached) {
+                return JSON.parse(cached);
+            }
+        }
+
         const downloads = await prisma.downloadLog.groupBy({
             by: ['timestamp'],
             where: {
@@ -96,18 +105,33 @@ export class AnalyticsService {
             dailyData[dateKey] = (dailyData[dateKey] || 0) + d._count.id;
         });
 
-        return Object.entries(dailyData)
+        const result = Object.entries(dailyData)
             .map(([date, count]) => ({ date, downloads: count }))
             .sort((a, b) => a.date.localeCompare(b.date));
+
+        if (isRedisConnected()) {
+            await getRedisClient().setex(cacheKey, CACHE_TTL, JSON.stringify(result));
+        }
+
+        return result;
     }
 
     /**
      * Get top downloaded resources
      */
     async getTopResources(limit: number = 10) {
+        const cacheKey = `analytics:top:resources:${limit}`;
+
+        if (isRedisConnected()) {
+            const cached = await getRedisClient().get(cacheKey);
+            if (cached) {
+                return JSON.parse(cached);
+            }
+        }
+
         const resources = await prisma.resource.findMany({
             where: { isActive: true },
-            orderBy: { downloadCount: 'desc' },
+            orderBy: [{ downloadCount: 'desc' }, { id: 'asc' }],
             take: limit,
             select: {
                 id: true,
@@ -119,6 +143,10 @@ export class AnalyticsService {
             },
         });
 
+        if (isRedisConnected()) {
+            await getRedisClient().setex(cacheKey, CACHE_TTL, JSON.stringify(resources));
+        }
+
         return resources;
     }
 
@@ -126,6 +154,15 @@ export class AnalyticsService {
      * Get top search terms
      */
     async getTopSearchTerms(limit: number = 20) {
+        const cacheKey = `analytics:top:searches:${limit}`;
+
+        if (isRedisConnected()) {
+            const cached = await getRedisClient().get(cacheKey);
+            if (cached) {
+                return JSON.parse(cached);
+            }
+        }
+
         const searches = await prisma.searchLog.groupBy({
             by: ['query'],
             _count: { query: true },
@@ -133,10 +170,16 @@ export class AnalyticsService {
             take: limit,
         });
 
-        return searches.map((s) => ({
+        const result = searches.map((s) => ({
             term: s.query,
             count: s._count.query,
         }));
+
+        if (isRedisConnected()) {
+            await getRedisClient().setex(cacheKey, CACHE_TTL, JSON.stringify(result));
+        }
+
+        return result;
     }
 
     /**
@@ -145,6 +188,15 @@ export class AnalyticsService {
     async getUserTrends(range: AnalyticsDateRange = {}) {
         const endDate = range.endDate || new Date();
         const startDate = range.startDate || new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        const cacheKey = `analytics:trends:users:${startDate.toISOString()}:${endDate.toISOString()}`;
+
+        if (isRedisConnected()) {
+            const cached = await getRedisClient().get(cacheKey);
+            if (cached) {
+                return JSON.parse(cached);
+            }
+        }
 
         const users = await prisma.user.groupBy({
             by: ['createdAt'],
@@ -163,9 +215,15 @@ export class AnalyticsService {
             dailyData[dateKey] = (dailyData[dateKey] || 0) + u._count.id;
         });
 
-        return Object.entries(dailyData)
+        const result = Object.entries(dailyData)
             .map(([date, count]) => ({ date, signups: count }))
             .sort((a, b) => a.date.localeCompare(b.date));
+
+        if (isRedisConnected()) {
+            await getRedisClient().setex(cacheKey, CACHE_TTL, JSON.stringify(result));
+        }
+
+        return result;
     }
 
     /**
@@ -187,16 +245,31 @@ export class AnalyticsService {
      * Get resources by category distribution
      */
     async getResourcesByCategory() {
+        const cacheKey = 'analytics:distribution:resources';
+
+        if (isRedisConnected()) {
+            const cached = await getRedisClient().get(cacheKey);
+            if (cached) {
+                return JSON.parse(cached);
+            }
+        }
+
         const resources = await prisma.resource.groupBy({
             by: ['category'],
             where: { isActive: true },
             _count: { category: true },
         });
 
-        return resources.map((r) => ({
+        const result = resources.map((r) => ({
             category: r.category,
             count: r._count.category,
         }));
+
+        if (isRedisConnected()) {
+            await getRedisClient().setex(cacheKey, CACHE_TTL, JSON.stringify(result));
+        }
+
+        return result;
     }
 
     /**

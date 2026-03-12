@@ -3,7 +3,7 @@ import { searchController } from './search.controller.js';
 import { validate } from '../../shared/middleware/validate.js';
 import { optionalAuth } from '../../shared/middleware/auth.js';
 import { searchRateLimiter } from '../../shared/middleware/rateLimiter.js';
-import { searchQuerySchema } from './search.validators.js';
+import { searchQuerySchema, searchSuggestionsSchema } from './search.validators.js';
 
 const router = Router();
 
@@ -23,6 +23,7 @@ router.get(
 router.get(
   '/suggestions',
   searchRateLimiter,
+  validate(searchSuggestionsSchema, 'query'),
   searchController.getSuggestions.bind(searchController)
 );
 

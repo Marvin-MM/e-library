@@ -14,4 +14,10 @@ export const searchQuerySchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 });
 
+export const searchSuggestionsSchema = z.object({
+  q: z.string().min(1, 'Query is required').max(100, 'Query too long'),
+  limit: z.coerce.number().int().positive().max(20).default(5),
+});
+
 export type SearchQueryInput = z.infer<typeof searchQuerySchema>;
+export type SearchSuggestionsInput = z.infer<typeof searchSuggestionsSchema>;

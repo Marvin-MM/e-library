@@ -1,7 +1,7 @@
 import prisma from '../../config/database.js';
 import { NotFoundError, BadRequestError } from '../../shared/errors/AppError.js';
 import { logger } from '../../shared/utils/logger.js';
-import { setEmailProvider, getCurrentProvider, getAvailableProviders, EmailProviderType } from '../email/email.provider.js';
+import { setEmailProvider, getCurrentProvider, getAvailableProviders, EmailProviderType, setFallbackEnabled } from '../email/email.provider.js';
 
 type SettingType = 'string' | 'boolean' | 'number' | 'json';
 
@@ -52,6 +52,18 @@ export class SettingsService {
                 update: {},
             });
         }
+        
+        // Sync email settings from DB to memory immediately 
+        const dbFallback = await prisma.systemSetting.findUnique({ where: { key: 'email.fallbackEnabled' } });
+        if (dbFallback && dbFallback.value === 'false') {
+             setFallbackEnabled(false);
+        }
+
+        const dbProvider = await prisma.systemSetting.findUnique({ where: { key: 'email.provider' } });
+        if (dbProvider) {
+             setEmailProvider(dbProvider.value as EmailProviderType);
+        }
+
         logger.info('System settings initialized');
     }
 
@@ -124,6 +136,8 @@ export class SettingsService {
         // Apply special settings immediately
         if (key === 'email.provider') {
             setEmailProvider(value as EmailProviderType);
+        } else if (key === 'email.fallbackEnabled') {
+            setFallbackEnabled(value === 'true');
         }
 
         logger.info('Setting updated', { key, value, adminId });

@@ -156,19 +156,18 @@ export class AuthService {
 
     const tokens = generateTokenPair(user.id, user.email, user.role as RoleType);
 
-    const expiration = getTokenExpiration(refreshToken);
-    if (expiration) {
-      await prisma.blacklistedToken.create({
-        data: {
-          token: refreshToken,
-          expiresAt: expiration,
-        },
+    // Atomically rotate: blacklist old token and persist new one
+    await prisma.$transaction(async (tx) => {
+      const expiration = getTokenExpiration(refreshToken);
+      if (expiration) {
+        await tx.blacklistedToken.create({
+          data: { token: refreshToken, expiresAt: expiration },
+        });
+      }
+      await tx.user.update({
+        where: { id: user.id },
+        data: { refreshToken: tokens.refreshToken },
       });
-    }
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { refreshToken: tokens.refreshToken },
     });
 
     logger.info('Tokens refreshed', { userId: user.id });
@@ -285,19 +284,33 @@ export class AuthService {
 
     const hashedPassword = await hashPassword(data.password);
 
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        hashedPassword,
-        resetToken: null,
-        resetTokenExpiry: null,
-        refreshToken: null,
-      },
+    // Blacklist any existing refresh token before clearing it
+    await prisma.$transaction(async (tx) => {
+      if (user.refreshToken) {
+        const expiration = getTokenExpiration(user.refreshToken);
+        if (expiration) {
+          await tx.blacklistedToken.upsert({
+            where: { token: user.refreshToken },
+            update: {},
+            create: { token: user.refreshToken, expiresAt: expiration },
+          });
+        }
+      }
+
+      await tx.user.update({
+        where: { id: user.id },
+        data: {
+          hashedPassword,
+          resetToken: null,
+          resetTokenExpiry: null,
+          refreshToken: null,
+        },
+      });
     });
 
     logger.info('Password reset completed', { userId: user.id });
 
-    return { message: 'Password reset successfully' };
+    return { message: 'Password reset successfully. Please log in again.' };
   }
 
   async getProfile(userId: string) {
@@ -360,22 +373,46 @@ export class AuthService {
       throw new NotFoundError('User not found');
     }
 
+    if (!user.hashedPassword) {
+      throw new BadRequestError('No password set for this account. Use Google login.');
+    }
+
     const isPasswordValid = await comparePassword(currentPassword, user.hashedPassword);
 
     if (!isPasswordValid) {
       throw new BadRequestError('Current password is incorrect');
     }
 
+    // Validate new password is different from current
+    const isSamePassword = await comparePassword(newPassword, user.hashedPassword);
+    if (isSamePassword) {
+      throw new BadRequestError('New password must be different from your current password');
+    }
+
     const hashedPassword = await hashPassword(newPassword);
 
-    await prisma.user.update({
-      where: { id: userId },
-      data: { hashedPassword },
+    // Atomically update password and invalidate all active sessions
+    await prisma.$transaction(async (tx) => {
+      if (user.refreshToken) {
+        const expiration = getTokenExpiration(user.refreshToken);
+        if (expiration) {
+          await tx.blacklistedToken.upsert({
+            where: { token: user.refreshToken },
+            update: {},
+            create: { token: user.refreshToken, expiresAt: expiration },
+          });
+        }
+      }
+
+      await tx.user.update({
+        where: { id: userId },
+        data: { hashedPassword, refreshToken: null },
+      });
     });
 
     logger.info('Password changed', { userId });
 
-    return { message: 'Password changed successfully' };
+    return { message: 'Password changed successfully. Please log in again with your new password.' };
   }
 
   async resendVerificationEmail(email: string) {

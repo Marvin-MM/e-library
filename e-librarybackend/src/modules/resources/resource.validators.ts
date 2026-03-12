@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
 export const resourceCategoryEnum = z.enum(['BOOK', 'JOURNAL', 'PAPER', 'MAGAZINE', 'THESIS', 'OTHER']);
-export const accessTypeEnum = z.enum(['VIEW_ONLY', 'DOWNLOADABLE']);
+export const accessTypeEnum = z.enum(['VIEW_ONLY', 'DOWNLOADABLE', 'CAMPUS_ONLY']);
+export const resourceTypeEnum = z.enum(['BOOK', 'JOURNAL', 'THESIS', 'DISSERTATION', 'MAGAZINE', 'MODULE_NOTES', 'PAST_PAPER', 'LECTURE_SLIDE', 'LAB_MANUAL', 'ASSIGNMENT', 'OTHER']);
+export const campusLocationEnum = z.enum(['MAIN_CAMPUS', 'MARKET_PLAZA', 'ONLINE']);
 
 export const createResourceSchema = z.object({
   title: z.string().min(1, 'Title is required').max(500, 'Title too long'),
@@ -13,6 +15,15 @@ export const createResourceSchema = z.object({
   accessType: accessTypeEnum.default('DOWNLOADABLE'),
   tags: z.array(z.string()).default([]),
   courseIds: z.array(z.string().uuid()).default([]),
+  resourceType: resourceTypeEnum.optional(),
+  physicalLocation: z.string().optional(),
+  shelfNumber: z.string().optional(),
+  availabilityNotes: z.string().optional(),
+  copies: z.coerce.number().int().min(0).optional(),
+  isbn: z.string().optional(),
+  issn: z.string().optional(),
+  courseUnitId: z.string().uuid().optional(),
+  campusLocation: campusLocationEnum.optional(),
 });
 
 export const updateResourceSchema = z.object({
@@ -26,6 +37,15 @@ export const updateResourceSchema = z.object({
   tags: z.array(z.string()).optional(),
   courseIds: z.array(z.string().uuid()).optional(),
   isActive: z.boolean().optional(),
+  resourceType: resourceTypeEnum.optional(),
+  physicalLocation: z.string().optional().nullable(),
+  shelfNumber: z.string().optional().nullable(),
+  availabilityNotes: z.string().optional().nullable(),
+  copies: z.coerce.number().int().min(0).optional().nullable(),
+  isbn: z.string().optional().nullable(),
+  issn: z.string().optional().nullable(),
+  courseUnitId: z.string().uuid().optional().nullable(),
+  campusLocation: campusLocationEnum.optional(),
 });
 
 export const resourceQuerySchema = z.object({
@@ -39,6 +59,9 @@ export const resourceQuerySchema = z.object({
   tag: z.string().optional(),
   author: z.string().optional(),
   accessType: accessTypeEnum.optional(),
+  resourceType: resourceTypeEnum.optional(),
+  courseUnitId: z.string().uuid().optional(),
+  campusLocation: campusLocationEnum.optional(),
   sortBy: z.enum(['createdAt', 'title', 'downloadCount', 'viewCount']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 });

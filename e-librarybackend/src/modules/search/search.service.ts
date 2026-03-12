@@ -26,7 +26,9 @@ export class SearchService {
     if (isRedisConnected()) {
       const cached = await getRedisClient().get(cacheKey);
       if (cached) {
-        await this.logSearch(q, userId, JSON.parse(cached).data.length);
+        this.logSearch(q, userId, JSON.parse(cached).data.length).catch(error => {
+          logger.error('Failed to log search from cache', { error, q });
+        });
         return JSON.parse(cached);
       }
     }
@@ -55,13 +57,13 @@ export class SearchService {
 
     switch (sortBy as SortByType) {
       case 'downloadCount':
-        orderBy = { downloadCount: sortOrder };
+        orderBy = [{ downloadCount: sortOrder }, { id: 'asc' }];
         break;
       case 'createdAt':
-        orderBy = { createdAt: sortOrder };
+        orderBy = [{ createdAt: sortOrder }, { id: 'asc' }];
         break;
       case 'title':
-        orderBy = { title: sortOrder };
+        orderBy = [{ title: sortOrder }, { id: 'asc' }];
         break;
       case 'relevance':
       default:
@@ -69,6 +71,7 @@ export class SearchService {
           { downloadCount: 'desc' },
           { viewCount: 'desc' },
           { createdAt: 'desc' },
+          { id: 'asc' },
         ];
     }
 
@@ -102,7 +105,9 @@ export class SearchService {
       prisma.resource.count({ where: where as any }),
     ]);
 
-    await this.logSearch(q, userId, total);
+    this.logSearch(q, userId, total).catch(error => {
+      logger.error('Failed to log search', { error, q });
+    });
 
     let result;
 
@@ -184,6 +189,15 @@ export class SearchService {
       return [];
     }
 
+    const cacheKey = `search:suggestions:${normalized}:${limit}`;
+
+    if (isRedisConnected()) {
+      const cached = await getRedisClient().get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    }
+
     const resources = await prisma.resource.findMany({
       where: {
         isActive: true,
@@ -199,6 +213,10 @@ export class SearchService {
       },
       take: limit,
     });
+
+    if (isRedisConnected()) {
+      await getRedisClient().setex(cacheKey, 60, JSON.stringify(resources)); // cache for 60 seconds
+    }
 
     return resources;
   }

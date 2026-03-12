@@ -219,8 +219,8 @@ export class CourseService {
       throw new NotFoundError('Course not found');
     }
 
-    const page = query.page;
-    const limit = query.limit;
+    const page = query.page || 1;
+    const limit = query.limit || 20;
     const skip = (page - 1) * limit;
 
     const where: any = {

@@ -6,13 +6,12 @@ export class NotificationsController {
     async getNotifications(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const userId = req.user!.userId;
-            const { page, limit, unreadOnly } = req.query;
+            const validatedQuery = (req as any).validated?.query ?? req.query;
 
-            const result = await notificationsService.getUserNotifications(userId, {
-                page: page ? Number(page) : undefined,
-                limit: limit ? Number(limit) : undefined,
-                unreadOnly: unreadOnly === 'true',
-            });
+            const result = await notificationsService.getUserNotifications(
+                userId,
+                validatedQuery as any
+            );
 
             res.json({ success: true, ...result });
         } catch (error) {

@@ -3,23 +3,7 @@ import prisma from '../../config/database.js';
 import { NotFoundError, ConflictError } from '../../shared/errors/AppError.js';
 import { logger } from '../../shared/utils/logger.js';
 
-interface CreateCourseUnitInput {
-    code: string;
-    name: string;
-    description?: string;
-}
-
-interface UpdateCourseUnitInput {
-    code?: string;
-    name?: string;
-    description?: string;
-}
-
-interface CourseUnitQueryInput {
-    page?: number;
-    limit?: number;
-    search?: string;
-}
+import type { CreateCourseUnitInput, UpdateCourseUnitInput, CourseUnitQueryInput } from './course-unit.validators.js';
 
 export class CourseUnitService {
     /**
@@ -83,7 +67,7 @@ export class CourseUnitService {
     /**
      * Get all units for a course
      */
-    async findByCourse(courseId: string, query: CourseUnitQueryInput = {}) {
+    async findByCourse(courseId: string, query: Partial<CourseUnitQueryInput> = {}) {
         const course = await prisma.course.findUnique({
             where: { id: courseId },
         });
@@ -93,7 +77,7 @@ export class CourseUnitService {
         }
 
         const page = query.page || 1;
-        const limit = query.limit || 50; // Usually not many units per course
+        const limit = query.limit || 50; 
         const skip = (page - 1) * limit;
 
         const where: Record<string, unknown> = { courseId };
@@ -262,7 +246,7 @@ export class CourseUnitService {
     /**
      * Get resources for a specific course unit
      */
-    async getResources(unitId: string, query: { page?: number; limit?: number } = {}) {
+    async getResources(unitId: string, query: Partial<CourseUnitQueryInput> = {}) {
         const unit = await prisma.courseUnit.findUnique({
             where: { id: unitId },
         });

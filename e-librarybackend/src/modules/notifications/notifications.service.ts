@@ -40,7 +40,7 @@ export class NotificationsService {
                 where: where as any,
                 skip,
                 take: limit,
-                orderBy: { createdAt: 'desc' },
+                orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
             }),
             prisma.notification.count({ where: where as any }),
             prisma.notification.count({

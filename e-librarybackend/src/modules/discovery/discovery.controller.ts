@@ -1,13 +1,11 @@
 // src/modules/discovery/discovery.controller.ts
 import { Request, Response, NextFunction } from 'express';
 import { discoveryService } from './discovery.service.js';
-import { validate } from '../../shared/middleware/validate.js';
-import { discoverySearchSchema } from './discovery.validators.js';
 
 export class DiscoveryController {
   async search(req: Request, res: Response, next: NextFunction) {
     try {
-      const query = (req as any).validated.query as any;
+      const query = (req as any).validated?.query ?? req.query;
       const result = await discoveryService.search(query);
 
       res.json({

@@ -7,6 +7,7 @@ import {
   updateRequestSchema,
   requestQuerySchema,
   requestIdSchema,
+  respondRequestSchema,
 } from './request.validators.js';
 
 const router = Router();
@@ -61,6 +62,7 @@ router.post(
   authenticate,
   authorize('ADMIN'),
   validate(requestIdSchema, 'params'),
+  validate(respondRequestSchema, 'body'),
   requestController.respond.bind(requestController)
 );
 

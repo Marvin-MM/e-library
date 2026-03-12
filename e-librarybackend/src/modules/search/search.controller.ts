@@ -31,8 +31,8 @@ export class SearchController {
 
   async getSuggestions(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { q } = req.query;
-      const suggestions = await searchService.getSuggestions(q as string);
+      const validatedQuery = (req as any).validated?.query ?? req.query;
+      const suggestions = await searchService.getSuggestions(validatedQuery.q as string, validatedQuery.limit as number);
       res.json({
         success: true,
         data: suggestions,

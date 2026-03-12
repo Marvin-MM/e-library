@@ -23,9 +23,6 @@ export const authRateLimiter = rateLimit({
   handler: (_req, _res, _next) => {
     throw new TooManyRequestsError('Too many authentication attempts, please try again in 15 minutes');
   },
-  keyGenerator: (req) => {
-    return req.ip || req.headers['x-forwarded-for']?.toString() || 'unknown';
-  },
 });
 
 export const strictRateLimiter = rateLimit({

@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { BaseDiscoverySource } from './base.source.js';
 import type { DiscoveryResult, DiscoverySearchQuery } from '../types.js';
+import { logger } from '../../../shared/utils/logger.js';
 
 export class ERICClient extends BaseDiscoverySource {
   name = 'eric' as const;
@@ -81,14 +82,12 @@ export class ERICClient extends BaseDiscoverySource {
         total: response.data?.response?.numFound || 0,
       };
     } catch (error: any) {
-      console.error(`ERIC API error: ${error.message}`);
+      logger.warn('ERIC API error', { message: error.message });
       return { results: [], total: 0 };
     }
   }
 
   async harvest(): Promise<void> {
-    // Optional background harvest implementation
-    // Could be used to periodically fetch new records
-    console.log(`${this.name}: Harvest not implemented`);
+    logger.debug(`${this.name}: Harvest not implemented`);
   }
 }
