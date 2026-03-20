@@ -1,26 +1,22 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { SearchModal } from "@/components/modals/SearchModal";
+import { Button } from "@/components/ui/button";
+import { useRole } from "@/hooks/useAuth";
+import { useMyRequests } from "@/hooks/useRequests";
+import { motion } from "framer-motion";
+import {
+    Activity,
+    ChevronRight,
+    GitPullRequest,
+    Layers,
+    MoveRight,
+    Search
+} from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { SearchModal } from "@/components/modals/SearchModal";
-import { useRole } from "@/hooks/useAuth";
-import { useMyRequests } from "@/hooks/useRequests";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-    Search,
-    GitPullRequest,
-    Globe,
-    BookOpen,
-    Sparkles,
-    ChevronRight,
-    Activity,
-    Layers,
-    MoveRight
-} from "lucide-react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 // Dynamic import for ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });

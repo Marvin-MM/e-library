@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
     Dialog,
     DialogContent,
@@ -43,6 +44,9 @@ import {
     ChevronLeft,
     ChevronRight,
     Loader2,
+    Mail,
+    Calendar,
+    Settings
 } from "lucide-react";
 import { getInitials, formatDate } from "@/lib/utils";
 import type { User, UserRole } from "@/types/api";
@@ -121,226 +125,273 @@ export default function AdminUsersPage() {
     };
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-bold tracking-tight">User Management</h2>
-                <p className="text-muted-foreground">
-                    Manage users, roles, and permissions
-                </p>
-            </div>
-            <Card>
-                <CardContent className="p-4">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search users..."
-                                value={search}
-                                onChange={(e) => {
-                                    setSearch(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="pl-10"
-                            />
-                        </div>
-                        <Select
-                            value={roleFilter}
-                            onValueChange={(value) => {
-                                setRoleFilter(value);
+        <div className="h-[calc(100vh-120px)] flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700 font-titillium">
+
+            {/* TOP ROW: Z-Pattern Start */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
+                <div className="flex flex-col justify-center gap-2">
+                    <h2 className="text-lg md:text-xl font-bold tracking-tight text-zinc-900 pl-3">
+                        User Management
+                    </h2>
+                    <p className="text-xs text-zinc-500 pl-4 font-semibold text-[10px]">
+                        Manage roles, permissions, & accounts
+                    </p>
+                </div>
+
+                {/* Z-Pattern Top Right: Actions & Tools */}
+                <div className="flex items-center justify-end gap-3 px-2">
+                    <div className="relative w-64 group">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within:text-blue-900 transition-colors" />
+                        <Input
+                            placeholder="Search by name or email..."
+                            value={search}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
                                 setPage(1);
                             }}
-                        >
-                            <SelectTrigger className="w-full sm:w-40">
-                                <SelectValue placeholder="All Roles" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Roles</SelectItem>
-                                <SelectItem value="ADMIN">Admin</SelectItem>
-                                <SelectItem value="STAFF">Staff</SelectItem>
-                                <SelectItem value="STUDENT">Student</SelectItem>
-                            </SelectContent>
-                        </Select>
+                            className="pl-9 h-11 border-2 border-zinc-100 shadow-none bg-white focus-visible:ring-0 focus-visible:border-blue-900 transition-all rounded"
+                        />
                     </div>
-                </CardContent>
-            </Card>
-            {isLoading ? (
-                <Card>
-                    <CardContent className="p-0">
-                        <div className="divide-y">
-                            {[...Array(5)].map((_, i) => (
-                                <div key={i} className="flex items-center gap-4 p-4">
-                                    <Skeleton className="h-10 w-10 rounded-full" />
-                                    <div className="flex-1">
-                                        <Skeleton className="h-5 w-48 mb-1" />
-                                        <Skeleton className="h-4 w-32" />
+                    <Select
+                        value={roleFilter}
+                        onValueChange={(value) => {
+                            setRoleFilter(value);
+                            setPage(1);
+                        }}
+                    >
+                        <SelectTrigger className="w-[140px] h-11 border-2 border-zinc-100 shadow-none bg-white rounded focus:ring-0 uppercase text-[10px] font-bold tracking-wider text-zinc-600 hover:border-zinc-300 transition-all cursor-pointer">
+                            <SelectValue placeholder="ALL ROLES" />
+                        </SelectTrigger>
+                        <SelectContent className="border-2 border-zinc-100 shadow-xl rounded">
+                            <SelectItem value="all" className="text-xs uppercase font-bold tracking-widest py-3">All Roles</SelectItem>
+                            <SelectItem value="ADMIN" className="text-xs uppercase font-bold tracking-widest text-red-600 py-3">Admin</SelectItem>
+                            <SelectItem value="STAFF" className="text-xs uppercase font-bold tracking-widest text-blue-600 py-3">Staff</SelectItem>
+                            <SelectItem value="STUDENT" className="text-xs uppercase font-bold tracking-widest text-zinc-600 py-3">Student</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+
+            {/* MIDDLE BODY: Z-Pattern Diagonal Flow -> Main Content */}
+            <div className="flex-1 overflow-hidden flex flex-col bg-white rounded relative shadow-sm">
+
+                {/* Header Row for Table */}
+                <div className="grid grid-cols-12 gap-4 p-4 border-b-2 border-zinc-100 bg-zinc-50/50 text-[10px] font-bold uppercase tracking-widest text-zinc-400 shrink-0">
+                    <div className="col-span-5 pl-4">User Details</div>
+                    <div className="col-span-3 hidden sm:block">Email Address</div>
+                    <div className="col-span-2 hidden md:block">Joined Date</div>
+                    <div className="col-span-1">Role</div>
+                    <div className="col-span-1 text-right pr-4">Actions</div>
+                </div>
+
+                {/* Users List Wrapper */}
+                <ScrollArea className="flex-1">
+                    {isLoading ? (
+                        <div className="divide-y divide-zinc-100">
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="grid grid-cols-12 gap-4 p-4 items-center animate-pulse">
+                                    <div className="col-span-5 flex flex-row items-center gap-4 pl-4">
+                                        <Skeleton className="h-10 w-10 border-2 border-zinc-100 rounded-full shrink-0" />
+                                        <div className="flex flex-col gap-2 w-full max-w-[200px]">
+                                            <Skeleton className="h-4 w-full" />
+                                            <Skeleton className="h-3 w-2/3" />
+                                        </div>
                                     </div>
-                                    <Skeleton className="h-6 w-16" />
                                 </div>
                             ))}
                         </div>
-                    </CardContent>
-                </Card>
-            ) : users.length > 0 ? (
-                <>
-                    <Card>
-                        <CardContent className="p-0">
-                            <div className="divide-y">
-                                {users.map((user, index) => (
-                                    <div
-                                        key={user.id}
-                                        className="flex items-center gap-4 p-4 hover:bg-accent/50 transition-colors"
-                                    >
-                                        <Avatar>
-                                            <AvatarImage src={user.avatar} />
-                                            <AvatarFallback>
+                    ) : users.length > 0 ? (
+                        <div className="divide-y divide-zinc-100/60 pb-20">
+                            {users.map((user) => (
+                                <div
+                                    key={user.id}
+                                    className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-blue-50/30 transition-all group"
+                                >
+                                    {/* User Block */}
+                                    <div className="col-span-11 sm:col-span-5 flex flex-row items-center gap-4 pl-2">
+                                        <Avatar className="h-11 w-11 border-2 border-white shadow-sm ring-2 ring-zinc-50 group-hover:ring-blue-100 transition-all shrink-0">
+                                            <AvatarImage src={user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.firstName + ' ' + user.lastName)}`} />
+                                            <AvatarFallback className="bg-zinc-100 text-zinc-600 font-bold">
                                                 {getInitials(`${user.firstName} ${user.lastName}`)}
                                             </AvatarFallback>
                                         </Avatar>
-                                        <div className="flex-1 min-w-0">
+                                        <div className="flex flex-col min-w-0 pr-4">
                                             <div className="flex items-center gap-2">
-                                                <p className="font-medium truncate">
+                                                <p className="font-bold text-zinc-900 text-sm truncate group-hover:text-blue-900 transition-colors">
                                                     {user.firstName} {user.lastName}
                                                 </p>
-                                                {!user.isVerified && (
-                                                    <Badge variant="outline" className="text-xs">
-                                                        Unverified
-                                                    </Badge>
-                                                )}
                                             </div>
-                                            <p className="text-sm text-muted-foreground truncate">
-                                                {user.email}
-                                            </p>
+                                            {!user.isVerified && (
+                                                <Badge variant="outline" className="text-[9px] uppercase tracking-widest bg-orange-50 text-orange-600 border-none w-fit mt-1 px-1.5 py-0 h-4">
+                                                    Unverified
+                                                </Badge>
+                                            )}
                                         </div>
-                                        <div className="hidden sm:block text-sm text-muted-foreground">
+                                    </div>
+
+                                    {/* Email Block */}
+                                    <div className="col-span-3 hidden sm:flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                                        <Mail className="h-3.5 w-3.5 text-zinc-400" />
+                                        <p className="text-xs text-zinc-600 truncate font-medium">
+                                            {user.email}
+                                        </p>
+                                    </div>
+
+                                    {/* Joined Block */}
+                                    <div className="col-span-2 hidden md:flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                                        <Calendar className="h-3.5 w-3.5 text-zinc-400" />
+                                        <p className="text-[11px] text-zinc-500 font-medium whitespace-nowrap">
                                             {formatDate(user.createdAt)}
-                                        </div>
-                                        <Badge variant={getRoleBadgeVariant(user.role)}>
+                                        </p>
+                                    </div>
+
+                                    {/* Role Block */}
+                                    <div className="col-span-1 hidden sm:flex items-center">
+                                        <Badge
+                                            variant={getRoleBadgeVariant(user.role)}
+                                            className="text-[9px] uppercase tracking-widest font-bold shadow-none rounded shrink-0 h-5"
+                                        >
                                             {user.role}
                                         </Badge>
+                                    </div>
+
+                                    {/* Actions Block */}
+                                    <div className="col-span-1 sm:col-span-1 flex justify-end pr-2">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon">
-                                                    <MoreHorizontal className="h-4 w-4" />
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-zinc-100 border-2 border-transparent hover:border-zinc-200 transition-all opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100">
+                                                    <Settings className="h-4 w-4 text-zinc-600" />
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
+                                            <DropdownMenuContent align="end" className="border-2 border-zinc-100 shadow-xl rounded-xl w-48 p-1">
+                                                <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-zinc-400 font-bold px-3 py-2">Manage User</DropdownMenuLabel>
+                                                <DropdownMenuSeparator className="bg-zinc-100" />
                                                 <DropdownMenuItem
                                                     onClick={() => {
                                                         setSelectedUser(user);
                                                         setNewRole(user.role);
                                                         setRoleDialogOpen(true);
                                                     }}
+                                                    className="rounded-lg cursor-pointer text-xs font-semibold py-2.5 outline-none focus:bg-blue-50 focus:text-blue-900 transition-colors"
                                                 >
-                                                    <Shield className="mr-2 h-4 w-4" />
+                                                    <Shield className="mr-2 h-4 w-4 opacity-70" />
                                                     Change Role
                                                 </DropdownMenuItem>
                                                 {canDeleteUser(user) && (
-                                                    <DropdownMenuItem
-                                                        onClick={() => {
-                                                            setSelectedUser(user);
-                                                            setDeleteDialogOpen(true);
-                                                        }}
-                                                        className="text-destructive"
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        Delete User
-                                                    </DropdownMenuItem>
+                                                    <>
+                                                        <DropdownMenuSeparator className="bg-zinc-100" />
+                                                        <DropdownMenuItem
+                                                            onClick={() => {
+                                                                setSelectedUser(user);
+                                                                setDeleteDialogOpen(true);
+                                                            }}
+                                                            className="rounded-lg cursor-pointer text-xs font-semibold py-2.5 outline-none focus:bg-red-50 focus:text-red-900 text-red-600 transition-colors"
+                                                        >
+                                                            <Trash2 className="mr-2 h-4 w-4 opacity-70" />
+                                                            Delete User
+                                                        </DropdownMenuItem>
+                                                    </>
                                                 )}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    {pagination && pagination.totalPages > 1 && (
-                        <div className="flex items-center justify-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                disabled={!pagination.hasPrev}
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                                Previous
-                            </Button>
-                            <span className="text-sm text-muted-foreground px-4">
-                                Page {pagination.page} of {pagination.totalPages}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setPage((p) => p + 1)}
-                                disabled={!pagination.hasNext}
-                            >
-                                Next
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-20 opacity-50">
+                            <Users className="h-16 w-16 text-zinc-300 mb-6" />
+                            <h3 className="text-xl font-bold tracking-tight text-zinc-900 mb-2">No users found</h3>
+                            <p className="text-sm text-zinc-500 text-center max-w-sm">
+                                {search || roleFilter !== "all"
+                                    ? "0 users match your current filters. Try relaxing your search criteria."
+                                    : "There are absolutely no users registered on the platform yet."}
+                            </p>
                         </div>
                     )}
-                </>
-            ) : (
-                <Card>
-                    <CardContent className="flex flex-col items-center justify-center py-12">
-                        <Users className="h-12 w-12 text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">No users found</h3>
-                        <p className="text-muted-foreground text-center max-w-sm">
-                            {search || roleFilter !== "all"
-                                ? "Try adjusting your filters."
-                                : "There are no users yet."}
-                        </p>
-                    </CardContent>
-                </Card>
+                </ScrollArea>
+            </div>
+
+            {/* BOTTOM ROW: Z-Pattern End (Pagination) */}
+            {pagination && pagination.totalPages > 1 && (
+                <div className="flex items-center justify-between mt-auto mb-2 px-2 shrink-0 bg-white p-3 rounded-2xl border-2 border-zinc-100">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 pl-2 hidden sm:block">
+                        Showing Page <span className="text-zinc-800">{pagination.page}</span> of <span className="text-zinc-800">{pagination.totalPages}</span>
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-2 border-zinc-100 shadow-none hover:bg-zinc-50 rounded-xl h-9 px-4 text-xs font-bold transition-all"
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            disabled={!pagination.hasPrev}
+                        >
+                            <ChevronLeft className="h-4 w-4 mr-1" />
+                            Previous
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-2 border-zinc-100 shadow-none hover:bg-zinc-50 rounded-xl h-9 px-4 text-xs font-bold transition-all bg-zinc-900 text-white hover:text-zinc-900 hover:border-zinc-300 border-zinc-900"
+                            onClick={() => setPage((p) => p + 1)}
+                            disabled={!pagination.hasNext}
+                        >
+                            Next
+                            <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                    </div>
+                </div>
             )}
+
+            {/* Modals remain structurally the same but styled better if needed */}
             <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
-                <DialogContent>
+                <DialogContent className="border-2 border-zinc-100 shadow-2xl rounded-2xl">
                     <DialogHeader>
-                        <DialogTitle>Change User Role</DialogTitle>
-                        <DialogDescription>
-                            Update the role for {selectedUser?.firstName} {selectedUser?.lastName}
+                        <DialogTitle className="text-xl font-bold">Manage Role</DialogTitle>
+                        <DialogDescription className="text-sm text-zinc-500">
+                            Adjust permissions for <span className="font-bold text-zinc-900">{selectedUser?.firstName} {selectedUser?.lastName}</span>
                         </DialogDescription>
                     </DialogHeader>
                     <div className="py-4">
                         <Select value={newRole} onValueChange={(v) => setNewRole(v as UserRole)}>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full h-11 border-2 border-zinc-100 shadow-none bg-zinc-50 rounded-xl focus:ring-0 uppercase text-xs font-bold tracking-wider text-zinc-700 hover:border-zinc-300 transition-all cursor-pointer">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="STUDENT">Student</SelectItem>
-                                <SelectItem value="STAFF">Staff</SelectItem>
-                                <SelectItem value="ADMIN">Admin</SelectItem>
+                            <SelectContent className="border-2 border-zinc-100 shadow-xl rounded-xl">
+                                <SelectItem value="STUDENT" className="text-xs uppercase font-bold tracking-widest text-zinc-600 py-3">Student Level</SelectItem>
+                                <SelectItem value="STAFF" className="text-xs uppercase font-bold tracking-widest text-blue-600 py-3">Staff / Faculty Level</SelectItem>
+                                <SelectItem value="ADMIN" className="text-xs uppercase font-bold tracking-widest text-red-600 py-3">Administrator Level</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setRoleDialogOpen(false)}>
+                        <Button variant="ghost" className="rounded-xl font-bold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900" onClick={() => setRoleDialogOpen(false)}>
                             Cancel
                         </Button>
-                        <Button onClick={handleUpdateRole} disabled={updatingRole}>
+                        <Button className="rounded-xl font-bold border-2 border-blue-900 bg-blue-900 text-white shadow-none hover:bg-blue-800 transition-colors" onClick={handleUpdateRole} disabled={updatingRole}>
                             {updatingRole && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Update Role
+                            Confirm Changes
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogContent>
+                <DialogContent className="border-2 border-red-50 shadow-2xl rounded-2xl">
                     <DialogHeader>
-                        <DialogTitle>Delete User</DialogTitle>
-                        <DialogDescription>
-                            Are you sure you want to delete {selectedUser?.firstName} {selectedUser?.lastName}?
-                            This action cannot be undone.
+                        <DialogTitle className="text-xl font-bold text-red-600">Terminate Account</DialogTitle>
+                        <DialogDescription className="text-sm text-zinc-500">
+                            Are you absolutely certain you want to permanently delete <span className="font-bold text-zinc-900">{selectedUser?.firstName} {selectedUser?.lastName}</span>? This action is irreversible and all associated data will be annihilated.
                         </DialogDescription>
                     </DialogHeader>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                            Cancel
+                    <DialogFooter className="mt-4">
+                        <Button variant="ghost" className="rounded-xl font-bold text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900" onClick={() => setDeleteDialogOpen(false)}>
+                            Abort
                         </Button>
-                        <Button variant="destructive" onClick={handleDeleteUser} disabled={deletingUser}>
+                        <Button variant="destructive" className="rounded-xl font-bold shadow-none" onClick={handleDeleteUser} disabled={deletingUser}>
                             {deletingUser && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Delete
+                            Terminate User
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const statusOptions = [
-  { value: "OPEN", label: "Open" },
+  { value: "PENDING", label: "Pending" },
   { value: "IN_PROGRESS", label: "In Progress" },
   { value: "RESOLVED", label: "Resolved" },
   { value: "REJECTED", label: "Rejected" },

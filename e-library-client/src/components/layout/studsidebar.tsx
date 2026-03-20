@@ -1,7 +1,11 @@
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
+import { DiscoverySearchModal } from '@/components/modals/DiscoverySearchModal';
+import { useDiscoveryStore } from '@/stores/discoveryStore';
+import { useLogout } from '@/hooks/useAuth';
 import {
   BookAIcon,
+  BoxSelectIcon,
   ChevronRight,
   ChevronsUpDown,
   Film,
@@ -20,6 +24,7 @@ import {
   Zap
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { useAuthStore } from '@/stores/authStore';
 
 interface SidebarProps {
   activeTab: string;
@@ -31,8 +36,16 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
   const [activeWorkspace, setActiveWorkspace] = useState({ id: 'Faculty of IT', name: 'Faculty of IT', icon: Zap });
+
+  const { user } = useAuthStore();
+  const logoutMutation = useLogout();
+  const userName = user?.firstName || user?.name || "Student";
+  const userAvatar = user?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(userName)}`;
+
+  const { selectedSources, toggleSource, setSelectedSources } = useDiscoveryStore();
 
   const profileRef = useRef<HTMLDivElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
@@ -75,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed 
       title: "Resources",
       items: [
         { id: '/students/dissertations', label: 'Dissertations', icon: HandCoins },
-        { id: '/students/audio-books', label: 'Audio Books', icon: Headphones },
+        { id: '/resources', label: 'Resources', icon: BoxSelectIcon },
         { id: '/students/favourites', label: 'Favourites', icon: Heart },
       ]
     }
@@ -103,22 +116,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed 
 
 
 
-  const [minPrice, setMinPrice] = useState('1000');
-  const [maxPrice, setMaxPrice] = useState('3800000');
-  const [selectedLocation, setSelectedLocation] = useState('Kampala');
-  const [selectedCondition, setSelectedCondition] = useState('New');
-
-  const locations = [
-    { name: 'Kampala', count: 12 },
-    { name: 'Mbarara', count: 2 },
-    { name: 'Gulu', count: 1 },
-    { name: 'Jinja', count: 1 },
-    { name: 'Kira', count: 1 },
-  ];
-
-  const conditions = [
-    { name: 'New', count: 15 },
-    { name: 'Used', count: 2 },
+  const discoverySources = [
+    { id: 'openalex', name: 'OpenAlex', count: '2.3M' },
+    { id: 'doaj', name: 'DOAJ Repository', count: '890K' },
+    { id: 'core', name: 'CORE Academic', count: '1.2M' },
   ];
 
   return (
@@ -235,33 +236,43 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed 
 
         {/* Filters Section */}
         {!isCollapsed && (
-          <div className="mt-4 border-t border-zinc-50 pt-6 px-2 space-y-4">
-            {/* Location */}
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                {locations.map((loc) => (
-                  <button
-                    key={loc.name}
-                    onClick={() => setSelectedLocation(loc.name)}
-                    className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-all",
-                      selectedLocation === loc.name
-                        ? "bg-blue-900 text-white border-blue-900"
-                        : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300"
-                    )}
-                  >
-                    <span>{loc.name}</span>
-                    <span className={cn(
-                      "text-[10px]",
-                      selectedLocation === loc.name ? "text-zinc-400" : "text-zinc-400"
-                    )}>({loc.count})</span>
-                  </button>
-                ))}
+          <div className="mt-4  pt-5 px-2 space-y-3">
+            <h3 className="text-[14px] text-zinc-500 mb-2 px-2 font-medium">Discovery Sources</h3>
+            <div className="space-y-2">
+              <div className="flex flex-col gap-2">
+                {discoverySources.map((source) => {
+                  const isSelected = selectedSources.includes(source.id);
+                  return (
+                    <button
+                      key={source.id}
+                      onClick={() => {
+                        // If not selected, select it and open modal
+                        if (!isSelected) {
+                          setSelectedSources([...selectedSources, source.id]);
+                        }
+                        setIsSearchModalOpen(true);
+                      }}
+                      className={cn(
+                        "flex items-center justify-between px-3 py-2 rounded-lg border text-xs transition-all w-full text-left group",
+                        isSelected
+                          ? "bg-blue-50 text-blue-900 border-blue-200"
+                          : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50"
+                      )}
+                    >
+                      <span className="font-semibold">{source.name}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
         )}
       </div>
+
+      <DiscoverySearchModal
+        open={isSearchModalOpen}
+        onOpenChange={setIsSearchModalOpen}
+      />
 
       {/* Footer / User */}
       <div className="p-3 mt-auto border-t border-zinc-200 relative" ref={profileRef}>
@@ -275,14 +286,17 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed 
             >
               {/* User Header */}
               <div className="px-3 py-2 flex items-center gap-2.5 border-b border-zinc-100 mb-1">
-                <div className="w-8 h-8 rounded-full overflow-hidden ">
+                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 mt-2">
                   <img
-                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Benjamin"
-                    alt="Profile"
+                    src={userAvatar}
+                    alt={userName}
                     className="w-full h-full object-cover bg-zinc-100"
                   />
                 </div>
-                <span className="text-sm font-semibold text-zinc-900">Canac</span>
+                <div className="flex flex-col mt-2">
+                  <span className="text-sm font-semibold text-zinc-900 leading-none">{userName}</span>
+                  {user?.email && <span className="text-[10px] text-zinc-500 mt-1">{user.email}</span>}
+                </div>
               </div>
 
               {/* Group 1 */}
@@ -390,9 +404,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed 
 
               {/* Group 3 */}
               <div className="px-1 space-y-0.5">
-                <button className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition-colors">
+                <button
+                  onClick={() => logoutMutation.mutate()}
+                  disabled={logoutMutation.isPending}
+                  className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition-colors disabled:opacity-50"
+                >
                   <LogOut className="w-4 h-4 text-zinc-400" />
-                  <span>Log out</span>
+                  <span>{logoutMutation.isPending ? 'Logging out...' : 'Log out'}</span>
                 </button>
               </div>
             </motion.div>
@@ -406,17 +424,17 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, isCollapsed 
             isProfileOpen ? "bg-zinc-200/50" : "hover:bg-zinc-200/50",
             isCollapsed && "justify-center px-0"
           )}
-          title={isCollapsed ? "Canac" : undefined}
+          title={isCollapsed ? userName : undefined}
         >
           <div className={cn("flex items-center gap-2.5", isCollapsed && "gap-0")}>
-            <div className="w-8 h-8 rounded-full overflow-hidden border border-zinc-200 shadow-sm shrink-0">
+            <div className="w-8 h-8 rounded-full overflow-hidden border border-zinc-200 shadow-sm shrink-0 mt-3">
               <img
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Benjamin"
-                alt="Profile"
+                src={userAvatar}
+                alt={userName}
                 className="w-full h-full object-cover bg-zinc-100"
               />
             </div>
-            {!isCollapsed && <span className="text-sm font-semibold text-zinc-900 truncate">Canac</span>}
+            {!isCollapsed && <span className="text-sm font-semibold text-zinc-900 truncate mt-3">{userName}</span>}
           </div>
           {!isCollapsed && <MoreVertical className="w-4 h-4 text-zinc-500" />}
         </button>

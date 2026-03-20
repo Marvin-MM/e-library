@@ -262,7 +262,7 @@ export interface ResourceRequest {
   category?: RequestCategory;
   priority: RequestPriority;
   dueDate?: string;
-  status: string;
+  status: RequestStatus;
   adminReply?: string; // Changed from adminNotes
   accessInstructions?: string;
   externalSourceUrl?: string;
@@ -284,7 +284,7 @@ export interface CreateRequestData {
 }
 
 export interface UpdateRequestData {
-  status?: string;
+  status?: RequestStatus;
   adminReply?: string;
   accessInstructions?: string;
   externalSourceUrl?: string;

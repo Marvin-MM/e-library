@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
     Dialog,
     DialogContent,
@@ -28,7 +29,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import { ClipboardList, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ClipboardList, ChevronLeft, ChevronRight, Loader2, User, MessageSquare, Clock, ArrowRight, ExternalLink } from "lucide-react";
 import { getInitials, formatDate } from "@/lib/utils";
 import { statusOptions } from "@/schemas/requests";
 import type { ResourceRequest, RequestStatus } from "@/types/api";
@@ -136,15 +137,24 @@ export default function AdminRequestsPage() {
     };
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-bold tracking-tight">All Requests</h2>
-                <p className="text-muted-foreground">
-                    Manage and respond to resource requests
-                </p>
-            </div>
-            <Card>
-                <CardContent className="p-4">
+        <div className="h-[calc(100vh-120px)] flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700 font-titillium">
+
+            {/* TOP ROW: Z-Pattern Start */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
+                <div className="flex flex-col justify-center gap-1">
+                    <h2 className="text-lg md:text-xl font-bold tracking-tight text-zinc-900 pl-3">
+                        Material Requests
+                    </h2>
+                    <p className="text-xs text-zinc-500 pl-4 font-semibold uppercase tracking-widest text-[9px]">
+                        Review and fulfill student and staff requests
+                    </p>
+                </div>
+
+                <div className="flex items-center gap-2 group px-2">
+                    <div className="flex items-center gap-2 px-3 py-2 bg-white border-2 border-zinc-100 rounded text-zinc-400 group-hover:border-zinc-300 transition-all">
+                        <ClipboardList className="h-3.5 w-3.5" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Filter Status</span>
+                    </div>
                     <Select
                         value={statusFilter}
                         onValueChange={(value) => {
@@ -152,203 +162,240 @@ export default function AdminRequestsPage() {
                             setPage(1);
                         }}
                     >
-                        <SelectTrigger className="w-full sm:w-48">
-                            <SelectValue placeholder="All Statuses" />
+                        <SelectTrigger className="w-[180px] h-10 border-2 border-zinc-100 shadow-none bg-white rounded focus:ring-0 uppercase text-[10px] font-bold tracking-wider text-zinc-600 hover:border-zinc-300 transition-all cursor-pointer">
+                            <SelectValue placeholder="ALL STATUSES" />
                         </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="__ALL_STATUSES__">All Statuses</SelectItem>
+                        <SelectContent className="border-2 border-zinc-100 shadow-xl rounded">
+                            <SelectItem value="__ALL_STATUSES__" className="text-xs font-bold uppercase tracking-widest py-3">All Statuses</SelectItem>
                             {statusOptions.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value} className="text-xs font-bold uppercase tracking-widest py-3">
                                     {option.label}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
-                </CardContent>
-            </Card>
-            {isLoading ? (
-                <div className="space-y-4">
-                    {[...Array(5)].map((_, i) => (
-                        <Card key={i}>
-                            <CardContent className="p-6">
-                                <div className="flex items-start gap-4">
-                                    <Skeleton className="h-10 w-10 rounded-full" />
-                                    <div className="flex-1">
-                                        <Skeleton className="h-5 w-3/4 mb-2" />
-                                        <Skeleton className="h-4 w-1/2" />
+                </div>
+            </div>
+
+            {/* MIDDLE BODY: Grid List instead of just cards */}
+            <div className="flex-1 overflow-hidden flex flex-col bg-white border-2 border-zinc-100 rounded relative shadow-sm">
+                <div className="grid grid-cols-12 gap-4 p-4 border-b-2 border-zinc-100 bg-zinc-50/50 text-[10px] font-bold uppercase tracking-widest text-zinc-400 shrink-0">
+                    <div className="col-span-5 pl-4">Request Detail</div>
+                    <div className="col-span-2 hidden md:block">Priority</div>
+                    <div className="col-span-2 hidden md:block">Status</div>
+                    <div className="col-span-2 hidden md:block">Requested On</div>
+                    <div className="col-span-1 text-right pr-4">Handle</div>
+                </div>
+
+                <ScrollArea className="flex-1">
+                    {isLoading ? (
+                        <div className="divide-y divide-zinc-100">
+                            {[1, 2, 3, 4, 5].map(i => (
+                                <div key={i} className="grid grid-cols-12 gap-4 p-6 items-center">
+                                    <div className="col-span-5 flex gap-4 pl-4">
+                                        <Skeleton className="h-10 w-10 rounded-full" />
+                                        <div className="flex-1"><Skeleton className="h-4 w-3/4 mb-2" /><Skeleton className="h-3 w-1/2" /></div>
                                     </div>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            ) : requests.length > 0 ? (
-                <>
-                    <div className="space-y-4">
-                        {requests.map((request, index) => (
-                            <div
-                                key={request.id}
-                            >
-                                <Card className="hover:shadow-md transition-shadow">
-                                    <CardContent className="p-6">
-                                        <div className="flex flex-col lg:flex-row gap-4">
-                                            <div className="flex items-start gap-4 flex-1">
-                                                <Avatar>
-                                                    <AvatarImage src={request.user?.avatar} />
-                                                    <AvatarFallback>
-                                                        {getInitials(
-                                                            `${request.user?.firstName} ${request.user?.lastName}`
-                                                        )}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                        <h3 className="font-semibold">{request.title}</h3>
-                                                        <Badge variant={getStatusVariant(request.status)}>
-                                                            {request.status.replace("_", " ")}
-                                                        </Badge>
-                                                        <Badge variant={getPriorityVariant(request.priority)}>
-                                                            {request.priority}
-                                                        </Badge>
-                                                    </div>
-                                                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                                                        {request.reason}
-                                                    </p>
-                                                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                                                        <span>
-                                                            By: {request.user?.firstName} {request.user?.lastName}
-                                                        </span>
-                                                        <span>{request.category}</span>
-                                                        <span>{formatDate(request.createdAt)}</span>
-                                                    </div>
+                            ))}
+                        </div>
+                    ) : requests.length > 0 ? (
+                        <div className="divide-y divide-zinc-100/60 pb-20">
+                            {requests.map((request) => (
+                                <div key={request.id} className="grid grid-cols-12 gap-4 p-5 items-center hover:bg-zinc-50 transition-all group border-b border-transparent">
+                                    {/* Info Block */}
+                                    <div className="col-span-11 md:col-span-5 flex items-start gap-4 pl-2">
+                                        <Avatar className="h-10 w-10 border-2 border-white shadow-sm ring-2 ring-zinc-50 group-hover:ring-blue-100 transition-all shrink-0">
+                                            <AvatarImage src={request.user?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(request.user?.firstName + ' ' + request.user?.lastName)}`} />
+                                            <AvatarFallback className="bg-zinc-100 text-zinc-600 font-bold text-xs">{getInitials(`${request.user?.firstName} ${request.user?.lastName}`)}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex flex-col min-w-0">
+                                            <h3 className="font-bold text-zinc-900 text-sm truncate uppercase tracking-tight group-hover:text-blue-900 transition-all">{request.title}</h3>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">{request.user?.firstName} {request.user?.lastName}</span>
+                                                <span className="text-[9px] text-zinc-300">•</span>
+                                                <span className="text-[9px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-1 rounded">{request.category}</span>
+                                            </div>
+                                            {request.adminReply && (
+                                                <div className="mt-2 text-[10px] text-zinc-500 italic flex items-center gap-1.5 line-clamp-1 opacity-70 group-hover:opacity-100 transition-all">
+                                                    <MessageSquare className="h-3 w-3" />
+                                                    Admin notes responded
                                                 </div>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <Button onClick={() => openUpdateDialog(request)}>
-                                                    Update Status
-                                                </Button>
-                                            </div>
+                                            )}
                                         </div>
-                                        {request.adminReply && (
-                                            <div className="mt-4 p-3 bg-muted rounded-lg">
-                                                <p className="text-sm font-medium mb-1">Admin Notes:</p>
-                                                <p className="text-sm text-muted-foreground">{request.adminReply}</p>
-                                            </div>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        ))}
-                    </div>
-                    {pagination && pagination.totalPages > 1 && (
-                        <div className="flex items-center justify-center gap-2">
+                                    </div>
+
+                                    {/* Priority */}
+                                    <div className="col-span-2 hidden md:flex items-center">
+                                        <Badge variant={getPriorityVariant(request.priority)} className="text-[9px] font-black uppercase tracking-widest border-2 shadow-none rounded h-5">
+                                            {request.priority}
+                                        </Badge>
+                                    </div>
+
+                                    {/* Status */}
+                                    <div className="col-span-2 hidden md:flex items-center">
+                                        <Badge variant={getStatusVariant(request.status)} className="text-[9px] font-bold uppercase tracking-widest border-2 shadow-none rounded h-5">
+                                            {request.status.replace("_", " ")}
+                                        </Badge>
+                                    </div>
+
+                                    {/* Date */}
+                                    <div className="col-span-2 hidden md:flex items-center gap-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                                        <Clock className="h-3.5 w-3.5" />
+                                        {formatDate(request.createdAt)}
+                                    </div>
+
+                                    {/* Action */}
+                                    <div className="col-span-1 flex justify-end pr-2">
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => openUpdateDialog(request)}
+                                            className="h-9 w-9 p-0 rounded-lg hover:bg-blue-900 hover:text-white border-2 border-transparent hover:border-blue-800 transition-all opacity-0 group-hover:opacity-100"
+                                        >
+                                            <ArrowRight className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-20 opacity-50">
+                            <ClipboardList className="h-16 w-16 text-zinc-300 mb-6" />
+                            <h3 className="text-xl font-bold tracking-tight text-zinc-900 mb-2">No resource requests</h3>
+                            <p className="text-sm text-zinc-500 text-center max-w-sm">
+                                No student has submitted a request that matches your current filter status.
+                            </p>
+                        </div>
+                    )}
+                </ScrollArea>
+
+                {/* BOTTOM ROW: Z-Pattern End (Pagination) */}
+                {pagination && pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-auto mx-4 mb-4 bg-white p-3 rounded border-2 border-zinc-100 shrink-0">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 pl-2">
+                            Page <span className="text-zinc-800">{pagination.page}</span> of <span className="text-zinc-800">{pagination.totalPages}</span>
+                        </span>
+
+                        <div className="flex items-center gap-2">
                             <Button
                                 variant="outline"
                                 size="sm"
+                                className="border-2 border-zinc-100 shadow-none hover:bg-zinc-50 rounded h-9 px-4 text-xs font-bold transition-all"
                                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                                 disabled={!pagination.hasPrev}
                             >
-                                <ChevronLeft className="h-4 w-4" />
+                                <ChevronLeft className="h-4 w-4 mr-1" />
                                 Previous
                             </Button>
-                            <span className="text-sm text-muted-foreground px-4">
-                                Page {pagination.page} of {pagination.totalPages}
-                            </span>
                             <Button
                                 variant="outline"
                                 size="sm"
+                                className="border-2 border-zinc-100 shadow-none hover:bg-zinc-50 rounded h-9 px-4 text-xs font-bold transition-all bg-zinc-900 text-white hover:text-zinc-900 hover:border-zinc-300 border-zinc-900"
                                 onClick={() => setPage((p) => p + 1)}
                                 disabled={!pagination.hasNext}
                             >
                                 Next
-                                <ChevronRight className="h-4 w-4" />
+                                <ChevronRight className="h-4 w-4 ml-1" />
                             </Button>
                         </div>
-                    )}
-                </>
-            ) : (
-                <Card>
-                    <CardContent className="flex flex-col items-center justify-center py-12">
-                        <ClipboardList className="h-12 w-12 text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">No requests</h3>
-                        <p className="text-muted-foreground text-center max-w-sm">
-                            {statusFilter
-                                ? "No requests found with this status."
-                                : "There are no requests to review."}
-                        </p>
-                    </CardContent>
-                </Card>
-            )}
+                    </div>
+                )}
+            </div>
+
+            {/* MODALS remain focused but styled */}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent className="sm:max-w-lg">
-                    <DialogHeader>
-                        <DialogTitle>Update Request</DialogTitle>
-                        <DialogDescription>
-                            Change the status and add notes for this request
+                <DialogContent className="sm:max-w-xl border-2 border-zinc-100 shadow-2xl rounded-2xl p-0 overflow-hidden">
+                    <DialogHeader className="p-6 bg-zinc-50/80 border-b-2 border-zinc-100">
+                        <DialogTitle className="text-xl font-bold text-zinc-900">Manage Material Request</DialogTitle>
+                        <DialogDescription className="text-xs font-bold uppercase tracking-widest text-zinc-400 mt-1">
+                            Set resolution status and provide student access instructions
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label>Status</Label>
-                            <Select value={newStatus} onValueChange={(v) => setNewStatus(v as RequestStatus)}>
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {statusOptions.map((option) => (
-                                        <SelectItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+
+                    <ScrollArea className="max-h-[70vh]">
+                        <div className="p-6 space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2 col-span-2 sm:col-span-1">
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Current Status</Label>
+                                    <Select value={newStatus} onValueChange={(v) => setNewStatus(v as RequestStatus)}>
+                                        <SelectTrigger className="h-11 border-2 border-zinc-100 shadow-none bg-white rounded focus:ring-0 uppercase text-xs font-bold tracking-wider text-zinc-700 hover:border-zinc-300 transition-all">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="border-2 border-zinc-100 shadow-xl rounded">
+                                            {statusOptions.map((option) => (
+                                                <SelectItem key={option.value} value={option.value} className="text-xs font-bold uppercase tracking-widest py-3">
+                                                    {option.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="col-span-2 sm:col-span-1 p-3 bg-blue-50/50 rounded border-2 border-blue-100/50">
+                                    <p className="text-[9px] font-bold text-blue-900 uppercase tracking-widest mb-1">Requestor</p>
+                                    <p className="font-bold text-xs text-blue-950 uppercase">{selectedRequest?.user?.firstName} {selectedRequest?.user?.lastName}</p>
+                                    <p className="text-[9px] font-medium text-blue-800/60 mt-0.5">{selectedRequest?.category}</p>
+                                </div>
+                            </div>
+
+                            {newStatus === "RESOLVED" && (
+                                <div className="space-y-6 animate-in slide-in-from-top-2 duration-300">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Access Instructions</Label>
+                                        <Textarea
+                                            placeholder="Provide instructions for the student (e.g. download link, bookshelf location)..."
+                                            value={accessInstructions}
+                                            onChange={(e) => setAccessInstructions(e.target.value)}
+                                            rows={3}
+                                            className="resize-none border-2 border-zinc-100 rounded focus-visible:ring-0 focus-visible:border-blue-900 transition-all font-medium text-sm p-4"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">External Source URL</Label>
+                                            <div className="relative">
+                                                <ExternalLink className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                                                <Input
+                                                    placeholder="https://..."
+                                                    value={externalSourceUrl}
+                                                    onChange={(e) => setExternalSourceUrl(e.target.value)}
+                                                    className="pl-9 h-11 border-2 border-zinc-100 rounded focus-visible:ring-0 focus-visible:border-blue-900 transition-all font-medium text-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Fulfilled ID</Label>
+                                            <Input
+                                                placeholder="Internal Resource UUID"
+                                                value={fulfilledResourceId}
+                                                onChange={(e) => setFulfilledResourceId(e.target.value)}
+                                                className="h-11 border-2 border-zinc-100 rounded focus-visible:ring-0 focus-visible:border-blue-900 transition-all font-medium text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Internal Admin Notes</Label>
+                                <Textarea
+                                    placeholder="Private staff notes about this request processing..."
+                                    value={adminReply}
+                                    onChange={(e) => setAdminNotes(e.target.value)}
+                                    rows={4}
+                                    className="resize-none border-2 border-zinc-100 rounded focus-visible:ring-0 focus-visible:border-blue-900 transition-all font-medium text-sm p-4"
+                                />
+                            </div>
                         </div>
-                        {newStatus === "RESOLVED" && (
-                            <>
-                                <div className="space-y-2">
-                                    <Label>Access Instructions</Label>
-                                    <Textarea
-                                        placeholder="Provide instructions on how to access this resource..."
-                                        value={accessInstructions}
-                                        onChange={(e) => setAccessInstructions(e.target.value)}
-                                        rows={3}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>External Source URL (Optional)</Label>
-                                    <Input
-                                        placeholder="https://..."
-                                        value={externalSourceUrl}
-                                        onChange={(e) => setExternalSourceUrl(e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Fulfilled Resource ID (Optional)</Label>
-                                    <Input
-                                        placeholder="UUID of the resource in the system"
-                                        value={fulfilledResourceId}
-                                        onChange={(e) => setFulfilledResourceId(e.target.value)}
-                                    />
-                                </div>
-                            </>
-                        )}
-                        <div className="space-y-2">
-                            <Label>Admin Notes</Label>
-                            <Textarea
-                                placeholder="Add notes for this request..."
-                                value={adminReply}
-                                onChange={(e) => setAdminNotes(e.target.value)}
-                                rows={4}
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                    </ScrollArea>
+
+                    <DialogFooter className="p-6 bg-zinc-50/50 border-t-2 border-zinc-100">
+                        <Button variant="ghost" className="rounded-xl font-bold text-zinc-500 hover:bg-zinc-100 h-11 px-6 shadow-none" onClick={() => setDialogOpen(false)}>
                             Cancel
                         </Button>
-                        <Button onClick={handleUpdateRequest} disabled={isPending}>
+                        <Button onClick={handleUpdateRequest} disabled={isPending} className="rounded-xl font-bold bg-zinc-900 text-white hover:bg-zinc-800 transition-colors h-11 px-8 shadow-none border-2 border-transparent">
                             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Update
+                            Commit Changes
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -157,20 +157,20 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: async () => {
+      // Optimistically clear everything first
+      logout();
+      queryClient.clear();
+      
       try {
         await authApi.logout();
       } catch (error) {
-        console.error("[Logout] API call failed:", error);
-        // Continue with local logout even if API fails
+        // We ignore network errors here because local state is already cleared
+        console.warn("[Logout] Server notification failed, but local session cleared.", error);
       }
     },
     onSettled: () => {
-      // Always clear local state, even if API call fails
-      logout();
-      queryClient.clear();
-
-      // Redirect to login
-      router.push("/login");
+      // Force redirect to login
+      router.replace("/login");
       toast.success("Logged out successfully");
     },
   });
