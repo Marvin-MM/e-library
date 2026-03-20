@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className="min-h-screen bg-background font-sans antialiased">
+            <body className="min-h-screen bg-zinc-50 font-sans antialiased">
                 <Providers>{children}</Providers>
             </body>
         </html>

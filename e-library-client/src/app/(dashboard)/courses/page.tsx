@@ -19,11 +19,13 @@ import {
 } from "@/components/ui/dialog";
 import Link from "next/link";
 
-import { GraduationCap, Loader2, Search, ChevronLeft, ChevronRight, BookOpen, ArrowRight, Clock, ShieldAlert, GitBranchPlus } from "lucide-react";
+import { GraduationCap, Loader2, Search, ChevronLeft, ChevronRight, BookOpen, ArrowRight, Clock, ShieldAlert, GitBranchPlus, Layers } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createCourseSchema, type CreateCourseFormData } from "@/schemas/courses";
 import { formatDistanceToNow } from "date-fns";
+import { motion } from "framer-motion";
+
 
 export default function CoursesPage() {
     const { isStaffOrAdmin } = useRole();
@@ -55,233 +57,233 @@ export default function CoursesPage() {
     };
 
     return (
-        <div className="space-y-8 pb-8">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-8 rounded-3xl">
-                <div className="space-y-2">
-                    <h2 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
-                        Explore Courses
-                    </h2>
-                    <p className="text-muted-foreground text-lg max-w-2xl">
-                        Discover a wide range of courses and access their comprehensive resources to enhance your learning journey.
-                    </p>
-                </div>
-                {isStaffOrAdmin && (
-                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button size="lg" className="shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl">
-                                <GitBranchPlus className="mr-1 h-4 w-4" />
-                                Create Course
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-lg">
-                            <DialogHeader>
-                                <DialogTitle>Create New Course</DialogTitle>
-                                <DialogDescription>
-                                    Add a new course to organize resources
-                                </DialogDescription>
-                            </DialogHeader>
-                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="code">Course Code</Label>
-                                        <Input
-                                            id="code"
-                                            placeholder="CS101"
-                                            {...register("code")}
-                                            className={errors.code ? "border-destructive" : ""}
-                                        />
-                                        {errors.code && (
-                                            <p className="text-sm text-destructive">{errors.code.message}</p>
-                                        )}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="department">Department</Label>
-                                        <Input
-                                            id="department"
-                                            placeholder="Computer Science"
-                                            {...register("department")}
-                                            className={errors.department ? "border-destructive" : ""}
-                                        />
-                                        {errors.department && (
-                                            <p className="text-sm text-destructive">{errors.department.message}</p>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Course Name</Label>
-                                    <Input
-                                        id="name"
-                                        placeholder="Introduction to Programming"
-                                        {...register("name")}
-                                        className={errors.name ? "border-destructive" : ""}
-                                    />
-                                    {errors.name && (
-                                        <p className="text-sm text-destructive">{errors.name.message}</p>
-                                    )}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="description">Description</Label>
-                                    <Textarea
-                                        id="description"
-                                        placeholder="Course description..."
-                                        rows={3}
-                                        {...register("description")}
-                                        className={errors.description ? "border-destructive" : ""}
-                                    />
-                                    {errors.description && (
-                                        <p className="text-sm text-destructive">{errors.description.message}</p>
-                                    )}
-                                </div>
-                                <DialogFooter>
-                                    <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                                        Cancel
-                                    </Button>
-                                    <Button type="submit" disabled={isPending}>
-                                        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                        Create Course
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
-                )}
-            </div>
+        <div className="h-[calc(100vh-120px)] flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700 font-titillium">
 
-            {/* Search Section */}
-            <div className="flex justify-center">
-                <div className="relative w-full max-w-2xl">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Search className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <Input
-                        placeholder="Search for courses by name, code, or department..."
-                        value={search}
-                        onChange={(e) => {
-                            setSearch(e.target.value);
-                            setPage(1);
-                        }}
-                        className="pl-11 py-6 text-lg rounded-2xl shadow-sm border-muted-foreground/20 focus-visible:ring-primary/20 transition-all"
-                    />
-                </div>
-            </div>
-
-            {/* Content Section */}
-            {isLoading ? (
-                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                    {[...Array(6)].map((_, i) => (
-                        <div key={i} className="relative overflow-hidden rounded-xl border bg-card p-6 shadow-sm">
-                            <Skeleton className="h-8 w-8 rounded-md mb-4" />
-                            <Skeleton className="h-6 w-3/4 mb-2" />
-                            <Skeleton className="h-4 w-1/2 mb-4" />
-                            <Skeleton className="h-20 w-full rounded-lg" />
-                        </div>
-                    ))}
-                </div>
-            ) : courses.length > 0 ? (
-                <>
-                    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                        {courses.map((course, index) => (
-                            <div key={course.id}>
-                                <Link href={`/courses/${course.id}`}>
-                                    <div className="group relative flex flex-col h-full overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-lg cursor-pointer">
-                                        {/* Top Accent Line */}
-                                        <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
-
-                                        <div className="p-6 flex-1">
-                                            {/* Header: Icon + Code */}
-                                            <div className="flex items-start justify-between mb-6">
-                                                <div className="rounded-lg bg-muted p-2.5 transition-colors group-hover:bg-primary/10">
-                                                    <BookOpen className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                                                </div>
-                                                <span className="text-xs font-mono text-muted-foreground/70 bg-muted/50 px-2 py-1 rounded-md">
-                                                    {course.code}
-                                                </span>
-                                            </div>
-
-                                            {/* Title & Department */}
-                                            <div className="space-y-1 mb-4">
-                                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                                    {course.resourceCount} Resources
-                                                </p>
-                                                <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-1">
-                                                    {course.name}
-                                                </h3>
-                                            </div>
-
-                                            {/* Dashed Badge (Department) */}
-                                            <div className="inline-flex items-center rounded-md border border-dashed border-muted-foreground/30 bg-muted/10 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                                                <ShieldAlert className="mr-1.5 h-3 w-3" />
-                                                {course.department}
-                                            </div>
-                                        </div>
-
-                                        {/* Footer */}
-                                        <div className="border-t bg-muted/5 px-6 py-3.5 text-xs text-muted-foreground transition-colors group-hover:bg-muted/20">
-                                            <div className="flex items-center justify-between">
-                                                <span className="group-hover:hidden flex items-center gap-1.5">
-                                                    <Clock className="h-3.5 w-3.5" />
-                                                    Updated {formatDistanceToNow(new Date(course.updatedAt), { addSuffix: true })}
-                                                </span>
-                                                <span className="hidden group-hover:flex items-center justify-end w-full gap-1.5 text-primary font-semibold animate-in fade-in slide-in-from-left-2 duration-300">
-                                                    Go to this course
-                                                    <ArrowRight className="h-3.5 w-3.5" />
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
-                            </div>
-                        ))}
-                    </div>
-                    {pagination && pagination.totalPages > 1 && (
-                        <div className="flex items-center justify-center gap-4 mt-8">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                disabled={!pagination.hasPrev}
-                                className="rounded-full px-6"
-                            >
-                                <ChevronLeft className="h-4 w-4 mr-1" />
-                                Previous
-                            </Button>
-                            <span className="text-sm font-medium text-muted-foreground">
-                                Page {pagination.page} of {pagination.totalPages}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setPage((p) => p + 1)}
-                                disabled={!pagination.hasNext}
-                                className="rounded-full px-6"
-                            >
-                                Next
-                                <ChevronRight className="h-4 w-4 ml-1" />
-                            </Button>
-                        </div>
-                    )}
-                </>
-            ) : (
-                <div
-                    className="flex flex-col items-center justify-center py-16 text-center"
+            {/* TOP ROW: Z-Pattern Start */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
+                <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className="flex flex-col justify-center gap-2"
                 >
-                    <div className="bg-muted/30 p-6 rounded-full mb-4">
-                        <GraduationCap className="h-16 w-16 text-muted-foreground/50" />
+                    <div className="flex items-center gap-2 text-blue-900 font-bold text-xs uppercase bg-blue-50 w-fit px-3 py-1 rounded">
+                        <GraduationCap className="w-3 h-3" />
+                        Academic Explorer
                     </div>
-                    <h3 className="text-2xl font-bold mb-2">No courses found</h3>
-                    <p className="text-muted-foreground max-w-md mb-6">
-                        {search
-                            ? `We couldn't find any courses matching "${search}". Try adjusting your search terms.`
-                            : "There are no courses available at the moment. Check back later or create a new one."}
+                    <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">
+                        Explore Courses
+                    </h1>
+                    <p className="text-zinc-500 text-sm max-w-sm">
+                        Discover a wide range of academic courses and their comprehensive repositories.
                     </p>
-                    {search && (
-                        <Button variant="outline" onClick={() => setSearch("")}>
-                            Clear Search
-                        </Button>
-                    )}
+                </motion.div>
+
+                <motion.div
+                    initial={{ x: 20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className="flex items-center justify-end"
+                >
+                    <div className="bg-white border-2 border-zinc-100 p-2 flex items-center gap-4 rounded">
+                        <div className="px-6 py-2 border-r-2 border-zinc-100 last:border-0 text-center">
+                            <p className="text-[10px] uppercase font-bold text-zinc-400">Total Courses</p>
+                            <p className="text-xl font-bold text-blue-900">{pagination?.total || 0}</p>
+                        </div>
+                        {isStaffOrAdmin && (
+                            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button className="h-12 px-6 rounded bg-blue-900 hover:bg-zinc-900 text-white shrink-0 font-bold text-xs uppercase tracking-wider">
+                                        <GitBranchPlus className="w-4 h-4 mr-2" />
+                                        Create New
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-lg border-2 border-zinc-100 shadow-none">
+                                    <DialogHeader>
+                                        <DialogTitle className="text-xl font-bold">Create New Course</DialogTitle>
+                                        <DialogDescription className="text-zinc-500">
+                                            Add a new course to organize academic resources
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-xs font-bold uppercase text-zinc-400">Course Code</Label>
+                                                <Input
+                                                    {...register("code")}
+                                                    placeholder="CS101"
+                                                    className={`border-2 ${errors.code ? 'border-red-500' : 'border-zinc-100'} focus-visible:ring-0 rounded h-11`}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-xs font-bold uppercase text-zinc-400">Department</Label>
+                                                <Input
+                                                    {...register("department")}
+                                                    placeholder="Computer Science"
+                                                    className={`border-2 ${errors.department ? 'border-red-500' : 'border-zinc-100'} focus-visible:ring-0 rounded h-11`}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-xs font-bold uppercase text-zinc-400">Course Name</Label>
+                                            <Input
+                                                {...register("name")}
+                                                placeholder="Introduction to Programming"
+                                                className={`border-2 ${errors.name ? 'border-red-500' : 'border-zinc-100'} focus-visible:ring-0 rounded h-11`}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-xs font-bold uppercase text-zinc-400">Description</Label>
+                                            <Textarea
+                                                {...register("description")}
+                                                placeholder="Enter course description..."
+                                                className={`border-2 ${errors.description ? 'border-red-500' : 'border-zinc-100'} focus-visible:ring-0 rounded min-h-[100px]`}
+                                            />
+                                        </div>
+                                        <DialogFooter className="pt-4">
+                                            <Button type="button" variant="ghost" onClick={() => setDialogOpen(false)} className="font-bold uppercase text-xs">Cancel</Button>
+                                            <Button type="submit" disabled={isPending} className="bg-blue-900 hover:bg-zinc-900 text-white font-bold uppercase text-xs px-8">
+                                                {isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                                Create Course
+                                            </Button>
+                                        </DialogFooter>
+                                    </form>
+                                </DialogContent>
+                            </Dialog>
+                        )}
+                    </div>
+                </motion.div>
+            </div>
+
+            {/* MIDDLE ROW: Search & Discovery */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
+                <div className="lg:col-span-2 bg-white border-2 border-zinc-100 p-6 rounded relative flex items-center justify-between">
+                    <div className="flex items-center gap-4 w-full">
+                        <div className="w-12 h-12 rounded bg-zinc-50 flex items-center justify-center shrink-0 border-2 border-zinc-100">
+                            <Search className="w-5 h-5 text-zinc-900" />
+                        </div>
+                        <div className="flex-1">
+                            <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">Global Search</h2>
+                            <Input
+                                placeholder="Find by course name, code, or department..."
+                                value={search}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setPage(1);
+                                }}
+                                className="border-0 p-0 h-auto focus-visible:ring-0 text-lg font-bold placeholder:text-zinc-300 bg-transparent"
+                            />
+                        </div>
+                    </div>
                 </div>
-            )}
+
+                <div className="bg-white border-2 border-zinc-100 p-6 rounded flex flex-col justify-center">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-[10px] uppercase font-bold text-zinc-400 mb-1">Pagination</p>
+                            <p className="text-xs font-bold text-zinc-900">
+                                Page <span className="text-blue-900">{page}</span> of {pagination?.totalPages || 1}
+                            </p>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                disabled={!pagination?.hasPrev}
+                                className="border-2 border-zinc-100 h-10 w-10 hover:bg-zinc-900 hover:text-white transition-all disabled:opacity-20"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setPage((p) => p + 1)}
+                                disabled={!pagination?.hasNext}
+                                className="border-2 border-zinc-100 h-10 w-10 hover:bg-zinc-900 hover:text-white transition-all disabled:opacity-20"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* BOTTOM ROW: Course Grid */}
+            <div className="flex-1 overflow-hidden">
+                <div className="bg-white border-2 border-zinc-100 rounded flex flex-col h-full overflow-hidden">
+                    <div className="flex items-center justify-between p-6 border-b-2 border-zinc-50 shrink-0">
+                        <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-tight flex items-center gap-2">
+                            <BookOpen className="w-4 h-4" />
+                            Course Catalog
+                        </h3>
+                        {search && (
+                            <span className="text-[10px] font-bold text-blue-900 bg-blue-50 px-2 py-1 rounded uppercase">
+                                Results for: {search}
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                        {isLoading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {[...Array(8)].map((_, i) => (
+                                    <div key={i} className="bg-white border-2 border-zinc-100 p-6 rounded flex flex-col gap-4">
+                                        <div className="flex justify-between items-start">
+                                            <Skeleton className="w-10 h-10 rounded" />
+                                            <Skeleton className="w-16 h-4 rounded" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Skeleton className="w-full h-5 rounded" />
+                                            <Skeleton className="w-2/3 h-4 rounded" />
+                                        </div>
+                                        <div className="mt-4 flex justify-between pt-4 border-t-2 border-zinc-50">
+                                            <Skeleton className="w-20 h-4 rounded" />
+                                            <Skeleton className="w-4 h-4 rounded" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : courses.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {courses.map((course) => (
+                                    <Link key={course.id} href={`/courses/${course.id}`}>
+                                        <div className="bg-white border-2 border-zinc-100 p-6 rounded flex flex-col justify-between hover:border-blue-900 transition-all group h-[200px]">
+                                            <div>
+                                                <div className="flex items-start justify-between mb-4">
+                                                    <div className="w-10 h-10 rounded bg-blue-50 flex items-center justify-center border-2 border-blue-100 group-hover:bg-blue-900 group-hover:border-blue-900 transition-all">
+                                                        <BookOpen className="w-5 h-5 text-blue-900 group-hover:text-white transition-all" />
+                                                    </div>
+                                                    <span className="text-[10px] font-mono text-zinc-400 bg-zinc-50 px-2 py-1 rounded">
+                                                        {course.code}
+                                                    </span>
+                                                </div>
+                                                <h4 className="text-sm font-bold text-zinc-900 line-clamp-2 leading-tight group-hover:text-blue-900 transition-colors mb-2">
+                                                    {course.name}
+                                                </h4>
+                                                <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                                    {course.department}
+                                                </p>
+                                            </div>
+                                            <div className="mt-4 flex items-center justify-between pt-4 border-t-2 border-zinc-50">
+                                                <span className="text-[10px] font-bold text-zinc-400 flex items-center gap-1">
+                                                    <Layers className="w-3 h-3" />
+                                                    {course.resourceCount} Repositories
+                                                </span>
+                                                <ArrowRight className="w-4 h-4 text-zinc-300 group-hover:text-blue-900 group-hover:translate-x-1 transition-all" />
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center py-20">
+                                <GraduationCap className="w-16 h-16 text-zinc-100 mb-4" />
+                                <p className="text-sm font-bold text-zinc-400 uppercase">No Courses Found</p>
+                                <Button variant="link" className="text-xs text-blue-600 font-bold p-0 mt-2 uppercase" onClick={() => setSearch("")}>Clear all filters</Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

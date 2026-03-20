@@ -1,14 +1,13 @@
 "use client";
 
-import React, { ReactNode, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState } from "react";
 
-import { useAuthStore } from "@/stores/authStore";
-import { useUIStore } from "@/stores/uiStore";
-import { useRole, useLogout, useUser } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
+import { SearchModal } from "@/components/modals/SearchModal";
+import { NotificationsPopover } from "@/components/notifications/NotificationsPopover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,20 +17,24 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLogout, useRole, useUser } from "@/hooks/useAuth";
+import { cn, getInitials } from "@/lib/utils";
+import { useAuthStore } from "@/stores/authStore";
+import { useUIStore } from "@/stores/uiStore";
 import {
     BookOpen,
-    BotIcon,
+    Command,
+    GitPullRequest,
     LogOut,
     Menu,
     Moon,
+    Search,
     Settings,
-    Sun,
+    Sun
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { getInitials, cn } from "@/lib/utils";
-import { NotificationsPopover } from "@/components/notifications/NotificationsPopover";
 import { AdminSidebar } from "./admin-sidebar";
-import { StudentStaffTopbar } from "./student-staff-topbar";
+import Sidebar from "./studsidebar";
 
 interface DashboardShellProps {
     children: ReactNode;
@@ -41,12 +44,14 @@ interface DashboardShellProps {
 export function DashboardShell({ children, title }: DashboardShellProps) {
     const router = useRouter();
     const { user, isAuthenticated, isHydrated } = useAuthStore();
+    const pathname = usePathname();
     const { toggleSidebar } = useUIStore();
     const { isAdmin } = useRole();
     const { mutate: logout } = useLogout();
     const { theme, setTheme } = useTheme();
     const { isLoading: userLoading } = useUser();
     const [mounted, setMounted] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -85,17 +90,16 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
     }
 
     return (
-        <div className="min-h-screen bg-background font-sans antialiased">
-            {/* Admin Side: Sidebar */}
-            {isAdmin && <AdminSidebar />}
+        <div className="h-screen flex overflow-hidden bg-zinc-100 font-sans antialiased relative">
+            {/* Sidebar Section */}
+            {isAdmin ? <AdminSidebar /> : <Sidebar activeTab={pathname} setActiveTab={(tab) => router.push(tab)} />}
 
             {/* Main Layout Area */}
-            <div className={cn("min-h-screen flex flex-col transition-all duration-300", isAdmin && "lg:pl-64")}>
+            <div className={cn("flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 bg-zinc-100", "lg:pl-64")}>
 
-                {/* Universal Header */}
-                <header className="sticky top-0 z-30 h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-                    <div className="flex h-full items-center gap-4 px-4 container mx-auto">
-
+                {/* Universal Header - Modern Search-First Redesign */}
+                <header className="h-16 border-b bg-white dark:bg-zinc-950 flex items-center px-4 sm:px-8 sticky top-0 z-50 shrink-0">
+                    <div className="flex-1 flex items-center gap-6 max-w-4xl">
                         {/* Mobile Menu Trigger (Admin Only) */}
                         {isAdmin && (
                             <Button
@@ -108,112 +112,108 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                             </Button>
                         )}
 
-                        {/* Logo (Non-Admin Only) - Admins have logo in sidebar */}
+                        {/* Integrated Search Bar Trigger */}
                         {!isAdmin && (
-                            <Link href="/dashboard" className="flex items-center gap-2">
-                                <img src="/vu-logo.png" alt="VU Logo" className="h-8 w-8 object-contain" />
-                                <span className="font-bold text-lg hidden sm:inline-block">ResourceHub</span>
-                            </Link>
+                            <div className="relative group max-w-md w-full">
+                                <button
+                                    onClick={() => setSearchOpen(true)}
+                                    className="w-full flex items-center gap-3 px-4 h-10 bg-white border border-zinc-100 rounded text-zinc-400 hover:border-zinc-200 transition-all text-sm group"
+                                >
+                                    <Search className="w-4 h-4 text-zinc-400 group-hover:text-zinc-600" />
+                                    <span className="flex-1 text-left hidden sm:inline">Search resources, books, or courses...</span>
+                                    <span className="flex-1 text-left sm:hidden">Search...</span>
+                                    <div className="hidden md:flex items-center gap-1 px-1.5 py-0.5 rounded border border-zinc-200 bg-white text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">
+                                        <Command className="w-2.5 h-2.5" />
+                                        <span>K</span>
+                                    </div>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right Side Actions */}
+                    <div className="flex items-center gap-2 sm:gap-4">
+                        {!isAdmin && (
+                            <>
+                                <Button
+                                    variant="ghost"
+                                    asChild
+                                    className={cn(
+                                        "h-9 px-4 rounded flex items-center gap-2 font-semibold text-sm transition-all",
+                                        pathname === "/requests"
+                                            ? "bg-blue-50 text-blue-900 shadow-sm border border-blue-100/50"
+                                            : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
+                                    )}
+                                >
+                                    <Link href="/requests">
+                                        <GitPullRequest className="w-4 h-4" />
+                                        <span className="hidden lg:inline">My Requests</span>
+                                    </Link>
+                                </Button>
+                                <div className="h-4 w-px bg-zinc-200 mx-1 hidden sm:block" />
+                            </>
                         )}
 
-                        {/* Page Title / Welcome Message */}
-                        <div className="flex flex-col gap-0.5 min-w-0">
-                            {title ? (
-                                <h1 className="text-base font-bold tracking-tight truncate">{title}</h1>
-                            ) : (
-                                <h1 className="text-base font-bold tracking-tight truncate hidden sm:block">
-                                    Welcome, {user.firstName}
-                                </h1>
-                            )}
-                        </div>
-
-                        {/* Right Side Actions */}
-                        <div className="ml-auto flex items-center gap-2">
-
-                            {/* AI Assistant */}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="rounded-full">
-                                        <BotIcon className="h-5 w-5" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48">
-                                    <DropdownMenuItem disabled className="justify-center">
-                                        <span className="text-muted-foreground text-sm">AI Assistant Coming Soon</span>
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-
-                            <NotificationsPopover />
-
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                                className="rounded-full"
-                            >
-                                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                                <span className="sr-only">Toggle theme</span>
-                            </Button>
-
-                            {/* User Menu (Non-Admin Only) - Admins have user menu in sidebar */}
-                            {!isAdmin && (
-                                <>
-                                    <div className="h-6 w-px bg-border mx-1" />
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="rounded-full">
-                                                <Avatar className="h-8 w-8 border-2 border-background">
-                                                    <AvatarImage src={user.avatar} />
-                                                    <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
-                                                        {getInitials(`${user.name}`)}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-56">
-                                            <DropdownMenuLabel>
-                                                <div className="flex flex-col space-y-1">
-                                                    <p className="text-sm font-semibold">{user.name}</p>
-                                                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                                                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wider w-fit mt-1">
-                                                        {user.role}
-                                                    </span>
-                                                </div>
-                                            </DropdownMenuLabel>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem asChild>
-                                                <Link href="/settings" className="cursor-pointer">
-                                                    <Settings className="mr-2 h-4 w-4" />
-                                                    Settings
-                                                </Link>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem
-                                                onClick={() => logout()}
-                                                className="cursor-pointer text-destructive focus:text-destructive"
-                                            >
-                                                <LogOut className="mr-2 h-4 w-4" />
-                                                Log out
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </>
-                            )}
-                        </div>
+                        <NotificationsPopover />
+                        {/* User Profile Menu */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="rounded-full border border-zinc-100 hover:border-zinc-300 p-0.5">
+                                    <Avatar className="h-8 w-8">
+                                        <AvatarImage src={user.avatar} />
+                                        <AvatarFallback className="bg-zinc-100 text-zinc-600 font-semibold text-xs text-titillium uppercase">
+                                            {getInitials(`${user.name}`)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-64 p-2 rounded mt-2 border-zinc-100 bg-white">
+                                <DropdownMenuLabel className="px-3 py-4">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-10 w-10 shrink-0">
+                                            <AvatarImage src={user.avatar} />
+                                            <AvatarFallback className="bg-zinc-100 text-zinc-900 uppercase">
+                                                {getInitials(`${user.name}`)}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex flex-col min-w-0">
+                                            <p className="text-sm font-bold text-zinc-900 truncate">{user.name}</p>
+                                            <p className="text-xs text-zinc-400 truncate">{user.email}</p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 inline-flex items-center px-2  text-blue-700 text-[10px] uppercase tracking-wide">
+                                        {user.role}
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-zinc-50" />
+                                <DropdownMenuItem asChild className="rounded h-10 cursor-pointer focus:bg-zinc-50">
+                                    <Link href="/settings" className="flex items-center w-full">
+                                        <Settings className="mr-3 h-4 w-4 text-zinc-500" />
+                                        <span className="font-semibold text-zinc-700">Account Settings</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className="bg-zinc-50" />
+                                <DropdownMenuItem
+                                    onClick={() => logout()}
+                                    className="rounded h-10 cursor-pointer text-rose-600 focus:text-rose-700 focus:bg-rose-50 font-bold"
+                                >
+                                    <LogOut className="mr-3 h-4 w-4" />
+                                    Sign Out
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
+
+                    <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
                 </header>
 
-                {/* Student/Staff Topbar */}
-                {!isAdmin && <StudentStaffTopbar />}
 
                 {/* Main Content Area */}
-                <div className="flex-1 container mx-auto p-4 sm:p-6 lg:p-8 max-w-[1600px]">
+                <main className="flex-1 overflow-y-auto scrollbar-hide container mx-auto p-4 sm:p-6 lg:p-8 max-w-[1600px]">
                     <div>
                         {children}
                     </div>
-                </div>
+                </main>
             </div>
 
             <style jsx global>{`

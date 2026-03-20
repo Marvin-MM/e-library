@@ -272,6 +272,7 @@ export const useAuthStore = create<AuthState>()(
           expires: 7, // 7 days
           secure: process.env.NODE_ENV === "production",
           sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax", // lax for localhost
+          path: "/",
         });
 
         // Set role cookie for middleware
@@ -286,8 +287,10 @@ export const useAuthStore = create<AuthState>()(
         console.log("- Cookie set successfully:", storedToken === refreshToken);
         console.log("- Stored token length:", storedToken?.length);
 
-        if (storedToken !== refreshToken) {
-          console.error("[Auth Store] ⚠️ Cookie mismatch! Token not stored correctly");
+        if (refreshToken && storedToken !== refreshToken) {
+          console.error("[Auth Store] ⚠️ Cookie mismatch!");
+          console.error("- Expected (first 10 chars):", refreshToken.substring(0, 10) + "...");
+          console.error("- Stored (first 10 chars):", storedToken ? (storedToken.substring(0, 10) + "...") : "undefined");
         }
 
         set({

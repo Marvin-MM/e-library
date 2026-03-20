@@ -4,7 +4,6 @@ import type {
   DiscoverySearchParams,
   DiscoverySearchResponse,
   DiscoverySourcesResponse,
-  DiscoverySource,
 } from "@/types/discovery";
 
 export const discoveryApi = {

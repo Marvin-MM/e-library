@@ -114,7 +114,7 @@ export const categoryOptions = [
   { value: "OTHER", label: "Other" },
 ] as const;
 
-export const createResourceSchema = z.object({
+const createResourceBaseSchema = z.object({
   title: z
     .string()
     .min(1, "Title is required")
@@ -145,7 +145,9 @@ export const createResourceSchema = z.object({
   issn: z.string().max(20).optional(),
 
   file: z.custom<File>().optional(),
-}).superRefine((data, ctx) => {
+});
+
+export const createResourceSchema = createResourceBaseSchema.superRefine((data, ctx) => {
   // Validate File
   if (data.accessType !== 'CAMPUS_ONLY') {
     if (!data.file || !(data.file instanceof File)) {
@@ -183,6 +185,6 @@ export const createResourceSchema = z.object({
 
 export type CreateResourceFormData = z.infer<typeof createResourceSchema>;
 
-export const updateResourceSchema = createResourceSchema.partial().omit({ file: true });
+export const updateResourceSchema = createResourceBaseSchema.partial().omit({ file: true });
 
 export type UpdateResourceFormData = z.infer<typeof updateResourceSchema>;

@@ -139,6 +139,9 @@ const config: Config = {
   			'slide-in-from-top': 'slide-in-from-top 0.3s ease-out',
   			'slide-in-from-bottom': 'slide-in-from-bottom 0.3s ease-out',
   			shimmer: 'shimmer 2s infinite'
+  		},
+  		fontFamily: {
+  			titillium: ['"Titillium Web"', 'sans-serif']
   		}
   	}
   },

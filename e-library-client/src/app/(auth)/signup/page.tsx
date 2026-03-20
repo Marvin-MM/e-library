@@ -1,24 +1,17 @@
-
-
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, Suspense, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useSignup } from "@/hooks/useAuth";
 import { useAuthStore } from "@/stores/authStore";
 import { signupSchema, type SignupFormData } from "@/schemas/auth";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 
 
-export default function SignupPage() {
+function SignupForm() {
     const router = useRouter();
     const { isAuthenticated } = useAuthStore();
     const { mutate: signup, isPending } = useSignup();
@@ -41,9 +34,7 @@ export default function SignupPage() {
     }, [isAuthenticated, router]);
 
     const onSubmit = (data: SignupFormData) => {
-        if (!acceptedTerms) {
-            return;
-        }
+        if (!acceptedTerms) return;
         signup({
             email: data.email,
             password: data.password,
@@ -53,170 +44,173 @@ export default function SignupPage() {
     };
 
     return (
-        <div>
-            <div className="text-center space-y-2 mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-start">Sign Up</h1>
-                <p className="text-muted-foreground text-start">Enter your details to get started</p>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
 
-                <div className="bg-muted/50 p-4 rounded-lg text-sm text-left space-y-2 mt-4">
-                    <p className="font-semibold text-muted-foreground">Please use your school email:</p>
-                    <ul className="space-y-1 text-xs text-muted-foreground/80 list-disc list-inside">
-                        <li>Students: <span className="font-mono text-primary">example@vu.sc.ug</span></li>
-                        <li>Staff: <span className="font-mono text-primary">example@vu.sa.ug</span></li>
-                        <li>Admins: <span className="font-mono text-primary">example@vu.admin.ug</span></li>
-                    </ul>
-                </div>
-            </div>
-
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="firstName">First name</Label>
-                        <Input
-                            id="firstName"
-                            placeholder="John"
-                            {...register("firstName")}
-                            className={errors.firstName ? "border-destructive py-5" : "py-5"}
-                            autoComplete="given-name"
-                        />
-                        {errors.firstName && (
-                            <p className="text-sm text-destructive">{errors.firstName.message}</p>
-                        )}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="lastName">Last name</Label>
-                        <Input
-                            id="lastName"
-                            placeholder="Doe"
-                            {...register("lastName")}
-                            className={errors.lastName ? "border-destructive py-5" : "py-5"}
-                            autoComplete="family-name"
-                        />
-                        {errors.lastName && (
-                            <p className="text-sm text-destructive">{errors.lastName.message}</p>
-                        )}
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        placeholder="name@example.com"
-                        {...register("email")}
-                        className={errors.email ? "border-destructive py-5" : "py-5"}
-                        autoComplete="email"
-                    />
-                    {errors.email && (
-                        <p className="text-sm text-destructive">{errors.email.message}</p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                        <Input
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Create a password"
-                            {...register("password")}
-                            className={`pr-10 ${errors.password ? "border-destructive py-5" : "py-5"}`}
-                            autoComplete="new-password"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                            tabIndex={-1}
-                        >
-                            {showPassword ? (
-                                <EyeOff className="h-4 w-4" />
-                            ) : (
-                                <Eye className="h-4 w-4" />
-                            )}
-                        </button>
-                    </div>
-                    {errors.password && (
-                        <p className="text-sm text-destructive">{errors.password.message}</p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm password</Label>
-                    <div className="relative">
-                        <Input
-                            id="confirmPassword"
-                            type={showConfirmPassword ? "text" : "password"}
-                            placeholder="Confirm your password"
-                            {...register("confirmPassword")}
-                            className={`pr-10 ${errors.confirmPassword ? "border-destructive py-5" : "py-5"}`}
-                            autoComplete="new-password"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                            tabIndex={-1}
-                        >
-                            {showConfirmPassword ? (
-                                <EyeOff className="h-4 w-4" />
-                            ) : (
-                                <Eye className="h-4 w-4" />
-                            )}
-                        </button>
-                    </div>
-                    {errors.confirmPassword && (
-                        <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-                    )}
-                </div>
-
-                <div className="flex items-start space-x-2 pt-2">
-                    <Checkbox
-                        id="terms"
-                        checked={acceptedTerms}
-                        onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
-                        className="mt-1"
-                    />
-                    <label
-                        htmlFor="terms"
-                        className="text-sm leading-relaxed peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                        By creating an account means you agree to the{" "}
-                        <Link href="/terms" className="text-primary hover:underline">
-                            Terms and Conditions
-                        </Link>
-                        , and our{" "}
-                        <Link href="/privacy" className="text-primary hover:underline">
-                            Privacy Policy
-                        </Link>
+            {/* Name Grid */}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                    <label htmlFor="firstName" className="text-sm font-semibold text-neutral-600">
+                        First name
                     </label>
+                    <input
+                        id="firstName"
+                        placeholder="John"
+                        {...register("firstName")}
+                        className={`h-11 w-full border-0 border-b bg-neutral-50 px-3 text-sm font-normal text-neutral-900 placeholder:text-neutral-300 placeholder:font-light outline-none transition-all duration-200 focus:bg-white focus:border-blue-800 ${errors.firstName ? "border-red-400 bg-red-50" : "border-neutral-200"}`}
+                    />
+                    {errors.firstName && (
+                        <p className="text-[11px] text-red-500 tracking-wide">{errors.firstName.message}</p>
+                    )}
                 </div>
-
-                <Button
-                    type="submit"
-                    className="w-full py-5"
-                    disabled={isPending || !acceptedTerms}
-                >
-                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Create account
-                </Button>
-            </form>
-
-            <div className="text-start text-sm mt-4">
-                Already have an account?{" "}
-                <Link href="/login" className="text-primary hover:underline font-medium">
-                    Sign in
-                </Link>
+                <div className="flex flex-col gap-1.5">
+                    <label htmlFor="lastName" className="text-sm font-semibold text-neutral-600">
+                        Last name
+                    </label>
+                    <input
+                        id="lastName"
+                        placeholder="Doe"
+                        {...register("lastName")}
+                        className={`h-11 w-full border-0 border-b bg-neutral-50 px-3 text-sm font-normal text-neutral-900 placeholder:text-neutral-300 placeholder:font-light outline-none transition-all duration-200 focus:bg-white focus:border-blue-800 ${errors.lastName ? "border-red-400 bg-red-50" : "border-neutral-200"}`}
+                    />
+                    {errors.lastName && (
+                        <p className="text-[11px] text-red-500 tracking-wide">{errors.lastName.message}</p>
+                    )}
+                </div>
             </div>
 
-            {/* Footer */}
-            <div className="mt-8 pt-6 border-t border-border/50">
-                <div className="text-center space-y-2">
-                    <p className="text-xs text-muted-foreground">
-                        © {new Date().getFullYear()} Victoria University. All rights reserved.
-                    </p>
+            {/* Email */}
+            <div className="flex flex-col gap-1.5">
+                <label htmlFor="email" className="text-sm font-semibold text-neutral-600">
+                    Email
+                </label>
+                <input
+                    id="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    {...register("email")}
+                    className={`h-11 w-full border-0 border-b bg-neutral-50 px-3 text-sm font-normal text-neutral-900 placeholder:text-neutral-300 placeholder:font-light outline-none transition-all duration-200 focus:bg-white focus:border-blue-800 ${errors.email ? "border-red-400 bg-red-50" : "border-neutral-200"}`}
+                />
+                {errors.email && (
+                    <p className="text-[11px] text-red-500 tracking-wide">{errors.email.message}</p>
+                )}
+            </div>
+
+            {/* Password */}
+            <div className="flex flex-col gap-1.5">
+                <label htmlFor="password" className="text-sm font-semibold text-neutral-600">
+                    Password
+                </label>
+                <div className="relative">
+                    <input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Create a password"
+                        {...register("password")}
+                        className={`h-11 w-full border-0 border-b bg-neutral-50 px-3 pr-10 text-sm font-normal text-neutral-900 placeholder:text-neutral-300 placeholder:font-light outline-none transition-all duration-200 focus:bg-white focus:border-blue-800 ${errors.password ? "border-red-400 bg-red-50" : "border-neutral-200"}`}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-900 hover:text-blue-600 transition-colors"
+                        tabIndex={-1}
+                    >
+                        {showPassword ? <EyeOff className="w-[15px] h-[15px]" /> : <Eye className="w-[15px] h-[15px]" />}
+                    </button>
                 </div>
+                {errors.password && (
+                    <p className="text-[11px] text-red-500 tracking-wide">{errors.password.message}</p>
+                )}
+            </div>
+
+            {/* Confirm Password */}
+            <div className="flex flex-col gap-1.5">
+                <label htmlFor="confirmPassword" className="text-sm font-semibold text-neutral-600">
+                    Confirm password
+                </label>
+                <div className="relative">
+                    <input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Confirm your password"
+                        {...register("confirmPassword")}
+                        className={`h-11 w-full border-0 border-b bg-neutral-50 px-3 pr-10 text-sm font-normal text-neutral-900 placeholder:text-neutral-300 placeholder:font-light outline-none transition-all duration-200 focus:bg-white focus:border-blue-800 ${errors.confirmPassword ? "border-red-400 bg-red-50" : "border-neutral-200"}`}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-900 hover:text-blue-600 transition-colors"
+                        tabIndex={-1}
+                    >
+                        {showConfirmPassword ? <EyeOff className="w-[15px] h-[15px]" /> : <Eye className="w-[15px] h-[15px]" />}
+                    </button>
+                </div>
+                {errors.confirmPassword && (
+                    <p className="text-[11px] text-red-500 tracking-wide">{errors.confirmPassword.message}</p>
+                )}
+            </div>
+
+            {/* Terms */}
+            <div className="flex items-start gap-2 pt-1 group cursor-pointer" onClick={() => setAcceptedTerms(!acceptedTerms)}>
+                <button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={acceptedTerms}
+                    className={`w-3.5 h-3.5 mt-0.5 flex items-center justify-center border rounded-sm transition-all duration-150 flex-shrink-0 ${acceptedTerms ? "bg-blue-900 border-blue-900" : "bg-white border-neutral-300 group-hover:border-blue-900"}`}
+                >
+                    {acceptedTerms && (
+                        <svg className="w-2 h-2" viewBox="0 0 8 8" fill="none">
+                            <path d="M1 4L3 6L7 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    )}
+                </button>
+                <span className="text-xs text-neutral-500 leading-relaxed tracking-wide">
+                    By creating an account, you agree to our{" "}
+                    <Link href="/terms" className="text-blue-900 font-semibold hover:opacity-60">Terms</Link> and{" "}
+                    <Link href="/privacy" className="text-blue-900 font-semibold hover:opacity-60">Privacy Policy</Link>.
+                </span>
+            </div>
+
+            {/* Submit */}
+            <button
+                type="submit"
+                disabled={isPending || !acceptedTerms}
+                className="flex h-11 w-full items-center justify-center gap-2 bg-blue-900 text-white text-sm font-semibold rounded mt-2 transition-opacity duration-150 hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+                {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {isPending ? "Creating account…" : "Create account"}
+            </button>
+        </form>
+    );
+}
+
+export default function SignupPage() {
+    return (
+        <div className="flex items-center justify-center px-4 font-titillium">
+            <div className="w-full max-w-sm bg-white px-9">
+
+                {/* Heading */}
+                <div className="mb-6">
+                    <h1 className="text-lg font-bold text-neutral-900 mb-1.5">Create an account</h1>
+                    <p className="text-sm text-neutral-900 tracking-wide">Enter your details to get started</p>
+                </div>
+                {/* Form */}
+                <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="w-5 h-5 text-neutral-300 animate-spin" /></div>}>
+                    <SignupForm />
+                </Suspense>
+
+                {/* Divider */}
+                <div className="my-5 h-px bg-neutral-100" />
+
+                {/* Sign in */}
+                <p className="text-center text-xs text-neutral-600 tracking-wide">
+                    Already have an account?{" "}
+                    <Link
+                        href="/login"
+                        className="font-semibold text-blue-900 border-b border-blue-900 pb-px hover:opacity-60 transition-opacity duration-150"
+                    >
+                        Sign in
+                    </Link>
+                </p>
             </div>
         </div>
     );

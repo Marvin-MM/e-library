@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
 
-import Link from "next/link";
-import { BookOpen } from "lucide-react";
 
 interface AuthLayoutProps {
   children: ReactNode;
