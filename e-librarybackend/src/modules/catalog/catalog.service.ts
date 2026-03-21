@@ -58,7 +58,17 @@ export class CatalogService {
       }),
     ]);
     return {
-      data: books,
+      data: books.map(book => ({
+        ...book,
+        locations: book.inventory.map(inv => ({
+          campusId: inv.campus.id,
+          name: inv.campus.name,
+          code: inv.campus.code,
+          totalCopies: inv.totalCopies,
+          availableCopies: inv.availableCopies,
+          shelfLocation: inv.shelfLocation
+        }))
+      })),
       pagination: {
         total,
         page,
@@ -80,7 +90,17 @@ export class CatalogService {
       },
     });
     if (!book) throw new NotFoundError('Book not found');
-    return book;
+    return {
+      ...book,
+      locations: book.inventory.map(inv => ({
+        campusId: inv.campus.id,
+        name: inv.campus.name,
+        code: inv.campus.code,
+        totalCopies: inv.totalCopies,
+        availableCopies: inv.availableCopies,
+        shelfLocation: inv.shelfLocation
+      }))
+    };
   }
   // ─────────────────────────────────────────────────────────────────────────
   // Borrowing: Auth users
@@ -201,35 +221,51 @@ async createCampus(data: CreateCampusInput, adminId: string) {
 }
 
   async createBook(data: CreateBookInput, adminId: string) {
+    const { campusId, copies, ...bookData } = data;
+    const campus = await prisma.campus.findUnique({ where: { id: campusId } });
+    if (!campus) throw new NotFoundError('Specified campus not found');
+
     const book = await prisma.$transaction(async (tx) => {
       // Check ISBN uniqueness if provided
-      if (data.isbn) {
-        const existing = await tx.book.findUnique({ where: { isbn: data.isbn } });
-        if (existing) throw new ConflictError(`A book with ISBN ${data.isbn} already exists`);
+      if (bookData.isbn) {
+        const existing = await tx.book.findUnique({ where: { isbn: bookData.isbn } });
+        if (existing) throw new ConflictError(`A book with ISBN ${bookData.isbn} already exists`);
       }
-      const newBook = await tx.book.create({ data });
+      const newBook = await tx.book.create({ data: bookData });
+      
+      const defaultCopies = copies ?? 1;
+      await tx.inventory.create({
+        data: {
+          bookId: newBook.id,
+          campusId: campus.id,
+          totalCopies: defaultCopies,
+          availableCopies: defaultCopies
+        }
+      });
+
       await tx.auditLog.create({
         data: {
           entity: 'Book',
           entityId: newBook.id,
           action: 'CREATE',
           performedById: adminId,
-          meta: { title: newBook.title, author: newBook.author },
+          meta: { title: newBook.title, author: newBook.author, campusId: campus.id, copies: defaultCopies },
         },
       });
       return newBook;
     });
-    logger.info('Physical book created', { bookId: book.id, adminId });
+    logger.info('Physical book created', { bookId: book.id, adminId, campusId });
     return book;
   }
   async updateBook(id: string, data: UpdateBookInput, adminId: string) {
+    const { campusId, copies, ...bookData } = data;
     const existing = await prisma.book.findUnique({ where: { id } });
     if (!existing) throw new NotFoundError('Book not found');
-    if (data.isbn && data.isbn !== existing.isbn) {
-      const conflict = await prisma.book.findUnique({ where: { isbn: data.isbn } });
-      if (conflict) throw new ConflictError(`A book with ISBN ${data.isbn} already exists`);
+    if (bookData.isbn && bookData.isbn !== existing.isbn) {
+      const conflict = await prisma.book.findUnique({ where: { isbn: bookData.isbn } });
+      if (conflict) throw new ConflictError(`A book with ISBN ${bookData.isbn} already exists`);
     }
-    const book = await prisma.book.update({ where: { id }, data });
+    const book = await prisma.book.update({ where: { id }, data: bookData });
     await prisma.auditLog.create({
       data: {
         entity: 'Book',

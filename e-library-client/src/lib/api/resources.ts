@@ -52,4 +52,8 @@ export const resourcesApi = {
     const response = await api.get<ApiResponse<{ isFavorite: boolean }>>(`/resources/${id}/is-favorite`);
     return response.data;
   },
+  getPreview: async (id: string) => {
+    const response = await api.get<ApiResponse<{ url: string, storageType: string }>>(`/resources/${id}/preview`);
+    return response.data;
+  },
 };

@@ -150,3 +150,18 @@ export function useDownloadResource() {
     },
   });
 }
+
+export function usePreviewResource() {
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await resourcesApi.getPreview(id);
+      if (!response.success) {
+        throw new Error(response.message || "Failed to generate preview");
+      }
+      return response.data!;
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to load preview");
+    },
+  });
+}

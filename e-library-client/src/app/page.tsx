@@ -1,26 +1,24 @@
+// app/page.tsx (or your entry file)
 "use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 export default function Home() {
     const router = useRouter();
     const { isAuthenticated, isLoading } = useAuthStore();
 
     useEffect(() => {
-        if (!isLoading) {
-            if (isAuthenticated) {
-                router.replace("/dashboard");
-            } else {
-                router.replace("/login");
-            }
-        }
+        // Early return to do nothing while still loading
+        if (isLoading) return;
+
+        // Determine destination and route
+        const destination = isAuthenticated ? "/dashboard" : "/login";
+        router.replace(destination);
+        
     }, [isAuthenticated, isLoading, router]);
 
-    return (
-        <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-    );
+    return <FullScreenLoader message="Authenticating..." delayMs={200} />;
 }

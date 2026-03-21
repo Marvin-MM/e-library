@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useResourceStore } from "@/stores/resourceStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { CreateResourceDialog } from "@/components/resources/CreateResourceDialog"; // Added import
 
 import {
     FileText,
@@ -21,7 +22,6 @@ import {
     Download,
     ChevronLeft,
     ChevronRight,
-    CloudUpload,
     Layers,
     GraduationCap,
     BoxSelectIcon,
@@ -119,14 +119,8 @@ export default function ResourcesPage() {
                             <p className="text-[10px] uppercase font-bold text-zinc-400">Total</p>
                             <p className="text-2xl font-bold text-blue-900">{pagination?.total || 0}</p>
                         </div>
-                        {isStaffOrAdmin && (
-                            <Button asChild className="h-12 px-6 rounded bg-blue-900 hover:bg-zinc-900 text-white shrink-0 font-bold text-xs uppercase tracking-wider">
-                                <Link href="/resources/upload">
-                                    <CloudUpload className="w-4 h-4 mr-2" />
-                                    Upload New
-                                </Link>
-                            </Button>
-                        )}
+                        {/* Replaced Link with the Dialog Component */}
+                        {isStaffOrAdmin && <CreateResourceDialog />}
                     </div>
                 </motion.div>
             </div>

@@ -1,5 +1,6 @@
 import {
     BarChart3,
+    BookOpen,
     ClipboardList,
     FileText,
     FolderOpen,
@@ -78,6 +79,8 @@ export const adminNavigation: NavSection[] = [
         items: [
             { name: "Resources", href: "/resources", icon: FileText },
             { name: "Courses", href: "/courses", icon: GraduationCap },
+            { name: "Dissertations", href: "/admin/dissertations", icon: FileText },
+            { name: "Catalog", href: "/admin/catalog", icon: BookOpen },
         ],
     },
     {
@@ -92,7 +95,6 @@ export const adminNavigation: NavSection[] = [
         items: [
             { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
             { name: "Settings", href: "/admin/settings", icon: Settings },
-            { name: "Audit Logs", href: "/admin/audit-logs", icon: ScrollText },
         ],
     },
 ];

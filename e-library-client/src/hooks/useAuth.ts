@@ -113,8 +113,7 @@ export function useLogin() {
       } else {
         toast.error(error.message || "Login failed. Please try again.");
       }
-
-      console.error("[Login] Error:", error);
+      console.warn("[Login] Handled Error:", error.message || error);
     },
   });
 }
@@ -144,8 +143,7 @@ export function useSignup() {
       } else {
         toast.error(error.message || "Signup failed. Please try again.");
       }
-
-      console.error("[Signup] Error:", error);
+      console.warn("[Signup] Handled Error:", error.message || error);
     },
   });
 }
@@ -196,8 +194,7 @@ export function useForgotPassword() {
       } else {
         toast.error(error.message || "Failed to send reset email");
       }
-
-      console.error("[ForgotPassword] Error:", error);
+      console.warn("[ForgotPassword] Handled Error:", error.message || error);
     },
   });
 }
@@ -225,8 +222,7 @@ export function useResetPassword() {
       } else {
         toast.error(error.message || "Failed to reset password");
       }
-
-      console.error("[ResetPassword] Error:", error);
+      console.warn("[ResetPassword] Handled Error:", error.message || error);
     },
   });
 }
@@ -252,8 +248,7 @@ export function useVerifyEmail() {
       } else {
         toast.error(error.message || "Failed to verify email");
       }
-
-      console.error("[VerifyEmail] Error:", error);
+      console.warn("[VerifyEmail] Handled Error:", error.message || error);
     },
   });
 }

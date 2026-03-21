@@ -37,20 +37,20 @@ router.get(
 
 // ── Authenticated user endpoints ────────────────────────────────────────────
 
-// POST /catalog/borrow — borrow a book
-router.post(
-    '/borrow',
-    authenticate,
-    validate(borrowSchema),
-    catalogController.borrowBook.bind(catalogController)
-);
+// // POST /catalog/borrow — borrow a book
+// router.post(
+//     '/borrow',
+//     authenticate,
+//     validate(borrowSchema),
+//     catalogController.borrowBook.bind(catalogController)
+// );
 
-// GET /catalog/borrow/my — user's own borrow history
-router.get(
-    '/borrow/my',
-    authenticate,
-    catalogController.getMyBorrows.bind(catalogController)
-);
+// // GET /catalog/borrow/my — user's own borrow history
+// router.get(
+//     '/borrow/my',
+//     authenticate,
+//     catalogController.getMyBorrows.bind(catalogController)
+// );
 
 // ── Admin / Staff endpoints ─────────────────────────────────────────────────
 
@@ -90,31 +90,31 @@ router.delete(
     catalogController.deleteBook.bind(catalogController)
 );
 
-// PUT /catalog/inventory — upsert campus inventory
-router.put(
-    '/inventory',
-    authenticate,
-    authorize('ADMIN'),
-    validate(inventoryUpsertSchema),
-    catalogController.upsertInventory.bind(catalogController)
-);
+// // PUT /catalog/inventory — upsert campus inventory
+// router.put(
+//     '/inventory',
+//     authenticate,
+//     authorize('ADMIN'),
+//     validate(inventoryUpsertSchema),
+//     catalogController.upsertInventory.bind(catalogController)
+// );
 
-// GET /catalog/borrow-records — admin borrow records with filters
-router.get(
-    '/borrow-records',
-    authenticate,
-    authorize('ADMIN'),
-    validate(borrowRecordQuerySchema, 'query'),
-    catalogController.getBorrowRecords.bind(catalogController)
-);
+// // GET /catalog/borrow-records — admin borrow records with filters
+// router.get(
+//     '/borrow-records',
+//     authenticate,
+//     authorize('ADMIN'),
+//     validate(borrowRecordQuerySchema, 'query'),
+//     catalogController.getBorrowRecords.bind(catalogController)
+// );
 
-// POST /catalog/borrow-records/:id/return — process a return
-router.post(
-    '/borrow-records/:id/return',
-    authenticate,
-    authorize('ADMIN'),
-    validate(borrowIdParamSchema, 'params'),
-    catalogController.processReturn.bind(catalogController)
-);
+// // POST /catalog/borrow-records/:id/return — process a return
+// router.post(
+//     '/borrow-records/:id/return',
+//     authenticate,
+//     authorize('ADMIN'),
+//     validate(borrowIdParamSchema, 'params'),
+//     catalogController.processReturn.bind(catalogController)
+// );
 
 export default router;

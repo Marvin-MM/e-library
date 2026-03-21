@@ -63,4 +63,9 @@ export const queryKeys = {
     results: (query: string, filters?: Record<string, unknown>) =>
       ["search", "results", query, filters] as const,
   },
+  notifications: {
+    all: ["notifications"] as const,
+    list: (filters: any) => ["notifications", "list", filters] as const,
+    unreadCount: ["notifications", "unreadCount"] as const,
+  },
 };

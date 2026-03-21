@@ -5,6 +5,8 @@ export const createBookSchema = z.object({
   author: z.string().min(1).max(500),
   description: z.string().max(2000).optional(),
   isbn: z.string().max(20).optional(),
+  campusId: z.string().uuid('Invalid campus ID'),
+  copies: z.coerce.number().int().min(0).optional().default(1),
 });
 export const updateBookSchema = createBookSchema.partial();
 // ── Catalog query ──────────────────────────────────────────────────────────

@@ -1,8 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { coursesApi } from "@/lib/api";
+import { courseUnitsApi } from "@/lib/api/courseUnits";
 import { queryKeys } from "@/lib/queryClient";
 import { toast } from "sonner";
 import type { CreateCourseData, ResourceFilters } from "@/types/api";
+
+export function useDepartments() {
+  return useQuery({
+    queryKey: ['departments'],
+    queryFn: async () => {
+      const response = await coursesApi.getDepartments();
+      if (!response.success) throw new Error(response.message);
+      return response.data || [];
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
 
 export function useCourses(filters?: { page?: number; limit?: number; search?: string }) {
   return useQuery({
@@ -98,4 +111,28 @@ export function useDeleteCourse() {
       toast.error(error.message || "Failed to delete course");
     },
   });
+}
+
+export function useCourseUnits(courseId: string, filters?: any) {
+    return useQuery({
+      queryKey: ['courseUnits', courseId, filters],
+      queryFn: async () => {
+        const res = await courseUnitsApi.findByCourse(courseId, filters);
+        if (!res.success) throw new Error(res.message);
+        return res;
+      },
+      enabled: !!courseId,
+    });
+}
+
+export function useCourseUnitResources(unitId: string, filters?: any) {
+    return useQuery({
+      queryKey: ['courseUnitResources', unitId, filters],
+      queryFn: async () => {
+        const res = await courseUnitsApi.getResources(unitId, filters);
+        if (!res.success) throw new Error(res.message);
+        return res;
+      },
+      enabled: !!unitId,
+    });
 }

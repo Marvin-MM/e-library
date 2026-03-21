@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import { queryClient } from "@/lib/queryClient";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/authStore";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 function AuthHydration({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false);
@@ -16,11 +17,7 @@ function AuthHydration({ children }: { children: React.ReactNode }) {
     }, []);
 
     if (!mounted || !isHydrated) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-        );
+        return <FullScreenLoader message="Authenticating..." delayMs={200} />;
     }
 
     return <>{children}</>;

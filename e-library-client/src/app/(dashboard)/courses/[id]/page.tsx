@@ -1,72 +1,61 @@
 "use client";
 
-
-import { useRouter } from "next/navigation";
-import { useCourse, useCourseResources } from "@/hooks/useCourses";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useState, use } from "react";
 import Link from "next/link";
+import { format } from "date-fns";
+import { motion } from "framer-motion";
+
+import { useCourse, useCourseResources } from "@/hooks/useCourses";
+import { useCourseUnits, useDeleteCourseUnit } from "@/hooks/useCourseUnits";
+import { useRole } from "@/hooks/useAuth";
+
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ManageModuleDialog } from "@/components/courses/ManageModuleDialog";
 
 import {
-    FileText,
-    Download,
-    Calendar,
-    Clock,
-    BookOpen,
-    ArrowLeft,
-    Search,
-    Filter,
-    GraduationCap
+    FileText, Download, Calendar, Clock, ArrowLeft, Search, Filter, 
+    GraduationCap, Layers, Trash2, Library
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useState, use } from "react";
-import { format } from "date-fns";
-import { useRole } from "@/hooks/useAuth";
-import { motion } from "framer-motion";
 
 interface CourseDetailPageProps {
     params: Promise<{ id: string }>;
 }
 
 export default function CourseDetailPage({ params }: CourseDetailPageProps) {
-    // Unwrap params with use() (Next.js 15)
     const { id } = use(params);
     const [search, setSearch] = useState("");
+    const { isStaffOrAdmin } = useRole();
 
+    // Data Hooks
     const { data: course, isLoading: loadingCourse } = useCourse(id);
+    const { data: modulesData, isLoading: loadingModules } = useCourseUnits(id, { limit: 50 });
     const { data: resourcesData, isLoading: loadingResources } = useCourseResources(id, {
         limit: 100,
         search: search || undefined,
     });
 
+    const { mutate: deleteModule } = useDeleteCourseUnit(id);
+
+    const modules = modulesData?.data || [];
     const resources = resourcesData?.data || [];
 
-    const { isStaffOrAdmin } = useRole();
+    const handleDeleteModule = (unitId: string, name: string) => {
+        if (window.confirm(`Are you sure you want to delete the module "${name}"? This action cannot be undone.`)) {
+            deleteModule(unitId);
+        }
+    };
 
     if (loadingCourse) {
         return (
             <div className="h-[calc(100vh-120px)] flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700 font-titillium">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
-                    <div className="space-y-4">
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-10 w-64" />
-                        <Skeleton className="h-4 w-full max-w-sm" />
-                    </div>
-                    <div className="flex justify-end items-center">
-                        <Skeleton className="h-20 w-48 rounded" />
-                    </div>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
-                    <Skeleton className="lg:col-span-2 h-20 rounded" />
-                    <Skeleton className="h-20 rounded" />
-                </div>
+                <Skeleton className="h-32 w-full rounded" />
+                <Skeleton className="h-10 w-64 rounded" />
                 <div className="flex-1 bg-white border-2 border-zinc-100 rounded p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {[...Array(6)].map((_, i) => (
-                            <Skeleton key={i} className="h-32 rounded w-full" />
-                        ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-40 rounded w-full" />)}
                     </div>
                 </div>
             </div>
@@ -81,10 +70,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                     <h3 className="text-xl font-bold text-zinc-900 mb-2 uppercase tracking-tight">Course Not Found</h3>
                     <p className="text-xs font-bold text-zinc-400 uppercase mb-6">The repository you are looking for does not exist.</p>
                     <Button asChild className="bg-blue-900 hover:bg-zinc-900 text-white font-bold uppercase text-xs px-8">
-                        <Link href="/courses">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Return to Catalog
-                        </Link>
+                        <Link href="/courses"><ArrowLeft className="mr-2 h-4 w-4" /> Return to Catalog</Link>
                     </Button>
                 </div>
             </div>
@@ -94,168 +80,171 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     return (
         <div className="h-[calc(100vh-120px)] flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700 font-titillium">
 
-            {/* TOP ROW: Z-Pattern Start */}
+            {/* TOP HEADER */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
-                <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    className="flex flex-col justify-center gap-2"
-                >
+                <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex flex-col justify-center gap-2">
                     <Button variant="ghost" asChild className="w-fit p-0 h-auto gap-1 text-[10px] font-bold text-blue-900 hover:bg-transparent uppercase mb-2">
-                        <Link href="/courses">
-                            <ArrowLeft className="w-3 h-3" />
-                            Back to Courses
-                        </Link>
+                        <Link href="/courses"><ArrowLeft className="w-3 h-3" /> Back to Courses</Link>
                     </Button>
                     <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black uppercase text-blue-900 bg-blue-50 px-2 py-1 rounded">
-                            {course.code}
-                        </span>
-                        <span className="text-[10px] font-bold uppercase text-zinc-400">
-                            {course.department}
-                        </span>
+                        <span className="text-[10px] font-black uppercase text-blue-900 bg-blue-50 px-2 py-1 rounded">{course.code}</span>
+                        <span className="text-[10px] font-bold uppercase text-zinc-400">{course.department}</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">
-                        {course.name}
-                    </h1>
+                    <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">{course.name}</h1>
                 </motion.div>
 
-                <motion.div
-                    initial={{ x: 20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    className="flex items-center justify-end"
-                >
+                <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex items-center justify-end">
                     <div className="bg-white border-2 border-zinc-100 p-2 flex items-center gap-4 rounded">
                         <div className="px-6 py-2 border-r-2 border-zinc-100 last:border-0 text-center">
-                            <p className="text-[10px] uppercase font-bold text-zinc-400">Repositories</p>
+                            <p className="text-[10px] uppercase font-bold text-zinc-400">Total Assets</p>
                             <p className="text-2xl font-bold text-blue-900">{course.resourceCount}</p>
                         </div>
                         <div className="px-6 py-2 border-r-2 border-zinc-100 last:border-0 text-left">
-                            <p className="text-[10px] uppercase font-bold text-zinc-400 mb-1 leading-none flex items-center gap-1">
-                                <Clock className="w-3 h-3" /> Updated
-                            </p>
+                            <p className="text-[10px] uppercase font-bold text-zinc-400 mb-1 flex items-center gap-1"><Clock className="w-3 h-3" /> Updated</p>
                             <p className="text-xs font-bold text-zinc-900">{format(new Date(course.updatedAt), 'MMM d, yyyy')}</p>
                         </div>
                     </div>
                 </motion.div>
             </div>
 
-            {/* MIDDLE ROW: Discovery & Actions */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
-                <div className="lg:col-span-2 bg-white border-2 border-zinc-100 p-6 rounded relative flex items-center justify-between">
-                    <div className="flex items-center gap-4 w-full">
-                        <div className="w-12 h-12 rounded bg-zinc-50 flex items-center justify-center shrink-0 border-2 border-zinc-100">
-                            <Search className="w-5 h-5 text-zinc-900" />
-                        </div>
-                        <div className="flex-1">
-                            <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 px-1">Resource Discovery</h2>
+            {/* TABS CONTAINER */}
+            <Tabs defaultValue="modules" className="flex-1 flex flex-col h-full overflow-hidden">
+                
+                {/* Discovery & Tab Controls */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0 mb-6">
+                    <div className="lg:col-span-2 flex flex-col sm:flex-row items-center gap-4">
+                        <TabsList className="bg-white border-2 border-zinc-100 p-1 h-14 rounded w-full sm:w-auto shrink-0 shadow-sm">
+                            <TabsTrigger value="modules" className="h-full px-6 text-[10px] uppercase font-bold tracking-widest data-[state=active]:bg-zinc-900 data-[state=active]:text-white transition-all rounded">
+                                <Layers className="w-4 h-4 mr-2" /> Course Modules
+                            </TabsTrigger>
+                            <TabsTrigger value="resources" className="h-full px-6 text-[10px] uppercase font-bold tracking-widest data-[state=active]:bg-zinc-900 data-[state=active]:text-white transition-all rounded">
+                                <Library className="w-4 h-4 mr-2" /> Uncategorized Resources
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <div className="bg-white border-2 border-zinc-100 px-4 rounded flex items-center h-14 w-full">
+                            <Search className="w-4 h-4 text-zinc-400 shrink-0" />
                             <Input
-                                placeholder="Filter resources by title or keywords..."
+                                placeholder="Filter within course..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="border-0 p-0 h-auto focus-visible:ring-0 text-lg font-bold placeholder:text-zinc-300 bg-transparent px-1"
+                                className="border-0 focus-visible:ring-0 shadow-none font-bold text-sm placeholder:text-zinc-300"
                             />
                         </div>
                     </div>
-                </div>
 
-                <div className="bg-white border-2 border-zinc-100 p-6 rounded flex flex-col justify-center gap-4">
-                    {isStaffOrAdmin ? (
-                        <div className="flex flex-col gap-2">
-                            <p className="text-[10px] uppercase font-bold text-zinc-400 text-center">Staff Controls</p>
-                            <Button className="w-full bg-blue-900 hover:bg-zinc-900 text-white h-11 font-bold text-xs uppercase tracking-wider rounded transition-all">
-                                <FileText className="w-4 h-4 mr-2" />
-                                Modify Course
-                            </Button>
-                        </div>
-                    ) : (
-                        <div className="text-center">
-                            <p className="text-[10px] uppercase font-bold text-zinc-400 mb-1">Status</p>
-                            <span className="text-xs font-black text-blue-900 bg-blue-50 px-3 py-1 rounded uppercase tracking-widest">Active</span>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* BOTTOM ROW: Content Grid */}
-            <div className="flex-1 overflow-hidden">
-                <div className="bg-white border-2 border-zinc-100 rounded flex flex-col h-full overflow-hidden">
-                    <div className="flex items-center justify-between p-6 border-b-2 border-zinc-50 shrink-0">
-                        <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-tight flex items-center gap-2">
-                            <FileText className="w-4 h-4" />
-                            Academic Repositories
-                        </h3>
-                        {resources.length > 0 && (
-                            <span className="text-[10px] font-bold text-zinc-400 uppercase">
-                                Displaying {resources.length} items
-                            </span>
-                        )}
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-                        {loadingResources ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {[...Array(6)].map((_, i) => (
-                                    <div key={i} className="bg-white border-2 border-zinc-100 p-6 rounded flex flex-col gap-4">
-                                        <Skeleton className="w-full h-8 rounded" />
-                                        <Skeleton className="w-2/3 h-4 rounded" />
-                                        <div className="mt-4 pt-4 border-t-2 border-zinc-50 flex justify-between">
-                                            <Skeleton className="w-16 h-4 rounded" />
-                                            <Skeleton className="w-16 h-4 rounded" />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : resources.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {resources.map((resource) => (
-                                    <Link key={resource.id} href={`/resources/${resource.id}`}>
-                                        <div className="bg-white border-2 border-zinc-100 p-6 rounded flex flex-col justify-between hover:border-blue-900 transition-all group h-full min-h-[160px]">
-                                            <div>
-                                                <div className="flex items-center justify-between mb-4">
-                                                    <span className="text-[10px] font-black uppercase text-blue-900 bg-blue-50 px-2 py-0.5 rounded">
-                                                        {resource.type || 'Resource'}
-                                                    </span>
-                                                    <Download className="w-4 h-4 text-zinc-300 group-hover:text-blue-900 transition-colors" />
-                                                </div>
-                                                <h4 className="text-sm font-bold text-zinc-900 line-clamp-2 leading-tight group-hover:text-blue-900 transition-colors mb-2">
-                                                    {resource.title}
-                                                </h4>
-                                                <p className="text-[10px] font-bold text-zinc-400 line-clamp-1">
-                                                    {resource.description}
-                                                </p>
-                                            </div>
-                                            <div className="mt-6 flex flex-col gap-3 pt-4 border-t-2 border-zinc-50">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold">
-                                                        <Calendar className="w-3.5 h-3.5" />
-                                                        {format(new Date(resource.createdAt), 'MMM d, yyyy')}
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold">
-                                                        <Download className="w-3.5 h-3.5" />
-                                                        {resource.downloadCount}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
+                    <div className="bg-white border-2 border-zinc-100 p-4 rounded flex items-center justify-between sm:justify-end gap-4 h-14">
+                        {isStaffOrAdmin ? (
+                            <ManageModuleDialog courseId={id} />
                         ) : (
-                            <div className="h-full flex flex-col items-center justify-center py-20 grayscale opacity-50">
-                                <div className="w-20 h-20 rounded bg-zinc-50 flex items-center justify-center border-2 border-zinc-100 mb-6">
-                                    <Filter className="w-10 h-10 text-zinc-400" />
-                                </div>
-                                <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-tight mb-2">No Resources Found</h3>
-                                <p className="text-[10px] font-bold text-zinc-400 uppercase max-w-[200px] text-center mb-6">This repository is currently empty or has no matching records.</p>
-                                {search && (
-                                    <Button variant="link" className="text-xs text-blue-600 font-bold p-0 uppercase" onClick={() => setSearch("")}>Clear Search</Button>
-                                )}
+                            <div className="flex items-center gap-2 w-full justify-center">
+                                <span className="text-[10px] uppercase font-bold text-zinc-400">Course Status</span>
+                                <span className="text-[10px] font-black text-blue-900 bg-blue-50 px-2 py-1 rounded uppercase tracking-widest">Active</span>
                             </div>
                         )}
                     </div>
                 </div>
-            </div>
+
+                {/* MODULES CONTENT */}
+                <TabsContent value="modules" className="flex-1 overflow-hidden mt-0 outline-none">
+                    <div className="bg-white border-2 border-zinc-100 rounded flex flex-col h-full overflow-hidden">
+                        <div className="flex items-center justify-between p-6 border-b-2 border-zinc-50 shrink-0">
+                            <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                                <Layers className="w-4 h-4" /> Structured Curriculum Modules
+                            </h3>
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{modules.length} Modules</span>
+                        </div>
+                        <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                            {loadingModules ? (
+                                <div className="space-y-4">
+                                    {[...Array(3)].map((_, i) => <Skeleton key={i} className="w-full h-24 rounded" />)}
+                                </div>
+                            ) : modules.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {modules.map((module: any) => (
+                                        <div key={module.id} className="bg-white border-2 border-zinc-100 p-5 rounded hover:border-blue-900 transition-all group flex flex-col justify-between min-h-[160px]">
+                                            <div>
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-900 bg-blue-50 px-2 py-1 rounded">
+                                                        {module.code}
+                                                    </span>
+                                                    {isStaffOrAdmin && (
+                                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <ManageModuleDialog courseId={id} initialData={module} triggerType="icon" />
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-red-600 border-2 border-transparent hover:border-red-100" onClick={() => handleDeleteModule(module.id, module.name)}>
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <h4 className="text-sm font-black text-zinc-900 leading-tight mb-2 group-hover:text-blue-900">{module.name}</h4>
+                                                <p className="text-[11px] font-bold text-zinc-500 line-clamp-2 leading-relaxed">{module.description || "No description provided."}</p>
+                                            </div>
+                                            <div className="mt-4 pt-4 border-t-2 border-zinc-50 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                                                <span>{module._count?.resources || 0} Assets</span>
+                                                <Link href={`/course-units/${module.id}`} className="text-blue-600 hover:text-blue-900 group-hover:underline">Open Module &rarr;</Link>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="h-full flex flex-col items-center justify-center grayscale opacity-50 py-12">
+                                    <Layers className="w-12 h-12 text-zinc-400 mb-4" />
+                                    <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-tight mb-1">No Modules Created</h3>
+                                    <p className="text-[10px] font-bold text-zinc-400 uppercase">This course has no structured modules yet.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </TabsContent>
+
+                {/* UNCATEGORIZED RESOURCES CONTENT */}
+                <TabsContent value="resources" className="flex-1 overflow-hidden mt-0 outline-none">
+                    <div className="bg-white border-2 border-zinc-100 rounded flex flex-col h-full overflow-hidden">
+                        <div className="flex items-center justify-between p-6 border-b-2 border-zinc-50 shrink-0">
+                            <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                                <FileText className="w-4 h-4" /> Uncategorized Course Files
+                            </h3>
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{resources.length} Assets</span>
+                        </div>
+                        <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                            {loadingResources ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-40 rounded w-full" />)}
+                                </div>
+                            ) : resources.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {resources.map((resource: any) => (
+                                        <Link key={resource.id} href={`/resources/${resource.id}`}>
+                                            <div className="bg-white border-2 border-zinc-100 p-6 rounded flex flex-col justify-between hover:border-blue-900 transition-all group h-full min-h-[160px]">
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <span className="text-[10px] font-black uppercase text-blue-900 bg-blue-50 px-2 py-0.5 rounded tracking-widest">{resource.type || 'Resource'}</span>
+                                                        <Download className="w-4 h-4 text-zinc-300 group-hover:text-blue-900 transition-colors" />
+                                                    </div>
+                                                    <h4 className="text-sm font-bold text-zinc-900 line-clamp-2 leading-tight group-hover:text-blue-900 transition-colors mb-2">{resource.title}</h4>
+                                                    <p className="text-[10px] font-bold text-zinc-400 line-clamp-1">{resource.description}</p>
+                                                </div>
+                                                <div className="mt-6 pt-4 border-t-2 border-zinc-50 flex justify-between">
+                                                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold"><Calendar className="w-3.5 h-3.5" />{format(new Date(resource.createdAt), 'MMM d, yyyy')}</div>
+                                                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold"><Download className="w-3.5 h-3.5" />{resource.downloadCount}</div>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="h-full flex flex-col items-center justify-center grayscale opacity-50 py-12">
+                                    <Filter className="w-12 h-12 text-zinc-400 mb-4" />
+                                    <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-tight mb-1">No Files Found</h3>
+                                    <p className="text-[10px] font-bold text-zinc-400 uppercase">No loose resources are associated directly with this course.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </TabsContent>
+
+            </Tabs>
         </div>
     );
 }

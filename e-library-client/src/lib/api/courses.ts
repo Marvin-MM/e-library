@@ -2,7 +2,12 @@ import api from "../axios";
 import type { ApiResponse, PaginatedResponse, Course, CreateCourseData, ResourceFilters, Resource } from "@/types/api";
 
 export const coursesApi = {
-  list: async (filters?: { page?: number; limit?: number; search?: string }) => {
+  // NEW: Fetch distinct departments
+  getDepartments: async () => {
+    const response = await api.get<ApiResponse<string[]>>("/courses/departments");
+    return response.data;
+  },
+  list: async (filters?: { page?: number; limit?: number; search?: string; department?: string }) => {
     const response = await api.get<PaginatedResponse<Course>>("/courses", { params: filters });
     return response.data;
   },
