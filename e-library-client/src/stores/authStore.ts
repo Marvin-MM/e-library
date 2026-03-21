@@ -1,213 +1,3 @@
-// import { create } from "zustand";
-// import { persist, createJSONStorage } from "zustand/middleware";
-// import type { User } from "@/types/api";
-// import Cookies from "js-cookie";
-
-// interface AuthState {
-//   user: User | null;
-//   accessToken: string | null;
-//   isAuthenticated: boolean;
-//   isLoading: boolean;
-//   isHydrated: boolean;
-//   setUser: (user: User | null) => void;
-//   setAccessToken: (token: string | null) => void;
-//   setTokens: (accessToken: string, refreshToken: string) => void;
-//   logout: () => void;
-//   setLoading: (loading: boolean) => void;
-//   setHydrated: () => void;
-// }
-
-// export const useAuthStore = create<AuthState>()(
-//   persist(
-//     (set, get) => ({
-//       user: null,
-//       accessToken: null,
-//       isAuthenticated: false,
-//       isLoading: true,
-//       isHydrated: false,
-
-//       setUser: (user) =>
-//         set({
-//           user,
-//           isAuthenticated: !!user,
-//           isLoading: false,
-//         }),
-
-//       setAccessToken: (token) =>
-//         set({
-//           accessToken: token,
-//           isAuthenticated: !!token,
-//         }),
-
-//       setTokens: (accessToken, refreshToken) => {
-//         Cookies.set("refreshToken", refreshToken, {
-//           expires: 7,
-//           secure: process.env.NODE_ENV === "production",
-//           sameSite: "lax",
-//         });
-//         set({
-//           accessToken,
-//           isAuthenticated: true,
-//         });
-//       },
-
-//       logout: () => {
-//         Cookies.remove("refreshToken");
-//         set({
-//           user: null,
-//           accessToken: null,
-//           isAuthenticated: false,
-//           isLoading: false,
-//         });
-//       },
-
-//       setLoading: (loading) => set({ isLoading: loading }),
-
-//       setHydrated: () => set({ isHydrated: true }),
-//     }),
-//     {
-//       name: "auth-storage",
-//       storage: createJSONStorage(() => sessionStorage),
-//       partialize: (state) => ({
-//         accessToken: state.accessToken,
-//         user: state.user,
-//         isAuthenticated: state.isAuthenticated,
-//       }),
-//       onRehydrateStorage: () => (state) => {
-//         if (state) {
-//           state.setHydrated();
-//           if (state.accessToken) {
-//             state.setLoading(false);
-//           } else {
-//             state.setLoading(false);
-//           }
-//         }
-//       },
-//     }
-//   )
-// );
-
-// export const getRefreshToken = (): string | undefined => {
-//   return Cookies.get("refreshToken");
-// };
-
-
-// import { create } from "zustand";
-// import { persist, createJSONStorage } from "zustand/middleware";
-// import type { User } from "@/types/api";
-// import Cookies from "js-cookie";
-
-// interface AuthState {
-//   user: User | null;
-//   accessToken: string | null;
-//   isAuthenticated: boolean;
-//   isLoading: boolean;
-//   isHydrated: boolean;
-//   setUser: (user: User | null) => void;
-//   setAccessToken: (token: string | null) => void;
-//   setTokens: (accessToken: string, refreshToken: string) => void;
-//   logout: () => void;
-//   clearAuth: () => void;
-//   setLoading: (loading: boolean) => void;
-//   setHydrated: () => void;
-// }
-
-// export const useAuthStore = create<AuthState>()(
-//   persist(
-//     (set) => ({
-//       user: null,
-//       accessToken: null,
-//       isAuthenticated: false,
-//       isLoading: true,
-//       isHydrated: false,
-
-//       setUser: (user) =>
-//         set({
-//           user,
-//           isAuthenticated: !!user,
-//           isLoading: false,
-//         }),
-
-//       setAccessToken: (token) =>
-//         set({
-//           accessToken: token,
-//           isAuthenticated: !!token,
-//         }),
-
-//       setTokens: (accessToken, refreshToken) => {
-//         // Store refresh token in httpOnly-like cookie (more secure than sessionStorage)
-//         Cookies.set("refreshToken", refreshToken, {
-//           expires: 7, // 7 days
-//           secure: process.env.NODE_ENV === "production",
-//           sameSite: "strict", // Changed from 'lax' to 'strict' for better security
-//           path: "/",
-//         });
-
-//         set({
-//           accessToken,
-//           isAuthenticated: true,
-//           isLoading: false,
-//         });
-//       },
-
-//       logout: () => {
-//         // Clear refresh token cookie
-//         Cookies.remove("refreshToken", { path: "/" });
-
-//         // Clear sessionStorage
-//         if (typeof window !== "undefined") {
-//           sessionStorage.removeItem("auth-storage");
-//         }
-
-//         set({
-//           user: null,
-//           accessToken: null,
-//           isAuthenticated: false,
-//           isLoading: false,
-//         });
-//       },
-
-//       clearAuth: () =>
-//         set({
-//           user: null,
-//           accessToken: null,
-//           isAuthenticated: false,
-//           isLoading: false,
-//         }),
-
-//       setLoading: (loading) => set({ isLoading: loading }),
-
-//       setHydrated: () => set({ isHydrated: true }),
-//     }),
-//     {
-//       name: "auth-storage",
-//       storage: createJSONStorage(() => sessionStorage),
-//       partialize: (state) => ({
-//         accessToken: state.accessToken,
-//         user: state.user,
-//         isAuthenticated: state.isAuthenticated,
-//       }),
-//       onRehydrateStorage: () => (state) => {
-//         if (state) {
-//           state.setHydrated();
-//           state.setLoading(false);
-//         }
-//       },
-//     }
-//   )
-// );
-
-// // Helper to get refresh token from cookies
-// export const getRefreshToken = (): string | undefined => {
-//   return Cookies.get("refreshToken");
-// };
-
-// // Hook to wait for hydration before rendering auth-dependent UI
-// export function useAuthHydration() {
-//   const isHydrated = useAuthStore((state) => state.isHydrated);
-//   return isHydrated;
-// }
-
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { User } from "@/types/api";
@@ -228,6 +18,13 @@ interface AuthState {
   setHydrated: () => void;
 }
 
+const COOKIE_OPTS = {
+  expires: 7,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: (process.env.NODE_ENV === "production" ? "strict" : "lax") as "strict" | "lax",
+  path: "/",
+} as const;
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -238,95 +35,36 @@ export const useAuthStore = create<AuthState>()(
       isHydrated: false,
 
       setUser: (user) => {
+        // Keep the role cookie in sync for middleware routing (avoids client-side flicker)
         if (user?.role) {
-          Cookies.set("user_role", user.role, {
-            expires: 7,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-          });
-        } else if (user === null) {
+          Cookies.set("user_role", user.role, COOKIE_OPTS);
+        } else {
           Cookies.remove("user_role", { path: "/" });
         }
-
-        set({
-          user,
-          isAuthenticated: !!user,
-          isLoading: false,
-        });
+        set({ user, isAuthenticated: !!user, isLoading: false });
       },
 
       setAccessToken: (token) =>
-        set({
-          accessToken: token,
-          isAuthenticated: !!token,
-        }),
+        set({ accessToken: token, isAuthenticated: !!token }),
 
       setTokens: (accessToken, refreshToken) => {
-        console.log("[Auth Store] Setting tokens...");
-        console.log("- Access token length:", accessToken?.length);
-        console.log("- Refresh token length:", refreshToken?.length);
-
-        // Store refresh token in cookie
-        Cookies.set("refreshToken", refreshToken, {
-          expires: 7, // 7 days
-          secure: process.env.NODE_ENV === "production",
-          sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax", // lax for localhost
-          path: "/",
-        });
-
-        // Set role cookie for middleware
-        if (accessToken) {
-          // We can't easily decode JWT here without a library, but usually we have element 'user' in the store method args?
-          // Wait, setTokens doesn't take 'user'. Let's look at setUser.
-        }
-
-        // Verify cookie was set
-        const storedToken = Cookies.get("refreshToken");
-        console.log("[Auth Store] Cookie verification:");
-        console.log("- Cookie set successfully:", storedToken === refreshToken);
-        console.log("- Stored token length:", storedToken?.length);
-
-        if (refreshToken && storedToken !== refreshToken) {
-          console.error("[Auth Store] ⚠️ Cookie mismatch!");
-          console.error("- Expected (first 10 chars):", refreshToken.substring(0, 10) + "...");
-          console.error("- Stored (first 10 chars):", storedToken ? (storedToken.substring(0, 10) + "...") : "undefined");
-        }
-
-        set({
-          accessToken,
-          isAuthenticated: true,
-          isLoading: false,
-        });
+        Cookies.set("refreshToken", refreshToken, COOKIE_OPTS);
+        set({ accessToken, isAuthenticated: true, isLoading: false });
       },
 
       logout: () => {
-        // Clear refresh token cookie
         Cookies.remove("refreshToken", { path: "/" });
-
-        // Clear sessionStorage
+        Cookies.remove("user_role", { path: "/" });
         if (typeof window !== "undefined") {
           sessionStorage.removeItem("auth-storage");
         }
-
-        set({
-          user: null,
-          accessToken: null,
-          isAuthenticated: false,
-          isLoading: false,
-        });
+        set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
       },
 
       clearAuth: () =>
-        set({
-          user: null,
-          accessToken: null,
-          isAuthenticated: false,
-          isLoading: false,
-        }),
+        set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false }),
 
       setLoading: (loading) => set({ isLoading: loading }),
-
       setHydrated: () => set({ isHydrated: true }),
     }),
     {
@@ -347,13 +85,9 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-// Helper to get refresh token from cookies
-export const getRefreshToken = (): string | undefined => {
-  return Cookies.get("refreshToken");
-};
+export const getRefreshToken = (): string | undefined =>
+  Cookies.get("refreshToken");
 
-// Hook to wait for hydration before rendering auth-dependent UI
 export function useAuthHydration() {
-  const isHydrated = useAuthStore((state) => state.isHydrated);
-  return isHydrated;
+  return useAuthStore((state) => state.isHydrated);
 }

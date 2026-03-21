@@ -92,31 +92,31 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
     return (
         <div className="h-screen flex overflow-hidden bg-zinc-100 font-sans antialiased relative">
             {/* Sidebar Section */}
-            {isAdmin ? <AdminSidebar /> : <Sidebar activeTab={pathname} setActiveTab={(tab) => router.push(tab)} />}
+            {isAdmin ? <AdminSidebar /> : <Sidebar />}
 
             {/* Main Layout Area */}
             <div className={cn("flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 bg-zinc-100", "lg:pl-64")}>
 
                 {/* Universal Header - Modern Search-First Redesign */}
-                <header className="h-16 border-b bg-white dark:bg-zinc-950 flex items-center px-4 sm:px-8 sticky top-0 z-50 shrink-0">
-                    <div className="flex-1 flex items-center gap-6 max-w-4xl">
-                        {/* Mobile Menu Trigger (Admin Only) */}
-                        {isAdmin && (
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={toggleSidebar}
-                                className="lg:hidden"
-                            >
-                                <Menu className="h-5 w-5" />
-                            </Button>
-                        )}
+                <header className="h-16 border-b bg-white dark:bg-zinc-950 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-50 shrink-0">
+                    <div className="flex items-center gap-4 max-w-4xl w-full">
+                        {/* Mobile Menu Trigger — shown for all roles on small screens */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={toggleSidebar}
+                            className="lg:hidden shrink-0"
+                            aria-label="Open navigation menu"
+                        >
+                            <Menu className="h-5 w-5" />
+                        </Button>
 
-                        {/* Integrated Search Bar Trigger */}
+                        {/* Integrated Search Bar Trigger — students only */}
                         {!isAdmin && (
                             <div className="relative group max-w-md w-full">
                                 <button
                                     onClick={() => setSearchOpen(true)}
+                                    aria-label="Search resources, books, or courses"
                                     className="w-full flex items-center gap-3 px-4 h-10 bg-white border border-zinc-100 rounded text-zinc-400 hover:border-zinc-200 transition-all text-sm group"
                                 >
                                     <Search className="w-4 h-4 text-zinc-400 group-hover:text-zinc-600" />
@@ -209,22 +209,16 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
 
 
                 {/* Main Content Area */}
-                <main className="flex-1 overflow-y-auto scrollbar-hide container mx-auto p-4 sm:p-6 lg:p-8 max-w-[1600px]">
+                <main
+                    id="main-content"
+                    className="flex-1 overflow-y-auto scrollbar-hide w-full p-4 sm:p-6 lg:p-8"
+                    aria-label="Main content"
+                >
                     <div>
                         {children}
                     </div>
                 </main>
             </div>
-
-            <style jsx global>{`
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
         </div>
     );
 }

@@ -69,11 +69,10 @@ export function useSessionManager() {
 
     try {
       console.log("[Session] Verifying session...");
-      const response = await authApi.getMe();
-
-      if (isMountedRef.current && response.success && response.data) {
-        setUser(response.data);
-        queryClient.setQueryData(queryKeys.auth.me, response.data);
+      const user = await authApi.getMe();
+      if (isMountedRef.current && user) {
+        setUser(user);
+        queryClient.setQueryData(queryKeys.auth.me, user);
         console.log("[Session] Session verified successfully");
         return true;
       }
@@ -114,19 +113,18 @@ export function useSessionManager() {
     try {
       console.log("[Session] Refreshing access token...");
       const response = await authApi.refreshToken(refreshTokenValue);
-
-      if (isMountedRef.current && response.success && response.data) {
-        const { accessToken: newAccessToken, refreshToken: newRefreshToken, user } = response.data;
-
-        // Update tokens in store
+      if (isMountedRef.current && response) {
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.tokens;
+        // AuthResult contains tokens: { accessToken, refreshToken } and user
+        // wait, let's check AuthResult structure again. user, tokens: AuthTokenPair.
+        // wait, I see in auth.ts: export interface AuthResult { user: User; tokens: AuthTokenPair; }
+        
         setTokens(newAccessToken, newRefreshToken);
-
-        // Update user if provided
-        if (user) {
-          setUser(user);
-          queryClient.setQueryData(queryKeys.auth.me, user);
+        if (response.user) {
+          setUser(response.user);
+          queryClient.setQueryData(queryKeys.auth.me, response.user);
         }
-
+        
         sessionStateRef.current.lastRefreshTime = Date.now();
         sessionStateRef.current.retryCount = 0;
         console.log("[Session] Token refreshed successfully");

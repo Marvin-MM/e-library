@@ -107,7 +107,11 @@ function AuditLogsPanel() {
                 ) : logs.length > 0 ? (
                     <div className="divide-y divide-zinc-100/60">
                         {logs.map((log) => {
-                            const performedBy = log.performedBy || { name: "Unknown System", email: "", role: "SYSTEM" };
+                            const performedBy = log.performedBy || { 
+                                name: log.user?.name || "Unknown System", 
+                                email: log.user?.email || "", 
+                                role: log.user?.role || "SYSTEM" 
+                            };
                             return (
                                 <div key={log.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-zinc-50/50 transition-all group">
                                     {/* User Block */}
@@ -134,7 +138,7 @@ function AuditLogsPanel() {
                                                 {log.action.replace("_", " ")}
                                             </Badge>
                                             <Badge variant="outline" className="text-[9px] uppercase tracking-widest border-2 border-zinc-100 shadow-none font-bold text-zinc-600 rounded shrink-0 px-2 py-0 h-5 bg-white">
-                                                {log.entity}
+                                                {log.entity || log.entityType}
                                             </Badge>
                                         </div>
                                         <div className="flex items-center gap-1.5 opacity-60 text-zinc-600 truncate">
@@ -150,7 +154,7 @@ function AuditLogsPanel() {
                                         <div className="flex items-center gap-2 text-zinc-500 group-hover:text-zinc-900 transition-colors">
                                             <Clock className="h-3.5 w-3.5" />
                                             <p className="text-[10px] font-bold whitespace-nowrap">
-                                                {formatDateTime(log.timestamp)}
+                                                {formatDateTime(log.timestamp || log.createdAt)}
                                             </p>
                                         </div>
                                         {log.ipAddress && (

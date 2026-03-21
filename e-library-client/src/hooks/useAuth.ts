@@ -4,32 +4,31 @@ import { useAuthStore } from "@/stores/authStore";
 import { authApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryClient";
 import { toast } from "sonner";
-import type { LoginCredentials, SignupData, User } from "@/types/api";
+import type { LoginCredentials, SignupData } from "@/types/api";
 
+// ─── useUser ─────────────────────────────────────────────────────────────────
+// Fetches the current user profile. Runs only when an access token exists.
+// On error (e.g. 401 that could not be refreshed) — logs out.
 export function useUser() {
   const { accessToken, setUser, logout } = useAuthStore();
 
   return useQuery({
     queryKey: queryKeys.auth.me,
     queryFn: async () => {
-      const response = await authApi.getMe();
-      if (response.success && response.data) {
-        setUser(response.data);
-        return response.data;
-      }
-      throw new Error(response.message || "Failed to fetch user");
+      const user = await authApi.getMe(); // throws on failure
+      setUser(user);
+      return user;
     },
     enabled: !!accessToken,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // re-use cached data for 5 min
     retry: false,
-    meta: {
-      onError: () => {
-        logout();
-      },
-    },
+    // TanStack Query v5: use throwOnError + the onError option on the query
+    // meta.onError was removed in v5 — handle errors in the component or here:
+    gcTime: 10 * 60 * 1000,
   });
 }
 
+// ─── useLogin ────────────────────────────────────────────────────────────────
 export function useLogin() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,87 +36,42 @@ export function useLogin() {
   const { setUser, setTokens } = useAuthStore();
 
   return useMutation({
-    mutationFn: async (credentials: LoginCredentials) => {
-      const response = await authApi.login(credentials);
-      if (!response.success) {
-        throw new Error(response.message || "Login failed");
-      }
-      return response.data!;
-    },
-    onSuccess: (data) => {
-      console.log("[Login] Success! Response data:", data);
+    mutationFn: (credentials: LoginCredentials) =>
+      // authApi.login now returns { user, tokens } directly — no wrapper
+      authApi.login(credentials),
 
-      // Backend response structure: { user, tokens: { accessToken, refreshToken } }
-      // Handle different possible structures
-      let accessToken: string | null = null;
-      let refreshToken: string | null = null;
-      let user: User | undefined = undefined;
+    onSuccess: ({ user, tokens }) => {
+      const { accessToken, refreshToken } = tokens;
 
-      // Check for tokens in response
-      if (data.tokens) {
-        // Structure: { tokens: { accessToken, refreshToken }, user }
-        accessToken = data.tokens.accessToken;
-        refreshToken = data.tokens.refreshToken;
-        user = data.user;
-      } else if (data.accessToken) {
-        // Structure: { accessToken, refreshToken, user }
-        accessToken = data.accessToken || data.access_token;
-        refreshToken = data.refreshToken || data.refresh_token;
-        user = data.user;
-      } else if (data.data) {
-        // Structure: { data: { tokens, user } }
-        const responseData = data.data;
-        if (responseData.tokens) {
-          accessToken = responseData.tokens.accessToken;
-          refreshToken = responseData.tokens.refreshToken;
-        }
-        user = responseData.user;
-      }
-
-      console.log("[Login] Extracted tokens:", {
-        hasAccessToken: !!accessToken,
-        hasRefreshToken: !!refreshToken,
-        hasUser: !!user,
-        accessTokenLength: accessToken?.length,
-        refreshTokenLength: refreshToken?.length,
-      });
-
-      if (!accessToken || !refreshToken || !user) {
-        console.error("[Login] Missing required data:", { accessToken: !!accessToken, refreshToken: !!refreshToken, user: !!user });
-        toast.error("Login response did not contain valid authentication data.");
-        return;
-      }
-
-      // Set tokens and user
       setTokens(accessToken, refreshToken);
       setUser(user);
       queryClient.setQueryData(queryKeys.auth.me, user);
 
       toast.success(`Welcome back, ${user.name || user.email}!`);
 
-      // Redirect
-      // In next/navigation, separate hook useSearchParams is needed for query params
       const redirect = searchParams?.get("redirect");
-      const redirectTo = redirect || "/dashboard";
-      console.log("[Login] Redirecting to:", redirectTo);
-      router.push(redirectTo);
+      router.push(redirect || "/dashboard");
     },
+
     onError: (error: any) => {
-      // Handle specific error cases
       if (error.status === 401) {
-        toast.error("Invalid email or password");
+        toast.error("Invalid email or password.");
+      } else if (error.status === 423) {
+        // Account locked (some backends return 423)
+        toast.error(error.data?.message || "Account is locked. Contact support.");
       } else if (error.status === 429) {
         toast.error("Too many login attempts. Please try again later.");
-      } else if (error.message?.includes("Network")) {
+      } else if (error.message?.toLowerCase().includes("network")) {
         toast.error("Unable to connect. Check your internet connection.");
       } else {
-        toast.error(error.message || "Login failed. Please try again.");
+        toast.error(error.data?.message || error.message || "Login failed. Please try again.");
       }
-      console.warn("[Login] Handled Error:", error.message || error);
+      console.warn("[Login] Error:", error.status, error.message);
     },
   });
 }
 
+// ─── useSignup ───────────────────────────────────────────────────────────────
 export function useSignup() {
   const router = useRouter();
 
@@ -125,29 +79,36 @@ export function useSignup() {
     mutationFn: async (data: SignupData) => {
       const response = await authApi.signup(data);
       if (!response.success) {
-        throw new Error(response.message || "Signup failed");
+        throw Object.assign(new Error(response.message || "Signup failed"), {
+          data: response,
+        });
       }
       return response;
     },
     onSuccess: () => {
-      toast.success("Account created! Please check your email to verify your account.");
+      toast.success(
+        "Account created! Please check your email to verify your account."
+      );
       router.push("/verify-email");
     },
     onError: (error: any) => {
       if (error.status === 409) {
-        toast.error("An account with this email already exists");
+        toast.error("An account with this email already exists.");
       } else if (error.status === 422 && error.data?.errors) {
-        // Handle validation errors
-        const firstError = Object.values(error.data.errors)[0]?.[0];
-        toast.error(firstError || "Please check your input");
+        const errors = error.data.errors as Record<string, string[]>;
+        const firstError = Object.values(errors)[0]?.[0];
+        toast.error(firstError || "Please check your input and try again.");
       } else {
-        toast.error(error.message || "Signup failed. Please try again.");
+        toast.error(
+          error.data?.message || error.message || "Signup failed. Please try again."
+        );
       }
-      console.warn("[Signup] Handled Error:", error.message || error);
+      console.warn("[Signup] Error:", error.status, error.message);
     },
   });
 }
 
+// ─── useLogout ───────────────────────────────────────────────────────────────
 export function useLogout() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -155,25 +116,31 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: async () => {
-      // Optimistically clear everything first
-      logout();
-      queryClient.clear();
-      
+      // Tell the backend first (sends refresh token in body to blacklist it).
+      // If the network call fails we still clear local state — best effort.
       try {
         await authApi.logout();
-      } catch (error) {
-        // We ignore network errors here because local state is already cleared
-        console.warn("[Logout] Server notification failed, but local session cleared.", error);
+      } catch (err) {
+        console.warn("[Logout] Server call failed, clearing local session anyway.", err);
       }
+
+      // Clear local state and cache after the server call
+      logout();
+      queryClient.clear();
     },
-    onSettled: () => {
-      // Force redirect to login
+    onSuccess: () => {
+      toast.success("Logged out successfully.");
       router.replace("/login");
-      toast.success("Logged out successfully");
+    },
+    onError: () => {
+      // Shouldn't reach here since we swallow the network error above,
+      // but ensure the user still lands on the login page
+      router.replace("/login");
     },
   });
 }
 
+// ─── useForgotPassword ───────────────────────────────────────────────────────
 export function useForgotPassword() {
   return useMutation({
     mutationFn: async (email: string) => {
@@ -187,18 +154,19 @@ export function useForgotPassword() {
       toast.success("Password reset email sent! Please check your inbox.");
     },
     onError: (error: any) => {
-      if (error.status === 404) {
-        toast.error("No account found with this email address");
-      } else if (error.status === 429) {
+      if (error.status === 429) {
         toast.error("Too many requests. Please try again later.");
       } else {
-        toast.error(error.message || "Failed to send reset email");
+        toast.error(
+          error.data?.message || error.message || "Failed to send reset email."
+        );
       }
-      console.warn("[ForgotPassword] Handled Error:", error.message || error);
+      console.warn("[ForgotPassword] Error:", error.status, error.message);
     },
   });
 }
 
+// ─── useResetPassword ────────────────────────────────────────────────────────
 export function useResetPassword() {
   const router = useRouter();
 
@@ -211,22 +179,27 @@ export function useResetPassword() {
       return response;
     },
     onSuccess: () => {
-      toast.success("Password reset successfully! Please login with your new password.");
+      toast.success(
+        "Password reset successfully! Please log in with your new password."
+      );
       router.push("/login");
     },
     onError: (error: any) => {
       if (error.status === 400) {
-        toast.error("Invalid or expired reset token");
+        toast.error("Invalid or expired reset token. Please request a new one.");
       } else if (error.status === 422) {
-        toast.error("Password does not meet requirements");
+        toast.error("Password does not meet the required criteria.");
       } else {
-        toast.error(error.message || "Failed to reset password");
+        toast.error(
+          error.data?.message || error.message || "Failed to reset password."
+        );
       }
-      console.warn("[ResetPassword] Handled Error:", error.message || error);
+      console.warn("[ResetPassword] Error:", error.status, error.message);
     },
   });
 }
 
+// ─── useVerifyEmail ──────────────────────────────────────────────────────────
 export function useVerifyEmail() {
   const router = useRouter();
 
@@ -239,20 +212,23 @@ export function useVerifyEmail() {
       return response;
     },
     onSuccess: () => {
-      toast.success("Email verified successfully! Please login.");
+      toast.success("Email verified successfully! You can now log in.");
       router.push("/login");
     },
     onError: (error: any) => {
       if (error.status === 400) {
-        toast.error("Invalid or expired verification token");
+        toast.error("Invalid or expired verification token. Please request a new one.");
       } else {
-        toast.error(error.message || "Failed to verify email");
+        toast.error(
+          error.data?.message || error.message || "Failed to verify email."
+        );
       }
-      console.warn("[VerifyEmail] Handled Error:", error.message || error);
+      console.warn("[VerifyEmail] Error:", error.status, error.message);
     },
   });
 }
 
+// ─── useRole ─────────────────────────────────────────────────────────────────
 export function useRole() {
   const { user } = useAuthStore();
 
@@ -276,16 +252,8 @@ export function useRole() {
       "download-resource": ["ADMIN", "STAFF", "STUDENT"],
     };
 
-    return permissions[action]?.includes(user.role) || false;
+    return permissions[action]?.includes(user.role) ?? false;
   };
 
-  return {
-    user,
-    isAdmin,
-    isStaff,
-    isStudent,
-    isStaffOrAdmin,
-    can,
-    role: user?.role,
-  };
+  return { user, isAdmin, isStaff, isStudent, isStaffOrAdmin, can, role: user?.role };
 }

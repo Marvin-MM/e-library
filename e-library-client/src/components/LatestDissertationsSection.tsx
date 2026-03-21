@@ -13,8 +13,21 @@ import {
   ExternalLink,
 } from "lucide-react";
 
+interface Dissertation {
+  id: number;
+  title: string;
+  author: string;
+  institution: string;
+  department: string;
+  year: number;
+  pages: number;
+  abstract: string;
+  keywords: string[];
+  pdfUrl: string;
+}
+
 // Mock dissertation data
-const mockDissertations = [
+const mockDissertations: Dissertation[] = [
   {
     id: 1,
     title: "Machine Learning Applications in Healthcare Diagnostics",
@@ -66,7 +79,7 @@ const mockDissertations = [
 ];
 
 export default function LatestDissertationsSection() {
-  const [selectedDissertation, setSelectedDissertation] = useState(null);
+  const [selectedDissertation, setSelectedDissertation] = useState<Dissertation | null>(null);
 
   return (
     <>

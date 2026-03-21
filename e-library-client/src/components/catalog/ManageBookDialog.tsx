@@ -103,7 +103,11 @@ export function ManageBookDialog({ initialData, triggerType = "button" }: Manage
                                 <Select onValueChange={(val) => setValue("campusId", val)} required>
                                     <SelectTrigger className="bg-white"><SelectValue placeholder="Select Campus" /></SelectTrigger>
                                     <SelectContent>
-                                        {campuses?.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                                        {Array.isArray(campuses) ? campuses.map(c => (
+                                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                        )) : (
+                                            <SelectItem value="none" disabled>No campuses available</SelectItem>
+                                        )}
                                     </SelectContent>
                                 </Select>
                             </div>

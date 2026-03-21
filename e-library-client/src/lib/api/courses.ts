@@ -7,7 +7,7 @@ export const coursesApi = {
     const response = await api.get<ApiResponse<string[]>>("/courses/departments");
     return response.data;
   },
-  list: async (filters?: { page?: number; limit?: number; search?: string; department?: string }) => {
+  list: async (filters?: ResourceFilters) => {
     const response = await api.get<PaginatedResponse<Course>>("/courses", { params: filters });
     return response.data;
   },

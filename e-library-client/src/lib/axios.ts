@@ -4,49 +4,55 @@ import { toast } from "sonner";
 
 /**
  * API BASE URL Configuration
- * Prioritizes environment variable, then falls back to local dev if on localhost, 
- * finally uses the production Render deployment.
  */
 const getBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_API_BASE_URL) {
     return process.env.NEXT_PUBLIC_API_BASE_URL;
   }
-  
-  if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
-    return "http://localhost:5000/api/v1";
-  }
-  
   return "http://localhost:5000/api/v1";
 };
 
-const API_BASE_URL = getBaseUrl();
+export const API_BASE_URL = getBaseUrl();
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  timeout: 60000, // Increased to 60s to handle cold starts on free tier hosting
+  headers: { "Content-Type": "application/json" },
+  timeout: 60000,
   withCredentials: true,
 });
 
-// Global state for token refresh
+// ─── Token Refresh Queue ─────────────────────────────────────────────────────
+// Holds pending requests while a token refresh is in flight.
+// When refresh completes: callbacks receive (null) → they retry.
+// When refresh fails:     callbacks receive (error) → they reject.
+
 let isRefreshing = false;
-let refreshSubscribers: Array<(error?: any) => void> = [];
+let pendingRequests: Array<{
+  resolve: (token: string) => void;
+  reject: (err: unknown) => void;
+}> = [];
 
-function subscribeTokenRefresh(callback: (error?: any) => void) {
-  refreshSubscribers.push(callback);
+function enqueueRequest(
+  resolve: (token: string) => void,
+  reject: (err: unknown) => void
+) {
+  pendingRequests.push({ resolve, reject });
 }
 
-function onRefreshComplete(error?: any) {
-  refreshSubscribers.forEach((callback) => callback(error));
-  refreshSubscribers = [];
+function flushQueue(newToken: string) {
+  pendingRequests.forEach(({ resolve }) => resolve(newToken));
+  pendingRequests = [];
 }
 
-// Request interceptor: Inject Access Token
+function rejectQueue(err: unknown) {
+  pendingRequests.forEach(({ reject }) => reject(err));
+  pendingRequests = [];
+}
+
+// ─── Request interceptor — inject access token ───────────────────────────────
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const accessToken = useAuthStore.getState().accessToken;
+    const { accessToken } = useAuthStore.getState();
     if (accessToken && config.headers) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -55,7 +61,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: Handle Errors & Token Refresh
+// ─── Response interceptor — handle errors and token refresh ──────────────────
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -67,107 +73,129 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Handle Timeouts explicitly
-    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-      toast.error("Cloud backend is taking too long to respond. It might be waking up from sleep. Please try again in a few seconds.", {
-        description: "Status: Connection Timeout (60s)",
-        duration: 5000,
-      });
+    // ── Connection timeout ──────────────────────────────────────────────────
+    if (error.code === "ECONNABORTED" || error.message?.includes("timeout")) {
+      toast.error(
+        "The server is taking too long to respond. It may be waking up from sleep — please try again in a few seconds.",
+        { duration: 5000 }
+      );
     }
 
-    // Handle 401 Unauthorized -> Refresh Flow
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      const isAuthEndpoint = originalRequest.url?.includes("/auth/");
-      
-      // If auth itself fails, don't loop
-      if (isAuthEndpoint && !originalRequest.url?.includes("/auth/me")) {
-        return Promise.reject(error);
+    // ── 401 → Token refresh flow ────────────────────────────────────────────
+    // Skip refresh for auth endpoints (except /auth/me which requires a valid token)
+    const isAuthEndpoint = originalRequest.url?.includes("/auth/");
+    const isRefreshEndpoint = originalRequest.url?.includes("/auth/refresh");
+    const isLoginEndpoint = originalRequest.url?.includes("/auth/login");
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isRefreshEndpoint &&
+      !isLoginEndpoint
+    ) {
+      // If we're already refreshing, queue this request and wait
+      if (isRefreshing) {
+        return new Promise<string>((resolve, reject) => {
+          enqueueRequest(resolve, reject);
+        })
+          .then((newToken) => {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            }
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
+      isRefreshing = true;
 
-      if (!isRefreshing) {
-        isRefreshing = true;
-        const refreshToken = getRefreshToken();
+      const refreshToken = getRefreshToken();
 
-        if (!refreshToken) {
-          isRefreshing = false;
-          onRefreshComplete(error);
-          useAuthStore.getState().logout();
-          if (typeof window !== "undefined" && !window.location.pathname.includes('/login')) {
-            window.location.href = "/login?session_expired=true";
-          }
-          return Promise.reject(error);
+      if (!refreshToken) {
+        isRefreshing = false;
+        rejectQueue(error);
+        useAuthStore.getState().logout();
+        if (
+          typeof window !== "undefined" &&
+          !window.location.pathname.includes("/login")
+        ) {
+          window.location.href = "/login?session_expired=true";
         }
-
-        try {
-          const response = await axios.post(
-            `${API_BASE_URL}/auth/refresh`,
-            { refreshToken },
-            {
-              headers: { "Content-Type": "application/json" },
-              withCredentials: true,
-            }
-          );
-
-          if (response.data.success && response.data.data) {
-            const { accessToken, refreshToken: newRefreshToken, user } = response.data.data;
-            useAuthStore.getState().setTokens(accessToken, newRefreshToken);
-            if (user) useAuthStore.getState().setUser(user);
-            
-            isRefreshing = false;
-            onRefreshComplete();
-
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-            }
-            return api(originalRequest);
-          } else {
-            throw new Error("Refresh failed");
-          }
-        } catch (refreshError: any) {
-          isRefreshing = false;
-          onRefreshComplete(refreshError);
-          useAuthStore.getState().logout();
-          if (typeof window !== "undefined" && !window.location.pathname.includes('/login')) {
-            window.location.href = "/login?session_expired=true";
-          }
-          return Promise.reject(refreshError);
-        }
+        return Promise.reject(error);
       }
 
-      // Queue requests while refreshing
-      return new Promise((resolve, reject) => {
-        subscribeTokenRefresh((err?: any) => {
-          if (err) {
-            reject(err);
-          } else {
-            const token = useAuthStore.getState().accessToken;
-            if (originalRequest.headers && token) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-            }
-            resolve(api(originalRequest));
+      try {
+        // Use a raw axios call (NOT the `api` instance) to avoid interceptor loops
+        const { data } = await axios.post(
+          `${API_BASE_URL}/auth/refresh`,
+          { refreshToken },
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
           }
-        });
-      });
+        );
+
+        // Backend shape: { success: true, data: { user, tokens: { accessToken, refreshToken } } }
+        if (!data?.success || !data?.data?.tokens) {
+          throw new Error("Refresh response did not contain tokens");
+        }
+
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+          data.data.tokens;
+        const user = data.data.user;
+
+        useAuthStore.getState().setTokens(newAccessToken, newRefreshToken);
+        if (user) useAuthStore.getState().setUser(user);
+
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        }
+
+        isRefreshing = false;
+        flushQueue(newAccessToken);
+
+        return api(originalRequest);
+      } catch (refreshError) {
+        isRefreshing = false;
+        rejectQueue(refreshError);
+
+        useAuthStore.getState().logout();
+        if (
+          typeof window !== "undefined" &&
+          !window.location.pathname.includes("/login")
+        ) {
+          window.location.href = "/login?session_expired=true";
+        }
+        return Promise.reject(refreshError);
+      }
     }
 
-    // Generic error handling
+    // ── Other HTTP errors ───────────────────────────────────────────────────
     if (error.response?.status === 403) {
-      toast.error("Access Denied: You don't have permission for this.");
+      toast.error("Access Denied: You don't have permission for this action.");
     }
 
     if (error.response?.status === 422) {
-      const data = error.response.data as { errors?: Record<string, string[]>, message?: string };
-      const msg = data?.message || (data?.errors ? Object.values(data.errors)[0]?.[0] : "Validation Error");
+      const errData = error.response.data as {
+        errors?: Record<string, string[]>;
+        message?: string;
+      };
+      const msg =
+        errData?.message ||
+        (errData?.errors
+          ? Object.values(errData.errors)[0]?.[0]
+          : "Validation error");
       toast.error(msg);
     }
 
     if (error.response?.status && error.response.status >= 500) {
-      toast.error("Internal Server Error", { description: "The backend encountered an unhandled exception." });
+      toast.error("Internal Server Error", {
+        description: "The server encountered an unexpected error.",
+      });
     }
 
-    // Attach metadata for easier hook consumption
+    // Attach metadata so hook onError handlers can check error.status / error.data
     const apiError = error as any;
     apiError.status = error.response?.status;
     apiError.data = error.response?.data;

@@ -63,6 +63,7 @@ export interface PaginationMeta {
 
 export interface PaginatedResponse<T> {
   success: boolean;
+  message?: string;
   data: T[];
   pagination: PaginationMeta;
 }
@@ -119,6 +120,9 @@ export interface Resource {
   createdAt: string;
   updatedAt: string;
   isActive: boolean;
+  s3Key?: string;
+  storageType?: 'CLOUDINARY' | 'S3';
+  approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
 }
 
 
@@ -133,6 +137,9 @@ export interface ResourceFilters {
   limit?: number;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  resourceType?: string;
+  department?: string;
+  [key: string]: any;
 }
 
 export interface RequestResponse {
@@ -306,6 +313,13 @@ export interface AuditLog {
   ipAddress?: string;
   userAgent?: string;
   createdAt: string;
+  performedBy?: {
+    name: string;
+    email: string;
+    role: string;
+  };
+  entity?: string;
+  timestamp?: string;
 }
 
 export interface DashboardMetrics {
@@ -317,6 +331,37 @@ export interface DashboardMetrics {
   newUsersThisMonth: number;
   resourcesByType: Record<ResourceType, number>;
   recentActivity: AuditLog[];
+  generatedAt: string;
+  users: {
+    total: number;
+    active: number;
+    newThisMonth: number;
+    byRole: Record<UserRole, number>;
+  };
+  resources: {
+    total: number;
+    downloadable: number;
+    viewOnly: number;
+    campusOnly: number;
+    byCategory: Record<ResourceType, number>;
+    topResources: Array<Resource & { downloadCount: number; viewCount: number }>;
+  };
+  downloads: {
+    total: number;
+    daily: number;
+    weekly: number;
+    monthly: number;
+  };
+  requests: {
+    total: number;
+    pending: number;
+    resolved: number;
+    rejected: number;
+  };
+  searches: {
+    total: number;
+    topTerms: Array<{ query: string; count: number }>;
+  };
 }
 
 export interface SearchSuggestion {

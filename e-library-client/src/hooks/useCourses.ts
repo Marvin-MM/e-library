@@ -17,7 +17,7 @@ export function useDepartments() {
   });
 }
 
-export function useCourses(filters?: { page?: number; limit?: number; search?: string }) {
+export function useCourses(filters?: ResourceFilters) {
   return useQuery({
     queryKey: queryKeys.courses.list(filters),
     queryFn: () => coursesApi.list(filters),

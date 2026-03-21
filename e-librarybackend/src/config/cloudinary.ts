@@ -1,4 +1,5 @@
 import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
+import { Readable } from 'stream';
 import { config } from './index.js';
 import { logger } from '../shared/utils/logger.js';
 
@@ -50,7 +51,7 @@ export const uploadBuffer = async (
   options: Record<string, unknown> = {}
 ): Promise<UploadResult> => {
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload_stream(
+    const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder,
         resource_type: 'auto',
@@ -71,7 +72,14 @@ export const uploadBuffer = async (
           });
         }
       }
-    ).end(buffer);
+    );
+
+    // Safely pipe the buffer into the stream
+    const readable = new Readable();
+    readable._read = () => {}; // _read is required but you can noop it
+    readable.push(buffer);
+    readable.push(null);
+    readable.pipe(uploadStream);
   });
 };
 

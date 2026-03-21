@@ -246,7 +246,7 @@ export default function RequestsPage() {
                     { label: "My Total", value: requests.length, color: "text-zinc-900" },
                     { label: "Resolved", value: requests.filter(r => r.status?.toUpperCase() === "RESOLVED").length, color: "text-emerald-600" },
                     { label: "Pending", value: requests.filter(r => ["In Progress", "Pending"].includes(r.status)).length, color: "text-blue-600" },
-                    { label: "Declined", value: requests.filter(r => ["REJECTED", "DECLINED"].includes(r.status)).length, color: "text-red-600" },
+                    { label: "Declined", value: requests.filter(r => r.status === "REJECTED").length, color: "text-red-600" },
                 ].map((stat) => (
                     <div key={stat.label} className="bg-white p-4 text-center">
                         <p className="text-[10px] uppercase tracking-wider font-bold text-zinc-400">{stat.label}</p>
@@ -298,8 +298,8 @@ export default function RequestsPage() {
                                             <span className="flex items-center gap-1.5"><User className="w-3 h-3" /> {request.authors || "N/A"}</span>
                                             <span>•</span>
                                             <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> {formatDate(request.createdAt)}</span>
-                                            {request.status === "DECLINED" && (
-                                                <span className="text-red-600 font- animate-pulse">! Declined</span>
+                                            {request.status === "REJECTED" && (
+                                                <span className="text-red-600 font-bold animate-pulse">! Rejected</span>
                                             )}
                                         </div>
                                     </div>
