@@ -27,14 +27,19 @@ import {
     BoxSelectIcon,
     BookOpen,
     Heart,
+    Trash2,
 } from "lucide-react";
 import { useRole } from "@/hooks/useAuth";
+import { useDeleteResource } from "@/hooks/useResources";
+import { DeleteConfirmationDialog } from "@/components/shared/DeleteConfirmationDialog";
+import { toast } from "sonner";
 import { resourceTypeOptions, categoryOptions } from "@/schemas/resources";
 import type { ResourceType } from "@/types/api";
 import { motion } from "framer-motion";
 
 export default function ResourcesPage() {
-    const { isStaffOrAdmin } = useRole();
+    const { isStaffOrAdmin, isAdmin } = useRole();
+    const { mutate: deleteResource } = useDeleteResource();
     
     const { 
         resources, 
@@ -231,8 +236,9 @@ export default function ResourcesPage() {
                         ) : resources.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {resources.map((resource) => (
-                                    <Link key={resource.id} href={`/resources/${resource.id}`}>
-                                        <div className="bg-white border-2 border-zinc-100 p-4 rounded flex flex-col justify-between hover:border-blue-900 transition-all group h-full relative">
+                                    <div key={resource.id} className="bg-white border-2 border-zinc-100 p-4 rounded flex flex-col justify-between hover:border-blue-900 transition-all group h-full relative">
+                                        <Link href={`/resources/${resource.id}`} className="absolute inset-0 z-0" />
+                                        <div className="z-10 pointer-events-none flex-1 flex flex-col justify-between">
                                             <div className="space-y-3">
                                                 <div className="aspect-[4/3] bg-zinc-50 rounded border-2 border-zinc-100 overflow-hidden relative">
                                                     {resource.coverImageUrl ? (
@@ -279,13 +285,32 @@ export default function ResourcesPage() {
                                                         {resource.uploadedBy?.name || 'Staff'}
                                                     </span>
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-zinc-300 group-hover:text-blue-900 transition-colors">
-                                                    <Download className="w-3 h-3" />
-                                                    <span className="text-[10px] font-black">{resource.downloadCount}</span>
-                                                </div>
+
+                                                {isAdmin ? (
+                                                    <DeleteConfirmationDialog 
+                                                        title="Delete Resource?"
+                                                        description={`You are about to permanently remove "${resource.title}". This action is irreversible.`}
+                                                        onDelete={() => deleteResource(resource.id)}
+                                                        trigger={
+                                                            <Button 
+                                                                variant="ghost" 
+                                                                size="icon" 
+                                                                className="h-8 w-8 text-zinc-400 hover:text-red-600 hover:bg-red-50/50 transition-colors pointer-events-auto"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            >
+                                                                <Trash2 className="w-3 h-3" />
+                                                            </Button>
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <div className="flex items-center gap-1.5 text-zinc-300 group-hover:text-blue-900 transition-colors">
+                                                        <Download className="w-3 h-3" />
+                                                        <span className="text-[10px] font-black">{resource.downloadCount}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
-                                    </Link>
+                                    </div>
                                 ))}
                             </div>
                         ) : (

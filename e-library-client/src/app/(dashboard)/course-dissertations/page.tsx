@@ -111,8 +111,9 @@ export default function CourseDissertationsPage() {
                         ) : dissertations.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {dissertations.map((doc) => (
-                                    <Link key={doc.id} href={`/course-dissertations/${doc.id}`}>
-                                        <div className="bg-white border-2 border-zinc-100 p-4 rounded flex flex-col justify-between hover:border-blue-900 transition-all group h-full relative">
+                                    <div key={doc.id} className="bg-white border-2 border-zinc-100 p-4 rounded flex flex-col justify-between hover:border-blue-900 transition-all group h-full relative">
+                                        <Link href={`/course-dissertations/${doc.id}`} className="absolute inset-0 z-0" />
+                                        <div className="z-10 pointer-events-none flex-1 flex flex-col justify-between">
                                             <div className="space-y-3">
                                                 <div className="aspect-[4/3] bg-zinc-50 rounded border-2 border-zinc-100 overflow-hidden relative">
                                                     {doc.coverImageUrl ? (
@@ -139,7 +140,7 @@ export default function CourseDissertationsPage() {
                                                 </div>
                                             </div>
                                         </div>
-                                    </Link>
+                                    </div>
                                 ))}
                             </div>
                         ) : (

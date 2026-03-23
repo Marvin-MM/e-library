@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ManageBookDialog } from "@/components/catalog/ManageBookDialog";
 import { CreateCampusDialog } from "@/components/catalog/CreateCampusDialog";
+import { DeleteConfirmationDialog } from "@/components/shared/DeleteConfirmationDialog";
 
 import { Library, Search, MapPin, ChevronLeft, ChevronRight, BookText, Trash2 } from "lucide-react";
 
@@ -33,12 +34,6 @@ export default function CatalogPage() {
 
     const books = booksData?.data || [];
     const pagination = booksData?.pagination;
-
-    const handleDelete = (id: string, title: string) => {
-        if (window.confirm(`Delete book "${title}" from the catalog?`)) {
-            deleteBook(id);
-        }
-    };
 
     return (
         <div className="h-[calc(100vh-120px)] flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700 font-titillium">
@@ -145,9 +140,21 @@ export default function CatalogPage() {
                                                 {isAdmin && (
                                                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto">
                                                         <ManageBookDialog initialData={book} triggerType="icon" />
-                                                        <Button variant="ghost" size="icon" onClick={() => handleDelete(book.id, book.title)} className="h-8 w-8 text-zinc-400 hover:text-red-600 border-2 border-transparent hover:border-red-100">
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </Button>
+                                                        <DeleteConfirmationDialog 
+                                                            title="Delete from Catalog?"
+                                                            description={`Are you sure you want to remove "${book.title}" from the physical library catalog?`}
+                                                            onDelete={() => deleteBook(book.id)}
+                                                            trigger={
+                                                                <Button 
+                                                                    variant="ghost" 
+                                                                    size="icon" 
+                                                                    className="h-8 w-8 text-zinc-400 hover:text-red-600 border-2 border-transparent hover:border-red-100 transition-colors"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </Button>
+                                                            }
+                                                        />
                                                     </div>
                                                 )}
                                             </div>

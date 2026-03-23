@@ -19,7 +19,9 @@ import {
 } from "@/components/ui/dialog";
 import Link from "next/link";
 
-import { GraduationCap, Loader2, Search, ChevronLeft, ChevronRight, BookOpen, ArrowRight, Clock, ShieldAlert, GitBranchPlus, Layers } from "lucide-react";
+import { GraduationCap, Loader2, Search, ChevronLeft, ChevronRight, BookOpen, ArrowRight, Clock, ShieldAlert, GitBranchPlus, Layers, Trash2 } from "lucide-react";
+import { useDeleteCourse } from "@/hooks/useCourses";
+import { DeleteConfirmationDialog } from "@/components/shared/DeleteConfirmationDialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createCourseSchema, type CreateCourseFormData } from "@/schemas/courses";
@@ -28,7 +30,8 @@ import { motion } from "framer-motion";
 
 
 export default function CoursesPage() {
-    const { isStaffOrAdmin } = useRole();
+    const { isStaffOrAdmin, isAdmin } = useRole();
+    const { mutate: deleteCourse } = useDeleteCourse();
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const { data, isLoading } = useCourses({ page, limit: 12, search: search || undefined });
@@ -245,16 +248,36 @@ export default function CoursesPage() {
                         ) : courses.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {courses.map((course) => (
-                                    <Link key={course.id} href={`/courses/${course.id}`}>
-                                        <div className="bg-white border-2 border-zinc-100 p-6 rounded flex flex-col justify-between hover:border-blue-900 transition-all group h-[200px]">
+                                    <div key={course.id} className="bg-white border-2 border-zinc-100 p-6 rounded flex flex-col justify-between hover:border-blue-900 transition-all group h-[200px] relative">
+                                        <Link href={`/courses/${course.id}`} className="absolute inset-0 z-0" />
+                                        <div className="z-10 pointer-events-none flex-1 flex flex-col justify-between">
                                             <div>
                                                 <div className="flex items-start justify-between mb-4">
                                                     <div className="w-10 h-10 rounded bg-blue-50 flex items-center justify-center border-2 border-blue-100 group-hover:bg-blue-900 group-hover:border-blue-900 transition-all">
                                                         <BookOpen className="w-5 h-5 text-blue-900 group-hover:text-white transition-all" />
                                                     </div>
-                                                    <span className="text-[10px] font-mono text-zinc-400 bg-zinc-50 px-2 py-1 rounded">
-                                                        {course.code}
-                                                    </span>
+                                                    <div className="flex items-center gap-2">
+                                                        {isAdmin && (
+                                                            <DeleteConfirmationDialog 
+                                                                title="Delete Course?"
+                                                                description={`Permanently remove "${course.name}" (${course.code})? This will unpin all linked resources.`}
+                                                                onDelete={() => deleteCourse(course.id)}
+                                                                trigger={
+                                                                    <Button 
+                                                                        variant="ghost" 
+                                                                        size="icon" 
+                                                                        className="h-8 w-8 text-zinc-400 hover:text-red-600 hover:bg-red-50/50 transition-colors pointer-events-auto"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        <Trash2 className="w-3 h-3" />
+                                                                    </Button>
+                                                                }
+                                                            />
+                                                        )}
+                                                        <span className="text-[10px] font-mono text-zinc-400 bg-zinc-50 px-2 py-1 rounded">
+                                                            {course.code}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                                 <h4 className="text-sm font-bold text-zinc-900 line-clamp-2 leading-tight group-hover:text-blue-900 transition-colors mb-2">
                                                     {course.name}
@@ -271,7 +294,7 @@ export default function CoursesPage() {
                                                 <ArrowRight className="w-4 h-4 text-zinc-300 group-hover:text-blue-900 group-hover:translate-x-1 transition-all" />
                                             </div>
                                         </div>
-                                    </Link>
+                                    </div>
                                 ))}
                             </div>
                         ) : (
