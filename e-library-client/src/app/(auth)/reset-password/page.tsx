@@ -42,7 +42,7 @@ function ResetPasswordForm() {
     if (!token) {
         return (
             <div className="flex items-center justify-center px-4">
-                <div className="w-full max-w-sm bg-white px-9 py-11 text-center">
+                <div className="w-full max-w-sm bg-white px-4 md:px-9 py-8 md:py-11 text-center">
                     <div className="mb-8">
                         <h1 className="text-lg font-bold text-neutral-900 mb-1.5">Invalid Reset Link</h1>
                         <p className="text-sm text-neutral-900 tracking-wide">The password reset link is invalid or expired</p>

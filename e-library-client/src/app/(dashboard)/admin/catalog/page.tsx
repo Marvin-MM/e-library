@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ManageBookDialog } from "@/components/catalog/ManageBookDialog";
 import { CreateCampusDialog } from "@/components/catalog/CreateCampusDialog";
 import { DeleteConfirmationDialog } from "@/components/shared/DeleteConfirmationDialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
     Library,
     Search,
@@ -49,8 +50,7 @@ export default function CatalogPage() {
     return (
         <div className="flex flex-col gap-6 pb-6">
 
-            {/* ── PAGE HEADER ── */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <motion.div
                     initial={{ y: -8, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -72,25 +72,52 @@ export default function CatalogPage() {
                     initial={{ y: -8, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.05 }}
-                    className="flex items-center gap-3 shrink-0"
+                    className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0"
                 >
-                    <div className="bg-white border-2 border-zinc-100 px-5 py-2.5 rounded text-center">
+                    <div className="bg-white border-2 border-zinc-100 flex items-center justify-between sm:flex-col sm:justify-center px-4 py-2 sm:px-5 sm:py-2.5 rounded text-center">
                         <p className="text-[10px] uppercase font-black tracking-widest text-zinc-400">Total Books</p>
                         <p className="text-xl font-black text-blue-900">{pagination?.total ?? 0}</p>
                     </div>
                     {isAdmin && (
-                        <div className="flex items-center gap-2">
-                            <CreateCampusDialog />
-                            <ManageBookDialog />
+                        <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 w-full sm:w-auto">
+                            <div className="w-full"><CreateCampusDialog /></div>
+                            <div className="w-full"><ManageBookDialog /></div>
                         </div>
                     )}
                 </motion.div>
             </div>
 
-            {/* ── CAMPUS FILTER PILLS ──
-                These are interactive — clicking one filters the book grid.
-                Active campus is highlighted; clicking it again resets to "all". */}
-            <div className="flex gap-3 overflow-x-auto pb-1 custom-scrollbar">
+            {/* ── CAMPUS FILTER ──
+                Interactive controls to filter the book grid by campus. */}
+            
+            {/* Mobile Select Dropdown */}
+            <div className="block md:hidden mb-1">
+                <Select value={campusId} onValueChange={(val) => { setCampusId(val); setPage(1); }}>
+                    <SelectTrigger className="w-full h-11 bg-white border-2 border-zinc-100 font-bold text-xs uppercase tracking-widest text-zinc-700">
+                        <SelectValue placeholder="Select Campus" />
+                    </SelectTrigger>
+                    <SelectContent className="border-2 border-zinc-100 rounded-lg">
+                        <SelectItem value="all" className="font-bold text-xs uppercase tracking-widest cursor-pointer py-3 focus:bg-blue-50 focus:text-blue-900">
+                            <div className="flex items-center gap-2">
+                                <Library className="w-3.5 h-3.5" /> All Campuses
+                            </div>
+                        </SelectItem>
+                        {campuses.map(campus => (
+                            <SelectItem key={campus.id} value={campus.id} className="font-bold text-xs uppercase tracking-widest cursor-pointer py-3 focus:bg-blue-50 focus:text-blue-900">
+                                <div className="flex items-center justify-between w-full min-w-[200px] pr-2">
+                                    <div className="flex items-center gap-2">
+                                        <MapPin className="w-3.5 h-3.5" /> {campus.name}
+                                    </div>
+                                    <span className="text-[9px] px-1.5 py-0.5 rounded font-black bg-zinc-100 text-zinc-400">{campus.code}</span>
+                                </div>
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
+            {/* Desktop / Tablet Pills */}
+            <div className="hidden md:flex gap-3 overflow-x-auto pb-1 custom-scrollbar">
                 {/* "All" pill */}
                 <button
                     onClick={() => { setCampusId("all"); setPage(1); }}

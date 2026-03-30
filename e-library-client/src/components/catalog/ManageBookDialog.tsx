@@ -142,7 +142,7 @@ export function ManageBookDialog({ initialData, triggerType = "button" }: Manage
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {triggerType === "button" ? (
-                    <Button className="bg-blue-900 hover:bg-zinc-900 text-white h-10 px-5 font-bold text-[10px] uppercase tracking-widest rounded transition-colors">
+                    <Button className="w-full sm:w-auto bg-blue-900 hover:bg-zinc-900 text-white h-10 px-5 font-bold text-[10px] uppercase tracking-widest rounded transition-colors">
                         <Plus className="w-3.5 h-3.5 mr-2" />
                         Catalog Book
                     </Button>

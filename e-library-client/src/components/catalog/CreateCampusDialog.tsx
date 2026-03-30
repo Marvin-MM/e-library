@@ -71,7 +71,7 @@ export function CreateCampusDialog() {
             <DialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className="border-2 border-zinc-200 h-10 px-4 font-bold text-[10px] uppercase tracking-widest text-zinc-600 hover:text-blue-900 hover:border-blue-900 transition-colors rounded"
+                    className="border-2 border-zinc-200 h-10 w-full sm:w-auto md:px-4 font-bold text-[10px] uppercase tracking-widest text-zinc-600 hover:text-blue-900 hover:border-blue-900 transition-colors rounded"
                 >
                     <MapPin className="w-3 h-3 mr-2" />
                     Add Campus

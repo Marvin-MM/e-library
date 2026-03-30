@@ -186,7 +186,7 @@ function SignupForm() {
 export default function SignupPage() {
     return (
         <div className="flex items-center justify-center px-4">
-            <div className="w-full max-w-sm bg-white px-9">
+            <div className="w-full max-w-sm bg-white px-4 md:px-9 py-8 md:py-11">
 
                 {/* Heading */}
                 <div className="mb-6">

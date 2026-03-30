@@ -5,7 +5,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     return (
         <div className="min-h-screen flex">
             {/* Left Side */}
-            <div className="hidden lg:flex lg:w-1/2 relative   items-center justify-center p-12"
+            <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center p-12"
                 style={{
                     backgroundImage: 'url("https://s3.us-east-1.amazonaws.com/victoria-university-elearning/website/images/gallery/9c0cab63-6a96-427c-bfd1-b0d81cea9f47.jpg")',
                     backgroundSize: 'cover',
@@ -47,7 +47,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             </div>
 
             {/* Right Side */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+            <div className="w-full lg:w-1/2 flex items-center justify-center md:p-8">
                 <div className="w-full max-w-md space-y-8">
                     <div className="lg:hidden flex items-center justify-center">
                         <img src="/vu-logo.png" alt="VU Logo" className="h-36 w-36 object-contain" />
