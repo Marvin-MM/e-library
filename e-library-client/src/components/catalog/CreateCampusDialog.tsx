@@ -11,6 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,11 +79,14 @@ export function CreateCampusDialog() {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md" aria-describedby="campus-dialog-description">
                 <DialogHeader>
                     <DialogTitle className="text-lg font-black text-blue-900 uppercase tracking-tight">
                         Register Campus
                     </DialogTitle>
+                    <DialogDescription id="campus-dialog-description" className="sr-only">
+                        Enter the details to register a new campus location.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>

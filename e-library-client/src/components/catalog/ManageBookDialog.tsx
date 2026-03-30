@@ -11,6 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogDescription,
 } from "@/components/ui/dialog";
 import {
     Select,
@@ -158,11 +159,14 @@ export function ManageBookDialog({ initialData, triggerType = "button" }: Manage
                 )}
             </DialogTrigger>
 
-            <DialogContent className="max-w-xl">
+            <DialogContent className="max-w-xl" aria-describedby="book-dialog-description">
                 <DialogHeader>
                     <DialogTitle className="text-lg font-black text-blue-900 uppercase tracking-tight">
                         {isEditMode ? "Update Book Details" : "Catalog New Physical Book"}
                     </DialogTitle>
+                    <DialogDescription id="book-dialog-description" className="sr-only">
+                        {isEditMode ? "Edit the book's metadata." : "Fill in the details to add a new physical book to the library."}
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
