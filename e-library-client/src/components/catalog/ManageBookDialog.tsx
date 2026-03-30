@@ -234,7 +234,7 @@ export function ManageBookDialog({ initialData, triggerType = "button" }: Manage
                                                         </SelectItem>
                                                     ))
                                                 ) : (
-                                                    <SelectItem value="" disabled>
+                                                    <SelectItem value="none" disabled>
                                                         No campuses available
                                                     </SelectItem>
                                                 )}
