@@ -62,7 +62,7 @@ export function DeleteConfirmationDialog({
                 className="max-w-md border-2 border-zinc-100" 
                 onClick={(e) => e.stopPropagation()}
             >
-                <DialogHeader className="space-y-4">
+                <DialogHeader className="space-y-3">
                     {/* <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center border-2 border-red-100 mb-2">
                         <AlertTriangle className="w-6 h-6 text-red-600" />
                     </div> */}
@@ -80,19 +80,19 @@ export function DeleteConfirmationDialog({
                         Warning: This action cannot be undone. Data will be permanently removed from our active servers.
                     </p>
                 </div>
-                <DialogFooter className="gap-3 pt-6">
+                <DialogFooter className="gap-3 pt-2">
                     <Button
                         variant="ghost"
                         onClick={() => setIsOpen(false)}
                         disabled={isDeleting}
-                        className="font-bold uppercase tracking-widest text-xs h-12"
+                        className="font-bold uppercase tracking-widest text-xs h-11"
                     >
                         {cancelText}
                     </Button>
                     <Button
                         onClick={handleConfirm}
                         disabled={isDeleting}
-                        className="bg-red-600 hover:bg-zinc-900 text-white font-black uppercase tracking-widest text-xs h-12 px-6 shadow-lg shadow-red-200"
+                        className="bg-red-600 hover:bg-zinc-900 text-white font-black uppercase tracking-widest text-xs h-11 px-4 shadow-lg shadow-red-200"
                     >
                         {isDeleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                         {confirmText}
