@@ -33,8 +33,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" suppressHydrationWarning className={titilliumWeb.variable}>
-            <body className={cn("min-h-screen bg-zinc-50 font-sans antialiased", titilliumWeb.className)}>
+        <html lang="en" suppressHydrationWarning>
+            <body className={cn("min-h-screen bg-zinc-50 font-sans antialiased")}>
                 {/* Skip to main content — critical for keyboard/screen reader accessibility */}
                 <a href="#main-content" className="skip-nav">
                     Skip to main content

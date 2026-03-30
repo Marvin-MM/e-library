@@ -9,7 +9,7 @@ const getBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_API_BASE_URL) {
     return process.env.NEXT_PUBLIC_API_BASE_URL;
   }
-  return "https://e-library-xbt1.onrender.com/api/v1";
+  return "http://localhost:5000/api/v1";
 };
 
 export const API_BASE_URL = getBaseUrl();
