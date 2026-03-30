@@ -30,7 +30,10 @@ import {
     Moon,
     Search,
     Settings,
-    Sun
+    Sun,
+    ChevronDown,
+    User as UserIcon,
+    ShieldCheck,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { AdminSidebar } from "./admin-sidebar";
@@ -158,48 +161,101 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                         {/* User Profile Menu */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="rounded-full border border-zinc-100 hover:border-zinc-300 p-0.5">
-                                    <Avatar className="h-8 w-8">
-                                        <AvatarImage src={user.avatar} />
-                                        <AvatarFallback className="bg-zinc-100 text-zinc-600 font-semibold text-xs uppercase">
-                                            {getInitials(`${user.name}`)}
-                                        </AvatarFallback>
-                                    </Avatar>
+                                <Button 
+                                    variant="ghost" 
+                                    className="rounded-full hover:bg-zinc-50 border border-zinc-100 pl-1 pr-3 py-1 h-10 gap-2.5 transition-all group"
+                                >
+                                    <div className="relative">
+                                        <Avatar className="h-8 w-8 border border-white shadow-sm ring-1 ring-zinc-100">
+                                            <AvatarImage src={user.avatar} />
+                                            <AvatarFallback className="bg-blue-50 text-blue-700 font-bold text-[10px] uppercase">
+                                                {getInitials(`${user.name}`)}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
+                                    </div>
+                                    <div className="hidden sm:flex flex-col items-start gap-0">
+                                        <span className="text-xs font-bold text-zinc-900 group-hover:text-blue-600 transition-colors truncate max-w-[100px]">
+                                            {user.name.split(' ')[0]}
+                                        </span>
+                                        <span className="text-[10px] font-medium text-zinc-400 leading-none">
+                                            {user.role.toLowerCase()}
+                                        </span>
+                                    </div>
+                                    <ChevronDown className="w-3.5 h-3.5 text-zinc-400 group-data-[state=open]:rotate-180 transition-transform" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-64 p-2 rounded mt-2 border-zinc-100 bg-white">
-                                <DropdownMenuLabel className="px-3 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <Avatar className="h-10 w-10 shrink-0">
+                            
+                            <DropdownMenuContent 
+                                align="end" 
+                                className="w-72 p-0 rounded-xl mt-2 border-2 border-zinc-100 bg-white shadow-2xl shadow-zinc-200/50 overflow-hidden animate-in slide-in-from-top-2 duration-300"
+                            >
+                                <div className="bg-gradient-to-br from-zinc-50 to-white px-5 py-2 border-b border-zinc-100 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl" />
+                                    <div className="flex items-center gap-4 relative z-10">
+                                        <Avatar className="h-12 w-12 border-2 border-white shadow-md">
                                             <AvatarImage src={user.avatar} />
-                                            <AvatarFallback className="bg-zinc-100 text-zinc-900 uppercase">
+                                            <AvatarFallback className="bg-zinc-100 text-zinc-900 font-black uppercase text-sm">
                                                 {getInitials(`${user.name}`)}
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col min-w-0">
-                                            <p className="text-sm font-bold text-zinc-900 truncate">{user.name}</p>
-                                            <p className="text-xs text-zinc-400 truncate">{user.email}</p>
+                                            <p className="text-sm font-black text-zinc-900 truncate tracking-tight">{user.name}</p>
+                                            <p className="text-[11px] font-medium text-zinc-400 truncate">{user.email}</p>
+                                            
+                                            <div className="mt-2.5 flex">
+                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-zinc-100 rounded-full shadow-sm">
+                                                    <ShieldCheck className="w-3 h-3 text-blue-600" />
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">
+                                                        {user.role} Account
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="mt-4 inline-flex items-center px-2  text-blue-700 text-[10px] uppercase tracking-wide">
-                                        {user.role}
-                                    </div>
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator className="bg-zinc-50" />
-                                <DropdownMenuItem asChild className="rounded h-10 cursor-pointer focus:bg-zinc-50">
-                                    <Link href="/settings" className="flex items-center w-full">
-                                        <Settings className="mr-3 h-4 w-4 text-zinc-500" />
-                                        <span className="font-semibold text-zinc-700">Account Settings</span>
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator className="bg-zinc-50" />
-                                <DropdownMenuItem
-                                    onClick={() => logout()}
-                                    className="rounded h-10 cursor-pointer text-rose-600 focus:text-rose-700 focus:bg-rose-50 font-bold"
-                                >
-                                    <LogOut className="mr-3 h-4 w-4" />
-                                    Sign Out
-                                </DropdownMenuItem>
+                                </div>
+
+                                <div className="p-1.5">
+                                    <DropdownMenuLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                        Manage Account
+                                    </DropdownMenuLabel>
+                                    
+                                    <DropdownMenuItem asChild className="rounded-lg h-11 cursor-pointer focus:bg-blue-50 focus:text-blue-700 transition-all">
+                                        <Link href="/settings" className="flex items-center w-full px-2">
+                                            <div className="w-8 h-8 rounded-md bg-zinc-50 flex items-center justify-center mr-3 group-focus:bg-blue-100/50 transition-colors">
+                                                <Settings className="h-4 w-4 text-zinc-500 group-focus:text-blue-600" />
+                                            </div>
+                                            <div className="flex flex-col gap-0">
+                                                <span className="font-bold text-sm tracking-tight">Account Settings</span>
+                                                <span className="text-[10px] text-zinc-400">Security and preferences</span>
+                                            </div>
+                                        </Link>
+                                    </DropdownMenuItem>
+
+                                    {!isAdmin && (
+                                        <DropdownMenuItem asChild className="rounded-lg h-11 cursor-pointer focus:bg-emerald-50 focus:text-emerald-700 transition-all">
+                                            <Link href="/students/library" className="flex items-center w-full px-2">
+                                                <div className="w-8 h-8 rounded-md bg-zinc-50 flex items-center justify-center mr-3">
+                                                    <UserIcon className="h-4 w-4 text-zinc-500" />
+                                                </div>
+                                                <div className="flex flex-col gap-0">
+                                                    <span className="font-bold text-sm tracking-tight">My Profile</span>
+                                                    <span className="text-[10px] text-zinc-400">View your library status</span>
+                                                </div>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    )}
+                                </div>
+
+                                <div className="p-1.5 border-t border-zinc-50 bg-zinc-50/30">
+                                    <DropdownMenuItem
+                                        onClick={() => logout()}
+                                        className="rounded-lg h-11 cursor-pointer text-rose-600 focus:text-rose-700 focus:bg-rose-50 font-black transition-all px-4"
+                                    >
+                                        <LogOut className="mr-3 h-4 w-4" />
+                                        <span className="uppercase tracking-widest text-[11px]">Sign Out</span>
+                                    </DropdownMenuItem>
+                                </div>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
