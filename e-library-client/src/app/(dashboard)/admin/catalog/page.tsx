@@ -79,9 +79,9 @@ export default function CatalogPage() {
                         <p className="text-xl font-black text-blue-900">{pagination?.total ?? 0}</p>
                     </div>
                     {isAdmin && (
-                        <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 w-full sm:w-auto">
-                            <div className="w-full"><CreateCampusDialog /></div>
-                            <div className="w-full"><ManageBookDialog /></div>
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                            <div className="w-full sm:w-auto"><CreateCampusDialog /></div>
+                            <div className="w-full sm:w-auto"><ManageBookDialog /></div>
                         </div>
                     )}
                 </motion.div>
@@ -90,8 +90,8 @@ export default function CatalogPage() {
             {/* ── CAMPUS FILTER ──
                 Interactive controls to filter the book grid by campus. */}
             
-            {/* Mobile Select Dropdown */}
-            <div className="block md:hidden mb-1">
+            {/* Mobile / Tablet Select Dropdown */}
+            <div className="block lg:hidden mb-1">
                 <Select value={campusId} onValueChange={(val) => { setCampusId(val); setPage(1); }}>
                     <SelectTrigger className="w-full h-11 bg-white border-2 border-zinc-100 font-bold text-xs uppercase tracking-widest text-zinc-700">
                         <SelectValue placeholder="Select Campus" />
@@ -116,8 +116,8 @@ export default function CatalogPage() {
                 </Select>
             </div>
 
-            {/* Desktop / Tablet Pills */}
-            <div className="hidden md:flex gap-3 overflow-x-auto pb-1 custom-scrollbar">
+            {/* Desktop Pills */}
+            <div className="hidden lg:flex gap-3 overflow-x-auto pb-1 custom-scrollbar">
                 {/* "All" pill */}
                 <button
                     onClick={() => { setCampusId("all"); setPage(1); }}
