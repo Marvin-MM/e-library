@@ -26,7 +26,7 @@ const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 const fadeUp = (delay = 0) => ({
     initial: { y: 16, opacity: 0 },
     animate: { y: 0, opacity: 1 },
-    transition: { duration: 0.4, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.4, delay, ease: [0.22, 1, 0.36, 1] as const },
 });
 
 // ── Status badge styling ─────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ const HEATMAP_OPTIONS: ApexCharts.ApexOptions = {
     chart: {
         toolbar:    { show: false },
         fontFamily: "inherit",
-        animations: { enabled: true, easing: "easeinout", speed: 700 },
+        animations: { enabled: true, speed: 700 },
     },
     dataLabels: { enabled: false },
     plotOptions: {

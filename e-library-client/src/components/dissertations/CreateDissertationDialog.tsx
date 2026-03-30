@@ -57,7 +57,7 @@ const dissertationSchema = z
         department: z.string().optional(),
         courseId: z.string().optional(),
         publicationYear: z
-            .number({ invalid_type_error: "Enter a valid year" })
+            .number({ message: "Enter a valid year" })
             .int()
             .min(1950, "Year must be 1950 or later")
             .max(CURRENT_YEAR, `Year cannot exceed ${CURRENT_YEAR}`),

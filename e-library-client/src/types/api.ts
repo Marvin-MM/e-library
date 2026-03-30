@@ -11,6 +11,7 @@ export interface User {
   avatar?: string;
   createdAt: string;
   updatedAt: string;
+  downloadCount?: number;
 }
 
 export interface AuthTokens {
@@ -337,6 +338,8 @@ export interface DashboardMetrics {
     active: number;
     newThisMonth: number;
     byRole: Record<UserRole, number>;
+    trend?: number[];
+    delta?: number;
   };
   resources: {
     total: number;
@@ -345,18 +348,24 @@ export interface DashboardMetrics {
     campusOnly: number;
     byCategory: Record<ResourceType, number>;
     topResources: Array<Resource & { downloadCount: number; viewCount: number }>;
+    trend?: number[];
+    delta?: number;
   };
   downloads: {
     total: number;
     daily: number;
     weekly: number;
     monthly: number;
+    trend?: number[];
+    delta?: number;
   };
   requests: {
     total: number;
     pending: number;
     resolved: number;
     rejected: number;
+    trend?: number[];
+    delta?: number;
   };
   searches: {
     total: number;

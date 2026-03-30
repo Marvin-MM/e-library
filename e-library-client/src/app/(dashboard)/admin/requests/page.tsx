@@ -68,7 +68,7 @@ const ALL_STATUSES = "__ALL__";
 const fadeUp = (delay = 0) => ({
     initial: { y: 10, opacity: 0 },
     animate: { y: 0, opacity: 1 },
-    transition: { duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] as const },
 });
 
 // ── Default dialog state ──────────────────────────────────────────────────────

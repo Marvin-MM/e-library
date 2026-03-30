@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { useDepartmentStore } from "@/stores/departmentStore";
 import { useCourses, useCourseResources } from "@/hooks/useCourses";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 // ─── Animation Variants ──────────────────────────────────────────────────────
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { y: 16, opacity: 0 },
   show: (i: number) => ({
     y: 0,
@@ -215,7 +215,7 @@ export default function CourseDissertationsPage() {
             Approved Theses
             {pagination && (
               <span className="text-blue-900 bg-blue-50 px-2 py-0.5 rounded-full ml-1">
-                {pagination.totalItems ?? dissertations.length}
+                {pagination.total ?? dissertations.length}
               </span>
             )}
           </h3>

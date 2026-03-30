@@ -170,7 +170,7 @@ export function CreateResourceDialog() {
     });
 
     const accessType        = watch("accessType");
-    const isCampusOnly      = accessType === "CAMPUS_ONLY";
+    const isCampusOnly      = (accessType as string) === "CAMPUS_ONLY";
     const selectedDepartment = watch("department");
 
     const { data: coursesData, isLoading: isCoursesLoading } = useCourses(
@@ -280,7 +280,7 @@ export function CreateResourceDialog() {
                             </Label>
                             <Select
                                 value={watch("department") || undefined}
-                                onValueChange={(v) => { setValue("department", v); setValue("courseId", ""); }}
+                                onValueChange={(v) => { setValue("department", v as any); setValue("courseId", "" as any); }}
                                 disabled={isDepartmentsLoading}
                             >
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
@@ -302,7 +302,7 @@ export function CreateResourceDialog() {
                             </Label>
                             <Select
                                 value={watch("courseId") || "none"}
-                                onValueChange={(v) => setValue("courseId", v === "none" ? "" : v)}
+                                onValueChange={(v) => setValue("courseId", (v === "none" ? "" : v) as any)}
                                 disabled={isCoursesLoading}
                             >
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
@@ -323,7 +323,7 @@ export function CreateResourceDialog() {
                         {/* Category */}
                         <div className="space-y-1.5">
                             <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Category</Label>
-                            <Select onValueChange={(v) => setValue("category", v)} defaultValue="BOOK">
+                            <Select onValueChange={(v) => setValue("category", v as any)} defaultValue="BOOK">
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -338,7 +338,7 @@ export function CreateResourceDialog() {
                         {/* Resource type */}
                         <div className="space-y-1.5">
                             <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Resource Type</Label>
-                            <Select onValueChange={(v) => setValue("resourceType", v)} defaultValue="BOOK">
+                            <Select onValueChange={(v) => setValue("resourceType", v as any)} defaultValue="BOOK">
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -379,7 +379,7 @@ export function CreateResourceDialog() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Access Type</Label>
-                            <Select onValueChange={(v) => setValue("accessType", v)} defaultValue="DOWNLOADABLE">
+                            <Select onValueChange={(v) => setValue("accessType", v as any)} defaultValue="DOWNLOADABLE">
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -394,7 +394,7 @@ export function CreateResourceDialog() {
                         <div className="space-y-1.5">
                             <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Campus Location</Label>
                             <Select
-                                onValueChange={(v) => setValue("campusLocation", v)}
+                                onValueChange={(v) => setValue("campusLocation", v as any)}
                                 defaultValue="ONLINE"
                                 disabled={!isCampusOnly}
                             >

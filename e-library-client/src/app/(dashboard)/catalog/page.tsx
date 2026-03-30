@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBooks, useBook } from "@/hooks/useCatalog";
+import { Book, CampusLocation } from "@/lib/api/catalog";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -33,26 +34,7 @@ import {
   X,
 } from "lucide-react";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
-interface CampusLocation {
-  campusId: string;
-  name: string;
-  code: string;
-  totalCopies: number;
-  availableCopies: number;
-  shelfLocation: string | null;
-}
-
-interface Book {
-  id: string;
-  title: string;
-  author: string;
-  description: string;
-  isbn: string;
-  createdAt: string;
-  updatedAt: string;
-  locations: CampusLocation[];
-}
+// Typings come from @/lib/api/catalog
 
 // ─── Availability Badge ────────────────────────────────────────────────────────
 function AvailabilityBadge({ available, total }: { available: number; total: number }) {
@@ -265,7 +247,7 @@ function BookDetailDialog({
 function BookCard({ book, index, onSelect }: { book: Book; index: number; onSelect: (id: string) => void }) {
   const totalAvailable = book.locations?.reduce((s, l) => s + l.availableCopies, 0) ?? 0;
   const totalCopies = book.locations?.reduce((s, l) => s + l.totalCopies, 0) ?? 0;
-  const hasLocations = book.locations && book.locations.length > 0;
+  const hasLocations = (book.locations?.length ?? 0) > 0;
 
   return (
     <motion.button
@@ -318,7 +300,7 @@ function BookCard({ book, index, onSelect }: { book: Book; index: number; onSele
         {hasLocations && (
           <div className="flex items-center gap-1 text-zinc-400 group-hover:text-blue-600 transition-colors">
             <MapPin className="w-3 h-3" />
-            <span className="text-[10px] font-bold">{book.locations.length} campus{book.locations.length !== 1 ? "es" : ""}</span>
+            <span className="text-[10px] font-bold">{book.locations?.length} campus{book.locations?.length !== 1 ? "es" : ""}</span>
           </div>
         )}
       </div>

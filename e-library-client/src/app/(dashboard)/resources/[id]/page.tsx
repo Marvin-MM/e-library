@@ -58,7 +58,7 @@ const formatFileSize = (bytes?: number | null) => {
 const fadeUp = (delay = 0) => ({
     initial: { y: 12, opacity: 0 },
     animate: { y: 0, opacity: 1 },
-    transition: { duration: 0.38, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.38, delay, ease: [0.22, 1, 0.36, 1] as const },
 });
 
 // ── Metadata row ──────────────────────────────────────────────────────────────
@@ -577,10 +577,10 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                         )}
 
                         {/* Associated courses */}
-                        {resource.courses?.length > 0 && (
+                        {(resource.courses?.length ?? 0) > 0 && (
                             <SideCard title="Academic Context" icon={BookOpen}>
                                 <div className="-mx-4">
-                                    {resource.courses.map((cr: any) => (
+                                    {resource.courses?.map((cr: any) => (
                                         <Link
                                             key={cr.course.id}
                                             href={`/courses/${cr.course.id}`}

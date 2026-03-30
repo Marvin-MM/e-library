@@ -42,7 +42,7 @@ import { cn } from "@/lib/utils";
 const fadeUp = (delay = 0) => ({
     initial: { y: 12, opacity: 0 },
     animate: { y: 0, opacity: 1 },
-    transition: { duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.38, delay, ease: [0.22, 1, 0.36, 1] as const },
 });
 
 // ── Resource card skeleton ───────────────────────────────────────────────────

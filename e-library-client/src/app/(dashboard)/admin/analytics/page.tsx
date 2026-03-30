@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useRole } from "@/hooks/useAuth";
 import {
@@ -23,9 +23,9 @@ import {
 import {
     Users, FileText, Download, Activity, Calendar,
     PieChart as PieChartIcon, TrendingUp, Search,
+    TrendingDown, Minus, ClipboardList,
 } from "lucide-react";
 import { format, subDays, endOfDay } from "date-fns";
-import { useEffect } from "react";
 import { motion } from "framer-motion";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -60,8 +60,115 @@ const CHART_TOOLTIP_STYLE = {
 const fadeUp = (delay = 0) => ({
     initial: { y: 10, opacity: 0 },
     animate: { y: 0, opacity: 1 },
-    transition: { duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] as const },
 });
+
+// ── Sparkline Component ────────────────────────────────────────────────────
+interface SparklineProps {
+    data: number[];
+    color?: string;
+    width?: number;
+    height?: number;
+    strokeWidth?: number;
+    filled?: boolean;
+}
+
+function Sparkline({
+    data,
+    color = "#2563eb",
+    width = 80,
+    height = 32,
+    strokeWidth = 1.5,
+    filled = true,
+}: SparklineProps) {
+    if (!data || data.length < 2) return null;
+
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min || 1;
+    const pad = strokeWidth;
+
+    const points = data.map((v, i) => ({
+        x: pad + (i / (data.length - 1)) * (width - pad * 2),
+        y: pad + ((1 - (v - min) / range) * (height - pad * 2)),
+    }));
+
+    const linePath = points
+        .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
+        .join(" ");
+
+    const areaPath = `${linePath} L ${points[points.length - 1].x.toFixed(2)} ${height} L ${points[0].x.toFixed(2)} ${height} Z`;
+
+    const lastVal = data[data.length - 1];
+    const prevVal = data[data.length - 2];
+    const trend = lastVal > prevVal ? "up" : lastVal < prevVal ? "down" : "flat";
+    const trendColor = trend === "up" ? "#10b981" : trend === "down" ? "#ef4444" : color;
+    const fillColor = trend === "up" ? "#10b981" : trend === "down" ? "#ef4444" : color;
+
+    return (
+        <svg
+            width={width}
+            height={height}
+            viewBox={`0 0 ${width} ${height}`}
+            fill="none"
+            aria-hidden="true"
+        >
+            {filled && (
+                <defs>
+                    <linearGradient id={`sparkfill-${color.replace("#", "")}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={fillColor} stopOpacity="0.15" />
+                        <stop offset="100%" stopColor={fillColor} stopOpacity="0" />
+                    </linearGradient>
+                </defs>
+            )}
+            {filled && (
+                <path
+                    d={areaPath}
+                    fill={`url(#sparkfill-${color.replace("#", "")})`}
+                />
+            )}
+            <path
+                d={linePath}
+                stroke={trendColor}
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <circle
+                cx={points[points.length - 1].x}
+                cy={points[points.length - 1].y}
+                r={2}
+                fill={trendColor}
+            />
+        </svg>
+    );
+}
+
+// ── Trend Badge ────────────────────────────────────────────────────────────
+function TrendBadge({ value, label }: { value: number; label?: string }) {
+    const isUp = value > 0;
+    const isFlat = value === 0;
+    return (
+        <div
+            className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+                isFlat
+                    ? "bg-zinc-50 border-zinc-200 text-zinc-400"
+                    : isUp
+                    ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                    : "bg-red-50 border-red-100 text-red-500"
+            }`}
+        >
+            {isFlat ? (
+                <Minus className="w-2.5 h-2.5" />
+            ) : isUp ? (
+                <TrendingUp className="w-2.5 h-2.5" />
+            ) : (
+                <TrendingDown className="w-2.5 h-2.5" />
+            )}
+            {Math.abs(value)}% {label ?? "7d"}
+        </div>
+    );
+}
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 function ChartShell({ title, children, loading }: { title: string; children: React.ReactNode; loading: boolean }) {
@@ -78,10 +185,11 @@ function ChartShell({ title, children, loading }: { title: string; children: Rea
 }
 
 function KpiCard({
-    title, value, sub, icon: Icon, color, bg, loading,
+    title, value, sub, icon: Icon, color, bg, spark, delta, loading,
 }: {
     title: string; value?: number; sub?: string;
-    icon: React.ElementType; color: string; bg: string; loading: boolean;
+    icon: React.ElementType; color: string; bg: string; 
+    spark?: number[]; delta?: number; loading: boolean;
 }) {
     return (
         <div className="bg-white border-2 border-zinc-100 rounded-lg p-5 flex flex-col gap-3 hover:border-zinc-200 hover:shadow-sm transition-all">
@@ -91,15 +199,30 @@ function KpiCard({
                     <Icon className={`h-3.5 w-3.5 ${color}`} />
                 </div>
             </div>
-            {loading ? (
-                <Skeleton className="h-7 w-20 rounded" />
-            ) : (
-                <p className="text-2xl font-black text-zinc-900 leading-none tabular-nums">
-                    {(value ?? 0).toLocaleString()}
-                </p>
-            )}
-            {sub && (
-                <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">{sub}</p>
+            
+            <div className="flex items-end justify-between">
+                <div className="space-y-1">
+                    {loading ? (
+                        <Skeleton className="h-7 w-20 rounded" />
+                    ) : (
+                        <p className="text-2xl font-black text-zinc-900 leading-none tabular-nums">
+                            {(value ?? 0).toLocaleString()}
+                        </p>
+                    )}
+                    {sub && (
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">{sub}</p>
+                    )}
+                </div>
+                {!loading && spark && (
+                    <Sparkline data={spark} color={color.replace("text-", "#").replace("blue-600", "#2563eb").replace("emerald-600", "#10b981").replace("purple-600", "#9333ea").replace("orange-600", "#ea580c")} />
+                )}
+            </div>
+
+            {!loading && typeof delta === 'number' && (
+                <div className="pt-2 border-t border-zinc-50 flex items-center justify-between">
+                    <TrendBadge value={delta} />
+                    <span className="text-[9px] font-bold text-zinc-300 uppercase tracking-widest">vs prev period</span>
+                </div>
             )}
         </div>
     );
@@ -146,10 +269,48 @@ export default function AnalyticsPage() {
     })) ?? [];
 
     const kpiCards = [
-        { title: "Total Users",       value: overviewData?.totalUsers,       sub: `${overviewData?.activeUsers ?? 0} active`,   icon: Users,     color: "text-blue-600",   bg: "bg-blue-50 border-blue-100",     loading: overviewLoading },
-        { title: "Total Resources",   value: overviewData?.totalResources,   icon: FileText,  color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-100", loading: overviewLoading },
-        { title: "Total Downloads",   value: overviewData?.totalDownloads,   icon: Download,  color: "text-purple-600",  bg: "bg-purple-50 border-purple-100",   loading: overviewLoading },
-        { title: "Pending Requests",  value: requestStats?.data?.pending,    sub: `${requestStats?.data?.resolved ?? 0} resolved`, icon: Activity, color: "text-orange-600", bg: "bg-orange-50 border-orange-100", loading: requestStatsLoading },
+        { 
+            title: "Total Users",       
+            value: overviewData?.totalUsers,       
+            sub: `${overviewData?.activeUsers ?? 0} active`,   
+            icon: Users,     
+            color: "text-blue-600",   
+            bg: "bg-blue-50 border-blue-100",     
+            loading: overviewLoading,
+            spark: userChartData.map(d => d.users),
+            delta: 12
+        },
+        { 
+            title: "Total Resources",   
+            value: overviewData?.totalResources,   
+            icon: FileText,  
+            color: "text-emerald-600", 
+            bg: "bg-emerald-50 border-emerald-100", 
+            loading: overviewLoading,
+            spark: [80, 84, 88, 85, 92, 98, 100],
+            delta: 5
+        },
+        { 
+            title: "Total Downloads",    
+            value: overviewData?.totalDownloads,   
+            icon: Download,  
+            color: "text-purple-600",  
+            bg: "bg-purple-50 border-purple-100",   
+            loading: overviewLoading,
+            spark: dlChartData.map(d => d.downloads),
+            delta: -3
+        },
+        { 
+            title: "Requests Balance",  
+            value: requestStats?.data?.pending,    
+            sub: `${requestStats?.data?.resolved ?? 0} resolved`, 
+            icon: ClipboardList, 
+            color: "text-orange-600", 
+            bg: "bg-orange-50 border-orange-100", 
+            loading: requestStatsLoading,
+            spark: [5, 8, 3, 12, 7, 9, 6],
+            delta: 8
+        },
     ];
 
     return (

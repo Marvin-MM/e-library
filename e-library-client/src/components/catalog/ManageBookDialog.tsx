@@ -126,7 +126,7 @@ export function ManageBookDialog({ initialData, triggerType = "button" }: Manage
                 { onSuccess: () => setOpen(false) }
             );
         } else {
-            createBook(data, {
+            createBook(data as any, {
                 onSuccess: () => {
                     setOpen(false);
                     reset();

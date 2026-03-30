@@ -253,12 +253,12 @@ export default function CatalogPage() {
                                         <div className="pt-3 border-t-2 border-zinc-50">
                                             <span
                                                 className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded ${
-                                                    book.locations?.length > 0
+                                                    (book.locations?.length ?? 0) > 0
                                                         ? "bg-emerald-50 text-emerald-700"
                                                         : "bg-red-50 text-red-600"
                                                 }`}
                                             >
-                                                {book.locations?.length > 0 ? "Stocked on Campus" : "Out of Stock"}
+                                                {(book.locations?.length ?? 0) > 0 ? "Stocked on Campus" : "Out of Stock"}
                                             </span>
                                         </div>
                                     </div>
