@@ -142,7 +142,7 @@ export default function CourseDissertationsPage() {
   const pagination = resourcesData?.pagination;
 
   return (
-    <div className="flex flex-col gap-6 min-h-0 animate-in fade-in duration-500 font-titillium pb-8">
+    <div className="flex flex-col gap-6 min-h-0 animate-in fade-in duration-500 pb-8">
 
       {/* ── Header ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
@@ -186,7 +186,7 @@ export default function CourseDissertationsPage() {
                 <SelectTrigger className="border border-zinc-100 bg-zinc-50 h-10 focus:ring-1 focus:ring-blue-200 font-semibold text-sm rounded-lg">
                   <SelectValue placeholder="Select a course..." />
                 </SelectTrigger>
-                <SelectContent className="font-titillium max-h-64">
+                <SelectContent className=" max-h-64">
                   {courses.length === 0 ? (
                     <SelectItem value="none" disabled>
                       No courses found

@@ -141,7 +141,7 @@ const config: Config = {
   			shimmer: 'shimmer 2s infinite'
   		},
   		fontFamily: {
-  			titillium: ['"Titillium Web"', 'sans-serif']
+  			sans: ['var(--font-outfit)', 'Inter', 'sans-serif'],
   		}
   	}
   },

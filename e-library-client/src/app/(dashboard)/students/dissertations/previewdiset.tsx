@@ -59,7 +59,7 @@ export function PreviewDissertation({ dissertation, onBack }: PreviewDissertatio
                     </Button>
                     <div className="min-w-0">
                         <h2 className="text font-semibold truncate max-w-[200px] font-serif sm:max-w-md">{dissertation.title}</h2>
-                        <p className="text-xs text-muted-foreground font-titillium">Document Preview</p>
+                        <p className="text-xs text-muted-foreground">Document Preview</p>
                     </div>
                 </div>
 
@@ -107,7 +107,7 @@ export function PreviewDissertation({ dissertation, onBack }: PreviewDissertatio
                 {/* Sidebar Info */}
                 <div className="space-y-6">
                     <section className="space-y-4">
-                        <h3 className="text-sm font-semibold font-titillium text-zinc-500">Metadata</h3>
+                        <h3 className="text-sm font-semibold text-zinc-500">Metadata</h3>
 
                         <div className="space-y-3">
                             <div className="flex items-start gap-3 p-3 rounded bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">

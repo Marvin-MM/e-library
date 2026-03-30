@@ -125,7 +125,7 @@ export function ManageModuleDialog({
                 )}
             </DialogTrigger>
 
-            <DialogContent className="max-w-md font-titillium border-2 border-zinc-100 shadow-xl">
+            <DialogContent className="max-w-md border-2 border-zinc-100 shadow-xl">
                 <DialogHeader className="border-b-2 border-zinc-50 pb-4 mb-2">
                     <DialogTitle className="text-lg font-black text-blue-900 uppercase tracking-tight">
                         {isEditMode ? "Modify Module" : "Create Course Module"}

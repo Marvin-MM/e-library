@@ -86,7 +86,7 @@ export default function ResourcesPage() {
     const currentPage = filters.page || 1;
 
     return (
-        <div className="flex flex-col gap-6 font-titillium pb-8">
+        <div className="flex flex-col gap-6 pb-8">
 
             {/* ── Header ─────────────────────────────────────────────────── */}
             <motion.div
@@ -166,7 +166,7 @@ export default function ResourcesPage() {
                             <Layers className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
                             <SelectValue placeholder="All Types" />
                         </SelectTrigger>
-                        <SelectContent className="border-2 border-zinc-100 shadow-none font-titillium">
+                        <SelectContent className="border-2 border-zinc-100 shadow-none">
                             <SelectItem value="all-types" className="font-bold text-xs uppercase">All Types</SelectItem>
                             {resourceTypeOptions.map((o) => (
                                 <SelectItem key={o.value} value={o.value} className="font-bold text-xs uppercase text-zinc-600">
@@ -189,7 +189,7 @@ export default function ResourcesPage() {
                             <Filter className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
                             <SelectValue placeholder="All Categories" />
                         </SelectTrigger>
-                        <SelectContent className="border-2 border-zinc-100 shadow-none font-titillium">
+                        <SelectContent className="border-2 border-zinc-100 shadow-none">
                             <SelectItem value="all-categories" className="font-bold text-xs uppercase">All Categories</SelectItem>
                             {categoryOptions.map((o) => (
                                 <SelectItem key={o.value} value={o.value} className="font-bold text-xs uppercase text-zinc-600">

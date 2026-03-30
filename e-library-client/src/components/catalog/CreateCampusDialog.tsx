@@ -78,7 +78,7 @@ export function CreateCampusDialog() {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-w-md font-titillium">
+            <DialogContent className="max-w-md">
                 <DialogHeader>
                     <DialogTitle className="text-lg font-black text-blue-900 uppercase tracking-tight">
                         Register Campus

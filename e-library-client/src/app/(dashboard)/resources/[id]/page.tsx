@@ -166,7 +166,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
     // ── Loading ──────────────────────────────────────────────────────────────
     if (isLoading) {
         return (
-            <div className="flex flex-col gap-6 font-titillium pb-8 animate-in fade-in duration-500">
+            <div className="flex flex-col gap-6 pb-8 animate-in fade-in duration-500">
                 <div className="flex flex-col sm:flex-row gap-6">
                     <Skeleton className="w-36 sm:w-48 aspect-[3/4] rounded-lg shrink-0" />
                     <div className="flex-1 space-y-4 pt-2">
@@ -191,7 +191,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
     // ── Error ────────────────────────────────────────────────────────────────
     if (error || !resource) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 gap-4 text-zinc-300 font-titillium">
+            <div className="flex flex-col items-center justify-center py-20 gap-4 text-zinc-300">
                 <div className="w-14 h-14 rounded-xl bg-zinc-50 border-2 border-zinc-100 flex items-center justify-center">
                     <AlertTriangle className="w-7 h-7 text-zinc-300" />
                 </div>
@@ -230,7 +230,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
         <>
             {/* ── Preview dialog ─────────────────────────────────────────── */}
             <Dialog open={isPreviewOpen} onOpenChange={(o) => { setIsPreviewOpen(o); if (!o) setPreviewUrl(null); }}>
-                <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0 overflow-hidden font-titillium border-0 shadow-2xl">
+                <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0 overflow-hidden border-0 shadow-2xl">
                     <DialogHeader className="px-5 py-3.5 border-b-2 border-zinc-100 shrink-0 bg-white z-10">
                         <DialogTitle className="text-sm font-black text-blue-900 flex items-center gap-2 truncate">
                             <Eye className="w-4 h-4 shrink-0" />
@@ -257,7 +257,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
             </Dialog>
 
             {/* ── Page ──────────────────────────────────────────────────── */}
-            <div className="flex flex-col gap-6 font-titillium pb-8 animate-in fade-in duration-500">
+            <div className="flex flex-col gap-6 pb-8 animate-in fade-in duration-500">
 
                 {/* Back + actions */}
                 <div className="flex flex-wrap items-center justify-between gap-3">

@@ -28,7 +28,7 @@ function VerifyEmailContent() {
 
     if (isSuccess) {
         return (
-            <div className="flex items-center justify-center px-4 font-titillium">
+            <div className="flex items-center justify-center px-4">
                 <div className="w-full max-w-sm bg-white px-9 py-11 text-center">
                     <div className="mb-8">
                         <h1 className="text-lg font-bold text-neutral-900 mb-1.5">Email Verified</h1>
@@ -58,7 +58,7 @@ function VerifyEmailContent() {
 
     if (token) {
         return (
-            <div className="flex items-center justify-center px-4 font-titillium">
+            <div className="flex items-center justify-center px-4">
                 <div className="w-full max-w-sm bg-white px-9 py-11 text-center">
                     <div className="mb-8">
                         <h1 className="text-lg font-bold text-neutral-900 mb-1.5">Verifying Email</h1>
@@ -75,7 +75,7 @@ function VerifyEmailContent() {
     }
 
     return (
-        <div className="flex items-center justify-center px-4 font-titillium">
+        <div className="flex items-center justify-center px-4">
             <div className="w-full max-w-sm bg-white px-9 py-11">
 
                 {/* Heading */}

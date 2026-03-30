@@ -197,7 +197,7 @@ export function CreateDissertationDialog() {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto font-titillium">
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader className="border-b-2 border-zinc-100 pb-4 mb-2">
                     <DialogTitle className="text-xl font-black text-blue-900 tracking-tight">
                         Publish New Dissertation

@@ -59,7 +59,7 @@ export function DeleteConfirmationDialog({
                 )}
             </DialogTrigger>
             <DialogContent 
-                className="max-w-md border-2 border-zinc-100 font-titillium" 
+                className="max-w-md border-2 border-zinc-100" 
                 onClick={(e) => e.stopPropagation()}
             >
                 <DialogHeader className="space-y-4">

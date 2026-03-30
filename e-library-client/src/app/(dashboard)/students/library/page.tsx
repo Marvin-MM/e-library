@@ -104,7 +104,7 @@ export default function LibraryPage() {
     });
 
     return (
-        <div className="max-w-7xl mx-auto animate-in fade-in duration-700 font-titillium">
+        <div className="max-w-7xl mx-auto animate-in fade-in duration-700">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8  pb-8">
                 <div className="space-y-1">

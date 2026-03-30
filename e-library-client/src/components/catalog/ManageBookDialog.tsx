@@ -158,7 +158,7 @@ export function ManageBookDialog({ initialData, triggerType = "button" }: Manage
                 )}
             </DialogTrigger>
 
-            <DialogContent className="max-w-xl font-titillium">
+            <DialogContent className="max-w-xl">
                 <DialogHeader>
                     <DialogTitle className="text-lg font-black text-blue-900 uppercase tracking-tight">
                         {isEditMode ? "Update Book Details" : "Catalog New Physical Book"}

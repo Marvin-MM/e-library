@@ -86,7 +86,7 @@ export function NotificationsPopover() {
             </PopoverTrigger>
             
             {/* UPDATED: Styled to match your global app theme */}
-            <PopoverContent className="w-80 p-0 border-2 border-zinc-100 shadow-xl font-titillium rounded-xl overflow-hidden" align="end">
+            <PopoverContent className="w-80 p-0 border-2 border-zinc-100 shadow-xl rounded-xl overflow-hidden" align="end">
                 <div className="flex items-center justify-between p-4 bg-zinc-50/80 border-b-2 border-zinc-100">
                     <h4 className="font-black text-sm uppercase tracking-widest text-zinc-900">Notifications</h4>
                     {unreadCount > 0 && (

@@ -130,7 +130,7 @@ export default function CourseDissertationDetail({ params }: CourseDissertationD
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6 animate-pulse font-titillium pb-8">
+      <div className="flex flex-col gap-6 animate-pulse pb-8">
         <Skeleton className="h-4 w-40" />
         <div className="flex flex-col md:flex-row gap-8">
           <Skeleton className="w-40 md:w-56 aspect-[3/4] rounded-xl shrink-0" />
@@ -148,7 +148,7 @@ export default function CourseDissertationDetail({ params }: CourseDissertationD
   // ── Error ─────────────────────────────────────────────────────────────────
   if (error || !resource) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 gap-4 font-titillium">
+      <div className="flex flex-col items-center justify-center py-32 gap-4">
         <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center">
           <FileWarning className="w-7 h-7 text-red-300" />
         </div>
@@ -171,11 +171,11 @@ export default function CourseDissertationDetail({ params }: CourseDissertationD
   const hasActions = (isDownloadable && hasDigitalFile) || hasDigitalFile || isCampusOnly;
 
   return (
-    <div className="flex flex-col gap-6 font-titillium animate-in fade-in duration-500 pb-8">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-500 pb-8">
 
       {/* ── Preview Dialog ── */}
       <Dialog open={isPreviewOpen} onOpenChange={handlePreviewOpenChange}>
-        <DialogContent className="w-[95vw] max-w-6xl h-[90vh] flex flex-col p-0 overflow-hidden font-titillium border-0 shadow-2xl rounded-2xl">
+        <DialogContent className="w-[95vw] max-w-6xl h-[90vh] flex flex-col p-0 overflow-hidden border-0 shadow-2xl rounded-2xl">
           <DialogHeader className="px-5 py-4 border-b border-zinc-100 shrink-0 bg-white">
             <DialogTitle className="text-base font-bold text-blue-900 flex items-center gap-2 leading-tight">
               <Eye className="w-4 h-4 shrink-0" />

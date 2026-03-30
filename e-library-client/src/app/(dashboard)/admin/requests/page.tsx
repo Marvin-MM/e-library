@@ -148,7 +148,7 @@ export default function AdminRequestsPage() {
 
     return (
         <>
-            <div className="flex flex-col gap-6 font-titillium pb-8">
+            <div className="flex flex-col gap-6 pb-8">
 
                 {/* ── Header ── */}
                 <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -168,7 +168,7 @@ export default function AdminRequestsPage() {
                             <SelectTrigger className="w-[160px] h-10 border-2 border-zinc-100 bg-white rounded-lg focus:ring-0 text-[10px] font-black uppercase tracking-widest text-zinc-600 hover:border-zinc-200 transition-colors shadow-none">
                                 <SelectValue placeholder="All Statuses" />
                             </SelectTrigger>
-                            <SelectContent className="border-2 border-zinc-100 shadow-xl rounded-lg font-titillium">
+                            <SelectContent className="border-2 border-zinc-100 shadow-xl rounded-lg">
                                 <SelectItem value={ALL_STATUSES} className="text-[10px] font-bold uppercase tracking-widest py-2.5">
                                     All Statuses
                                 </SelectItem>
@@ -323,7 +323,7 @@ export default function AdminRequestsPage() {
 
             {/* ── Manage dialog ── */}
             <Dialog open={dialogOpen} onOpenChange={(o) => { if (!o) closeDialog(); else setDialogOpen(true); }}>
-                <DialogContent className="sm:max-w-xl border-2 border-zinc-100 shadow-2xl rounded-2xl p-0 overflow-hidden font-titillium">
+                <DialogContent className="sm:max-w-xl border-2 border-zinc-100 shadow-2xl rounded-2xl p-0 overflow-hidden">
 
                     <DialogHeader className="px-6 py-5 bg-zinc-50/80 border-b-2 border-zinc-100">
                         <DialogTitle className="text-lg font-black text-zinc-900">Manage Request</DialogTitle>
@@ -342,7 +342,7 @@ export default function AdminRequestsPage() {
                                     <SelectTrigger className="h-11 border-2 border-zinc-100 bg-zinc-50 rounded-lg focus:ring-0 text-xs font-black uppercase tracking-widest hover:border-zinc-200 transition-colors">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="border-2 border-zinc-100 shadow-xl rounded-lg font-titillium">
+                                    <SelectContent className="border-2 border-zinc-100 shadow-xl rounded-lg">
                                         {statusOptions.map((o) => (
                                             <SelectItem key={o.value} value={o.value} className="text-[10px] font-bold uppercase tracking-widest py-2.5">
                                                 {o.label}

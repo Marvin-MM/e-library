@@ -92,7 +92,7 @@ export default function RequestsPage() {
             <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="max-w-6xl mx-auto font-titillium"
+                className="max-w-6xl mx-auto"
             >
                 <Button
                     variant="ghost"
@@ -212,7 +212,7 @@ export default function RequestsPage() {
     }
 
     return (
-        <div className="max-w-6xl mx-auto space-y-10 py-6 animate-in fade-in duration-700 font-titillium">
+        <div className="max-w-6xl mx-auto space-y-10 py-6 animate-in fade-in duration-700">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-1">

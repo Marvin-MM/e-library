@@ -77,7 +77,7 @@ function BookDetailDialog({
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
-        className="w-[95vw] max-w-2xl p-0 overflow-hidden border-0 shadow-2xl rounded-2xl font-titillium gap-0"
+        className="w-[95vw] max-w-2xl p-0 overflow-hidden border-0 shadow-2xl rounded-2xl gap-0"
         aria-describedby="book-detail-description"
       >
         {/* ── Dialog Header ── */}
@@ -349,7 +349,7 @@ export default function CatalogPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 font-titillium animate-in fade-in duration-500 pb-8">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-500 pb-8">
 
       {/* ── Detail Dialog ── */}
       {selectedBookId && (

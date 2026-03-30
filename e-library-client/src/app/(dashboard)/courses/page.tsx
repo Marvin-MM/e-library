@@ -57,7 +57,7 @@ export default function CoursesPage() {
     };
 
     return (
-        <div className="flex flex-col gap-6 min-h-0 font-titillium pb-6">
+        <div className="flex flex-col gap-6 min-h-0 pb-6">
 
             {/* ── PAGE HEADER ── */}
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">

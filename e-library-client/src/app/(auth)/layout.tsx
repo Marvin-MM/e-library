@@ -16,7 +16,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                 <div className="absolute top-12 left-12 z-10">
                     <img src="/vu-logo.png" alt="VU Logo" className="h-28 w-28 object-contain brightness-110" />
                 </div>
-                <div className="relative max-w-md text-white space-y-2 z-10 font-titillium">
+                <div className="relative max-w-md text-white space-y-2 z-10">
                     <h2 className="text-2xl font-bold leading-tight">
                         Your one-stop platform for educational resources
                     </h2>

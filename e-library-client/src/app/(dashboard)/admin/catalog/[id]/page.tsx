@@ -28,7 +28,7 @@ export default function BookDetailPage({ params }: CatalogDetailProps) {
     // ── Loading skeleton — matches the real page structure ─────────────────
     if (isLoading) {
         return (
-            <div className="flex flex-col gap-6 font-titillium pb-6">
+            <div className="flex flex-col gap-6 pb-6">
                 <Skeleton className="h-5 w-36 rounded" />
                 <div className="flex flex-col md:flex-row gap-8">
                     <Skeleton className="w-32 md:w-48 aspect-[3/4] rounded-lg shrink-0" />
@@ -53,7 +53,7 @@ export default function BookDetailPage({ params }: CatalogDetailProps) {
     // ── Error / 404 state ──────────────────────────────────────────────────
     if (error || !book) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh] p-6 font-titillium">
+            <div className="flex items-center justify-center min-h-[60vh] p-6">
                 <div className="text-center bg-white border-2 border-zinc-100 p-12 rounded max-w-md w-full">
                     <BookText className="w-14 h-14 text-zinc-100 mx-auto mb-4" />
                     <h3 className="text-xl font-bold text-zinc-900 mb-2 uppercase tracking-tight">
@@ -80,7 +80,7 @@ export default function BookDetailPage({ params }: CatalogDetailProps) {
         book.locations?.reduce((acc: number, curr: { availableCopies: number }) => acc + curr.availableCopies, 0) ?? 0;
 
     return (
-        <div className="flex flex-col gap-6 font-titillium pb-6">
+        <div className="flex flex-col gap-6 pb-6">
 
             {/* ── BACK NAV ── */}
             <Button

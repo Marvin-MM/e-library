@@ -80,7 +80,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
     if (loadingCourse) {
         return (
-            <div className="flex flex-col gap-6 font-titillium pb-6">
+            <div className="flex flex-col gap-6 pb-6">
                 <Skeleton className="h-28 w-full rounded" />
                 <Skeleton className="h-12 w-72 rounded" />
                 <div className="bg-white border-2 border-zinc-100 rounded p-6">
@@ -98,7 +98,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
     if (!course) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh] p-6 font-titillium">
+            <div className="flex items-center justify-center min-h-[60vh] p-6">
                 <div className="text-center bg-white border-2 border-zinc-100 p-12 rounded max-w-md w-full">
                     <GraduationCap className="w-14 h-14 text-zinc-100 mx-auto mb-4" />
                     <h3 className="text-xl font-bold text-zinc-900 mb-2 uppercase tracking-tight">
@@ -124,7 +124,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     const setActiveSearch = activeTab === "modules" ? setModuleSearch : setResourceSearch;
 
     return (
-        <div className="flex flex-col gap-6 font-titillium pb-6">
+        <div className="flex flex-col gap-6 pb-6">
 
             {/* ── PAGE HEADER ── */}
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">

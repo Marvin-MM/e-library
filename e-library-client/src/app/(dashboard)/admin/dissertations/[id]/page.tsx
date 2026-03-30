@@ -54,7 +54,7 @@ export default function DissertationDetailPage({ params }: DissertationDetailPag
     // ── Loading state ──────────────────────────────────────────────────────
     if (isLoading) {
         return (
-            <div className="flex flex-col gap-6 font-titillium pb-6">
+            <div className="flex flex-col gap-6 pb-6">
                 <Skeleton className="h-6 w-32 rounded" />
                 <div className="flex flex-col md:flex-row gap-8">
                     <Skeleton className="w-44 md:w-56 aspect-[3/4] rounded-lg shrink-0" />
@@ -77,7 +77,7 @@ export default function DissertationDetailPage({ params }: DissertationDetailPag
     // ── Error / 404 state ──────────────────────────────────────────────────
     if (error || !resource) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh] p-6 font-titillium">
+            <div className="flex items-center justify-center min-h-[60vh] p-6">
                 <div className="text-center bg-white border-2 border-zinc-100 p-12 rounded max-w-md w-full">
                     <GraduationCap className="w-14 h-14 text-zinc-100 mx-auto mb-4" />
                     <h3 className="text-xl font-bold text-zinc-900 mb-2 uppercase tracking-tight">
@@ -148,11 +148,11 @@ export default function DissertationDetailPage({ params }: DissertationDetailPag
     };
 
     return (
-        <div className="flex flex-col gap-6 font-titillium pb-6">
+        <div className="flex flex-col gap-6 pb-6">
 
             {/* ── DOCUMENT PREVIEW DIALOG ── */}
             <Dialog open={isPreviewOpen} onOpenChange={handlePreviewClose}>
-                <DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0 overflow-hidden font-titillium border-0 shadow-2xl">
+                <DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0 overflow-hidden border-0 shadow-2xl">
                     <DialogHeader className="p-4 border-b-2 border-zinc-100 shrink-0 bg-white">
                         <DialogTitle className="text-sm font-bold text-blue-900 flex items-center gap-2 truncate">
                             <Eye className="w-4 h-4 shrink-0" />

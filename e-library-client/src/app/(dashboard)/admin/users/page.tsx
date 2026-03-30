@@ -125,7 +125,7 @@ export default function AdminUsersPage() {
     };
 
     return (
-        <div className="h-[calc(100vh-120px)] flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700 font-titillium">
+        <div className="h-[calc(100vh-120px)] flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700">
 
             {/* TOP ROW: Z-Pattern Start */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">

@@ -1,15 +1,13 @@
 import "@/styles/globals.css";
 import { Providers } from "./providers";
 import type { Metadata, Viewport } from "next";
-import { Titillium_Web } from "next/font/google";
+import { Outfit } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const titilliumWeb = Titillium_Web({
-    weight: ['200', '300', '400', '600', '700', '900'],
+const outfit = Outfit({
     subsets: ['latin'],
-    variable: '--font-titillium',
-    display: 'swap', // show fallback immediately, swap in when loaded
-    preload: true,
+    variable: '--font-outfit',
+    display: 'swap',
 });
 
 export const viewport: Viewport = {
@@ -34,7 +32,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={cn("min-h-screen bg-zinc-50 font-sans antialiased")}>
+            <body className={cn(outfit.variable, "min-h-screen bg-zinc-50 font-sans antialiased")}>
                 {/* Skip to main content — critical for keyboard/screen reader accessibility */}
                 <a href="#main-content" className="skip-nav">
                     Skip to main content

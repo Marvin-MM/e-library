@@ -231,7 +231,7 @@ export function CreateResourceDialog() {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto font-titillium p-0">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
                 {/* Dialog header */}
                 <DialogHeader className="px-6 pt-6 pb-4 border-b-2 border-zinc-100 sticky top-0 bg-white z-10">
                     <div className="flex items-start justify-between">
@@ -286,7 +286,7 @@ export function CreateResourceDialog() {
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                     <SelectValue placeholder={isDepartmentsLoading ? "Loading…" : "Select department"} />
                                 </SelectTrigger>
-                                <SelectContent className="border-2 border-zinc-100 shadow-none font-titillium">
+                                <SelectContent className="border-2 border-zinc-100 shadow-none">
                                     {departments?.map((dept) => (
                                         <SelectItem key={dept} value={dept} className="text-xs font-bold">{dept}</SelectItem>
                                     ))}
@@ -308,7 +308,7 @@ export function CreateResourceDialog() {
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                     <SelectValue placeholder={isCoursesLoading ? "Loading…" : "Link to a course"} />
                                 </SelectTrigger>
-                                <SelectContent className="border-2 border-zinc-100 shadow-none font-titillium">
+                                <SelectContent className="border-2 border-zinc-100 shadow-none">
                                     <SelectItem value="none" className="text-xs font-bold text-zinc-400">No course linked</SelectItem>
                                     {courses.map((course) => (
                                         <SelectItem key={course.id} value={course.id} className="text-xs font-bold">
@@ -327,7 +327,7 @@ export function CreateResourceDialog() {
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="border-2 border-zinc-100 shadow-none font-titillium">
+                                <SelectContent className="border-2 border-zinc-100 shadow-none">
                                     {CATEGORIES.map((c) => (
                                         <SelectItem key={c} value={c} className="text-xs font-bold">{toLabel(c)}</SelectItem>
                                     ))}
@@ -342,7 +342,7 @@ export function CreateResourceDialog() {
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="border-2 border-zinc-100 shadow-none font-titillium">
+                                <SelectContent className="border-2 border-zinc-100 shadow-none">
                                     {RESOURCE_TYPES.map((t) => (
                                         <SelectItem key={t} value={t} className="text-xs font-bold">{toLabel(t)}</SelectItem>
                                     ))}
@@ -383,7 +383,7 @@ export function CreateResourceDialog() {
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="border-2 border-zinc-100 shadow-none font-titillium">
+                                <SelectContent className="border-2 border-zinc-100 shadow-none">
                                     {ACCESS_TYPES.map((t) => (
                                         <SelectItem key={t} value={t} className="text-xs font-bold">{toLabel(t)}</SelectItem>
                                     ))}
@@ -404,7 +404,7 @@ export function CreateResourceDialog() {
                                 )}>
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="border-2 border-zinc-100 shadow-none font-titillium">
+                                <SelectContent className="border-2 border-zinc-100 shadow-none">
                                     {CAMPUS_LOCATIONS.map((l) => (
                                         <SelectItem key={l} value={l} className="text-xs font-bold">{toLabel(l)}</SelectItem>
                                     ))}

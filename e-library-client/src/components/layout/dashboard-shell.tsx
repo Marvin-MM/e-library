@@ -161,7 +161,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                 <Button variant="ghost" size="icon" className="rounded-full border border-zinc-100 hover:border-zinc-300 p-0.5">
                                     <Avatar className="h-8 w-8">
                                         <AvatarImage src={user.avatar} />
-                                        <AvatarFallback className="bg-zinc-100 text-zinc-600 font-semibold text-xs text-titillium uppercase">
+                                        <AvatarFallback className="bg-zinc-100 text-zinc-600 font-semibold text-xs uppercase">
                                             {getInitials(`${user.name}`)}
                                         </AvatarFallback>
                                     </Avatar>

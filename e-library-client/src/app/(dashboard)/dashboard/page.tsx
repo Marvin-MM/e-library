@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
     return (
         <>
-            <div className="flex flex-col gap-6 font-titillium pb-8">
+            <div className="flex flex-col gap-6 pb-8">
 
                 {/* ── Header row ─────────────────────────────────────────── */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

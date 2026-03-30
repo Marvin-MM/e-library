@@ -185,7 +185,7 @@ function SignupForm() {
 
 export default function SignupPage() {
     return (
-        <div className="flex items-center justify-center px-4 font-titillium">
+        <div className="flex items-center justify-center px-4">
             <div className="w-full max-w-sm bg-white px-9">
 
                 {/* Heading */}

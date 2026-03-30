@@ -255,7 +255,7 @@ export default function AdminSettingsPage() {
     const settingsData = systemSettings?.data || {};
 
     return (
-        <div className="h-[calc(100vh-120px)] flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700 font-titillium">
+        <div className="h-[calc(100vh-120px)] flex flex-col gap-6 overflow-hidden animate-in fade-in duration-700">
 
             {/* TOP ROW */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">

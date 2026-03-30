@@ -89,7 +89,7 @@ export default function DissertationsPage() {
     }
 
     return (
-        <div className=" max-w-6xl mx-auto font-titillium space-y-10 py-6 animate-in fade-in duration-700">
+        <div className=" max-w-6xl mx-auto space-y-10 py-6 animate-in fade-in duration-700">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-1">
@@ -126,8 +126,8 @@ export default function DissertationsPage() {
                     { label: "Processing", value: "12", color: "text-amber-600" },
                 ].map((stat) => (
                     <div key={stat.label} className="p-4 rounded-none bg-white dark:bg-zinc-900/50  dark:border-zinc-800/50">
-                        <p className="text-sm font-titillium font-semibold text-zinc-700 ">{stat.label}</p>
-                        <p className={`text-xl font-titillium font-bold mt-1 ${stat.color}`}>{stat.value}</p>
+                        <p className="text-sm font-semibold text-zinc-700 ">{stat.label}</p>
+                        <p className={`text-xl font-bold mt-1 ${stat.color}`}>{stat.value}</p>
                     </div>
                 ))}
             </div>

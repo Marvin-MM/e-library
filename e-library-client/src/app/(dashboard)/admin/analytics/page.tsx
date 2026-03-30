@@ -314,7 +314,7 @@ export default function AnalyticsPage() {
     ];
 
     return (
-        <div className="flex flex-col gap-6 font-titillium pb-8">
+        <div className="flex flex-col gap-6 pb-8">
 
             {/* ── Header ── */}
             <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -334,7 +334,7 @@ export default function AnalyticsPage() {
                         <SelectTrigger className="w-[150px] h-10 border-2 border-zinc-100 bg-white rounded-lg focus:ring-0 text-[10px] font-black uppercase tracking-widest text-zinc-600 hover:border-zinc-200 transition-colors">
                             <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="border-2 border-zinc-100 shadow-xl rounded-lg font-titillium">
+                        <SelectContent className="border-2 border-zinc-100 shadow-xl rounded-lg">
                             {DATE_RANGES.map((r) => (
                                 <SelectItem key={r.value} value={r.value} className="text-[10px] font-bold uppercase tracking-widest py-3">
                                     {r.label}

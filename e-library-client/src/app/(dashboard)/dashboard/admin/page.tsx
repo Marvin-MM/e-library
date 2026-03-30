@@ -237,7 +237,7 @@ export default function AdminDashboardPage() {
     );
 
     return (
-        <div className="min-h-0 flex flex-col gap-6 font-titillium">
+        <div className="min-h-0 flex flex-col gap-6">
 
             {/* ── Header ── */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
