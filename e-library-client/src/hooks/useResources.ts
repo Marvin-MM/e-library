@@ -165,3 +165,44 @@ export function usePreviewResource() {
     },
   });
 }
+export function useApproveResource() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, note }: { id: string; note?: string }) => {
+      const response = await resourcesApi.approve(id, note);
+      if (!response.success) {
+        throw new Error(response.message || "Failed to approve resource");
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.resources.all });
+      toast.success("Resource approved successfully!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to approve resource");
+    },
+  });
+}
+
+export function useRejectResource() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
+      const response = await resourcesApi.reject(id, reason);
+      if (!response.success) {
+        throw new Error(response.message || "Failed to reject resource");
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.resources.all });
+      toast.success("Resource rejected!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to reject resource");
+    },
+  });
+}

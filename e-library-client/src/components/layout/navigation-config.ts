@@ -78,6 +78,7 @@ export const adminNavigation: NavSection[] = [
         title: "Content Management",
         items: [
             { name: "Resources", href: "/resources", icon: FileText },
+            { name: "Journals", href: "/journals", icon: BookOpen },
             { name: "Courses", href: "/courses", icon: GraduationCap },
             { name: "Dissertations", href: "/admin/dissertations", icon: FileText },
             { name: "Catalog", href: "/admin/catalog", icon: BookOpen },

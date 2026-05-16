@@ -32,6 +32,7 @@ export const courseResourcesQuerySchema = z.object({
   limit: z.coerce.number().int().positive().max(100).default(20),
   search: z.string().max(100).optional(),
   category: z.enum(['BOOK', 'JOURNAL', 'PAPER', 'MAGAZINE', 'THESIS', 'OTHER']).optional(),
+  resourceType: z.enum(['BOOK', 'JOURNAL', 'THESIS', 'DISSERTATION', 'MAGAZINE', 'MODULE_NOTES', 'PAST_PAPER', 'LECTURE_SLIDE', 'LAB_MANUAL', 'ASSIGNMENT', 'OTHER']).optional(),
 });
 
 export type CourseResourcesQueryInput = z.infer<typeof courseResourcesQuerySchema>;

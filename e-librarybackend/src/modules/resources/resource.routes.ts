@@ -129,9 +129,32 @@ router.get(
 );
 
 router.get(
+  '/pending',
+  authenticate,
+  authorize('ADMIN'),
+  resourceController.getPendingResources.bind(resourceController)
+);
+
+router.get(
   '/:id',
   validate(resourceIdSchema, 'params'),
   resourceController.findById.bind(resourceController)
+);
+
+router.post(
+  '/:id/approve',
+  authenticate,
+  authorize('ADMIN'),
+  validate(resourceIdSchema, 'params'),
+  resourceController.approveResource.bind(resourceController)
+);
+
+router.post(
+  '/:id/reject',
+  authenticate,
+  authorize('ADMIN'),
+  validate(resourceIdSchema, 'params'),
+  resourceController.rejectResource.bind(resourceController)
 );
 
 router.post(

@@ -56,4 +56,16 @@ export const resourcesApi = {
     const response = await api.get<ApiResponse<{ url: string, storageType: string }>>(`/resources/${id}/preview`);
     return response.data;
   },
+  approve: async (id: string, note?: string) => {
+    const response = await api.post<ApiResponse<Resource>>(`/resources/${id}/approve`, { note });
+    return response.data;
+  },
+  reject: async (id: string, reason?: string) => {
+    const response = await api.post<ApiResponse<Resource>>(`/resources/${id}/reject`, { reason });
+    return response.data;
+  },
+  getPending: async (filters?: ResourceFilters) => {
+    const response = await api.get<PaginatedResponse<Resource>>("/resources/pending", { params: filters });
+    return response.data;
+  },
 };

@@ -157,7 +157,13 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 }
 
 // ── Dialog ───────────────────────────────────────────────────────────────────
-export function CreateResourceDialog() {
+
+interface CreateResourceDialogProps {
+    forcedType?: "BOOK" | "JOURNAL" | "MAGAZINE" | "MODULE_NOTES" | "PAST_PAPER" | "LECTURE_SLIDE" | "LAB_MANUAL" | "ASSIGNMENT" | "OTHER";
+    forcedCategory?: "BOOK" | "JOURNAL" | "PAPER" | "MAGAZINE" | "OTHER";
+}
+
+export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResourceDialogProps = {}) {
     const [open, setOpen]           = useState(false);
     const [file, setFile]           = useState<File | null>(null);
     const [coverImage, setCoverImage] = useState<File | null>(null);
@@ -166,7 +172,11 @@ export function CreateResourceDialog() {
     const { data: departments, isLoading: isDepartmentsLoading } = useDepartments();
 
     const { register, handleSubmit, watch, setValue, reset } = useForm({
-        defaultValues: DEFAULT_VALUES,
+        defaultValues: {
+            ...DEFAULT_VALUES,
+            category: forcedCategory || "BOOK",
+            resourceType: forcedType || "BOOK",
+        },
     });
 
     const accessType        = watch("accessType");
@@ -321,34 +331,38 @@ export function CreateResourceDialog() {
                         </div>
 
                         {/* Category */}
-                        <div className="space-y-1.5">
-                            <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Category</Label>
-                            <Select onValueChange={(v) => setValue("category", v as any)} defaultValue="BOOK">
-                                <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="border-2 border-zinc-100 shadow-none">
-                                    {CATEGORIES.map((c) => (
-                                        <SelectItem key={c} value={c} className="text-xs font-bold">{toLabel(c)}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        {!forcedCategory && (
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Category</Label>
+                                <Select onValueChange={(v) => setValue("category", v as any)} defaultValue="BOOK">
+                                    <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="border-2 border-zinc-100 shadow-none">
+                                        {CATEGORIES.map((c) => (
+                                            <SelectItem key={c} value={c} className="text-xs font-bold">{toLabel(c)}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
 
                         {/* Resource type */}
-                        <div className="space-y-1.5">
-                            <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Resource Type</Label>
-                            <Select onValueChange={(v) => setValue("resourceType", v as any)} defaultValue="BOOK">
-                                <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="border-2 border-zinc-100 shadow-none">
-                                    {RESOURCE_TYPES.map((t) => (
-                                        <SelectItem key={t} value={t} className="text-xs font-bold">{toLabel(t)}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        {!forcedType && (
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Resource Type</Label>
+                                <Select onValueChange={(v) => setValue("resourceType", v as any)} defaultValue="BOOK">
+                                    <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="border-2 border-zinc-100 shadow-none">
+                                        {RESOURCE_TYPES.map((t) => (
+                                            <SelectItem key={t} value={t} className="text-xs font-bold">{toLabel(t)}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
 
                         {/* Publication year */}
                         <div className="space-y-1.5">

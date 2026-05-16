@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 import { useDepartmentStore } from "@/stores/departmentStore";
 import { useCourses, useCourseResources } from "@/hooks/useCourses";
+import { useRole } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -15,7 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  GraduationCap,
   BookOpen,
   Download,
   FileText,
@@ -24,6 +24,7 @@ import {
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
+import { CreateResourceDialog } from "@/components/resources/CreateResourceDialog";
 
 // ─── Animation Variants ──────────────────────────────────────────────────────
 const fadeUp: Variants = {
@@ -35,8 +36,8 @@ const fadeUp: Variants = {
   }),
 };
 
-// ─── Dissertation Card ────────────────────────────────────────────────────────
-function DissertationCard({ doc, index }: { doc: any; index: number }) {
+// ─── Journal Card ────────────────────────────────────────────────────────
+function JournalCard({ doc, index }: { doc: any; index: number }) {
   return (
     <motion.div
       custom={index}
@@ -47,7 +48,7 @@ function DissertationCard({ doc, index }: { doc: any; index: number }) {
                  hover:border-blue-200 hover:shadow-lg hover:shadow-blue-50 transition-all duration-300"
     >
       {/* Clickable overlay */}
-      <Link href={`/course-dissertations/${doc.id}`} className="absolute inset-0 z-10" aria-label={`View ${doc.title}`} />
+      <Link href={`/resources/${doc.id}`} className="absolute inset-0 z-10" aria-label={`View ${doc.title}`} />
 
       {/* Cover Image */}
       <div className="aspect-[4/3] bg-zinc-50 overflow-hidden border-b border-zinc-100 relative">
@@ -114,45 +115,29 @@ function SkeletonCard() {
   );
 }
 
+import { useResources } from "@/hooks/useResources";
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
-export default function CourseDissertationsPage() {
+export default function JournalsPage() {
   const { selectedDepartment } = useDepartmentStore();
+  const { isStaffOrAdmin } = useRole();
 
-  const { data: coursesData, isLoading: isLoadingCourses } = useCourses({
-    department: selectedDepartment || undefined,
-    limit: 100,
-  });
-
-  const courses = coursesData?.data ?? [];
-  const [selectedCourseId, setSelectedCourseId] = useState<string>("");
   const [page, setPage] = useState(1);
 
-  // ✅ FIX: Auto-select first course via useEffect, NOT during render
-  useEffect(() => {
-    if (courses.length > 0 && !selectedCourseId) {
-      setSelectedCourseId(courses[0].id);
-    }
-  }, [courses, selectedCourseId]);
+  const { data: resourcesData, isLoading: isLoadingResources } = useResources({
+    department: selectedDepartment || undefined,
+    resourceType: "JOURNAL",
+    page,
+  });
 
-  // Reset page when course changes
-  const handleCourseChange = (val: string) => {
-    setSelectedCourseId(val);
-    setPage(1);
-  };
-
-  const { data: resourcesData, isLoading: isLoadingResources } = useCourseResources(
-    selectedCourseId,
-    { resourceType: "DISSERTATION", page }
-  );
-
-  const dissertations = resourcesData?.data ?? [];
+  const journals = resourcesData?.data ?? [];
   const pagination = resourcesData?.pagination;
 
   return (
     <div className="flex flex-col gap-6 min-h-0 animate-in fade-in duration-500 pb-8">
 
       {/* ── Header ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
         <motion.div
           initial={{ x: -16, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -160,11 +145,11 @@ export default function CourseDissertationsPage() {
           className="flex flex-col gap-2"
         >
           <div className="flex items-center gap-1.5 text-blue-900 font-bold text-[10px] uppercase bg-blue-50 w-fit px-3 py-1.5 rounded-full tracking-wider">
-            <GraduationCap className="w-3 h-3" />
-            Course Research Archive
+            <BookOpen className="w-3 h-3" />
+            Academic Journals
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight leading-tight">
-            Department Dissertations
+            Department Journals
           </h1>
           {selectedDepartment && (
             <p className="text-zinc-400 text-sm flex items-center gap-1.5">
@@ -175,40 +160,19 @@ export default function CourseDissertationsPage() {
           )}
         </motion.div>
 
-        {/* Course Selector */}
+        {/* Right side actions */}
         <motion.div
           initial={{ x: 16, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className="sm:flex sm:justify-end"
+          className="flex flex-col sm:flex-row gap-3 w-full justify-start md:justify-end items-start sm:items-center"
         >
-          <div className="bg-white border border-zinc-100 shadow-sm p-3 rounded-xl w-full sm:max-w-xs">
-            <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400 mb-2 ml-0.5">
-              Filter by Course
-            </p>
-            {isLoadingCourses ? (
-              <Skeleton className="h-10 w-full rounded-lg" />
-            ) : (
-              <Select value={selectedCourseId} onValueChange={handleCourseChange}>
-                <SelectTrigger className="border border-zinc-100 bg-zinc-50 h-10 focus:ring-1 focus:ring-blue-200 font-semibold text-sm rounded-lg">
-                  <SelectValue placeholder="Select a course..." />
-                </SelectTrigger>
-                <SelectContent className=" max-h-64">
-                  {courses.length === 0 ? (
-                    <SelectItem value="none" disabled>
-                      No courses found
-                    </SelectItem>
-                  ) : (
-                    courses.map((course) => (
-                      <SelectItem key={course.id} value={course.id} className="font-semibold text-xs">
-                        {course.code} — {course.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            )}
-          </div>
+          {/* Staff/Admin Upload Button */}
+          {isStaffOrAdmin && (
+             <div className="mt-3 sm:mt-0 flex shrink-0 self-stretch items-center">
+                 <CreateResourceDialog forcedType="JOURNAL" forcedCategory="JOURNAL" />
+             </div>
+          )}
         </motion.div>
       </div>
 
@@ -219,10 +183,10 @@ export default function CourseDissertationsPage() {
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-50">
           <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
             <BookOpen className="w-4 h-4" />
-            Approved Theses
+            Journals
             {pagination && (
               <span className="text-blue-900 bg-blue-50 px-2 py-0.5 rounded-full ml-1">
-                {pagination.total ?? dissertations.length}
+                {pagination.total ?? journals.length}
               </span>
             )}
           </h3>
@@ -265,10 +229,10 @@ export default function CourseDissertationsPage() {
                 <SkeletonCard key={i} />
               ))}
             </div>
-          ) : dissertations.length > 0 ? (
+          ) : journals.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
-              {dissertations.map((doc, i) => (
-                <DissertationCard key={doc.id} doc={doc} index={i} />
+              {journals.map((doc, i) => (
+                <JournalCard key={doc.id} doc={doc} index={i} />
               ))}
             </div>
           ) : (
@@ -280,9 +244,7 @@ export default function CourseDissertationsPage() {
               <div className="text-center">
                 <h3 className="text-sm font-bold text-zinc-700 mb-1">No Records Found</h3>
                 <p className="text-xs text-zinc-400 max-w-xs">
-                  {selectedCourseId
-                    ? "No dissertations have been published for this course yet."
-                    : "Select a course above to browse dissertations."}
+                  No journals have been published yet.
                 </p>
               </div>
             </div>

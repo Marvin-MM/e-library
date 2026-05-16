@@ -40,6 +40,7 @@ const menuGroups = [
         title: "Resources",
         items: [
             { id: "/course-dissertations", label: "Course Dissertations", icon: HandCoins },
+            { id: "/journals", label: "Journals", icon: BookOpen },
             { id: "/resources", label: "Resources", icon: Library },
             { id: "/catalog", label: "Catalog", icon: BookOpen },
             { id: "/students/favourites", label: "Favourites", icon: Heart },

@@ -27,11 +27,12 @@ import {
     BoxSelect,
     BookOpen,
     Heart,
+    CheckCircle2,
     Trash2,
     X,
 } from "lucide-react";
 import { useRole } from "@/hooks/useAuth";
-import { useDeleteResource } from "@/hooks/useResources";
+import { useDeleteResource, useApproveResource } from "@/hooks/useResources";
 import { DeleteConfirmationDialog } from "@/components/shared/DeleteConfirmationDialog";
 import { resourceTypeOptions, categoryOptions } from "@/schemas/resources";
 import type { ResourceType } from "@/types/api";
@@ -125,7 +126,7 @@ export default function ResourcesPage() {
                             {isLoading ? "—" : (pagination?.total ?? 0).toLocaleString()}
                         </p>
                     </div>
-                    {isStaffOrAdmin && <CreateResourceDialog />}
+                    {isAdmin && <CreateResourceDialog />}
                 </div>
             </motion.div>
 
@@ -357,6 +358,7 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
 }
 
 // ── Resource card ────────────────────────────────────────────────────────────
+
 function ResourceCard({
     resource,
     index,
@@ -368,6 +370,8 @@ function ResourceCard({
     isAdmin: boolean;
     onDelete: () => void;
 }) {
+    const { mutate: approveResource, isPending: isApproving } = useApproveResource();
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -395,9 +399,18 @@ function ResourceCard({
                     {/* Type badge */}
                     <div className="absolute top-2 left-2">
                         <span className="text-[8px] font-black uppercase tracking-widest text-blue-900 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full border border-zinc-100 shadow-sm">
-                            {resource.type ?? "DOC"}
+                            {resource.resourceType?.replace(/_/g, ' ') ?? "DOC"}
                         </span>
                     </div>
+
+                    {/* Pending badge */}
+                    {resource.approvalStatus === 'PENDING' && (
+                        <div className="absolute top-2 right-2">
+                            <span className="text-[8px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 shadow-sm">
+                                Pending
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Body */}
@@ -432,7 +445,23 @@ function ResourceCard({
                         </div>
 
                         {isAdmin ? (
-                            <div className="pointer-events-auto">
+                            <div className="pointer-events-auto flex items-center gap-1">
+                                {resource.approvalStatus === 'PENDING' && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7 text-amber-500 hover:text-emerald-600 hover:bg-emerald-50 transition-colors rounded-md"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            approveResource({ id: resource.id, note: "Approved by admin" });
+                                        }}
+                                        disabled={isApproving}
+                                        title="Approve Resource"
+                                    >
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                    </Button>
+                                )}
                                 <DeleteConfirmationDialog
                                     title="Delete Resource?"
                                     description={`Permanently remove "${resource.title}". This is irreversible.`}

@@ -225,10 +225,12 @@ export class CourseService {
 
     const where: any = {
       courseId,
+      resource: {
+        approvalStatus: 'APPROVED',
+      },
     };
 
-    if (query.search || query.category) {
-      where.resource = {};
+    if (query.search || query.category || (query as any).resourceType) {
       if (query.search) {
         where.resource.OR = [
           { title: { contains: query.search, mode: 'insensitive' } },
@@ -237,6 +239,9 @@ export class CourseService {
       }
       if (query.category) {
         where.resource.category = query.category;
+      }
+      if ((query as any).resourceType) {
+        where.resource.resourceType = (query as any).resourceType;
       }
     }
 
