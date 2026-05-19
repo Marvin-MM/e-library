@@ -20,7 +20,7 @@ const clients = {
   doaj: new DOAJClient(),
   eric: new ERICClient(),
   doab: new DOABClient(),
-  googleScholar: new GoogleScholarClient(), // Requires SERPAPI_KEY
+  googleScholar: new GoogleScholarClient(),
   // oatd: new OATDClient(),
   // agris: new AGRISClient(),
 } as const;

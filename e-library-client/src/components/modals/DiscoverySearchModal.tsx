@@ -78,7 +78,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
   const { data: searchData, isLoading: isSearching, error: searchError } = useDiscoverySearch({
     q: debouncedSearch,
     page,
-    limit: 10,
+    limit: 20,
     source: selectedSources.length > 0 ? selectedSources : undefined,
   });
 
@@ -101,10 +101,12 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
     }
   }, [searchData, setSourceStatus]);
 
-  // Select all sources by default when sources are loaded
+  // Select all sources by default (except Google Scholar) when sources are loaded
   useEffect(() => {
     if (sourcesData?.data && selectedSources.length === 0) {
-      const sourceIds = sourcesData.data.map(s => s.id);
+      const sourceIds = sourcesData.data
+        .map(s => s.id)
+        .filter(id => id !== "googleScholar");
       setSelectedSources(sourceIds);
     }
   }, [sourcesData, selectedSources.length, setSelectedSources]);
@@ -320,9 +322,8 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
     }
 
     return (
-      <ScrollArea className="h-[460px]">
-        <div className="space-y-2">
-          {logs.map((log, index) => (
+      <div className="space-y-2 h-full overflow-y-auto pr-2 pb-4">
+        {logs.map((log, index) => (
             <div
               key={index}
               className={cn(
@@ -363,8 +364,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
               </div>
             </div>
           ))}
-        </div>
-      </ScrollArea>
+      </div>
     );
   };
 
@@ -480,9 +480,9 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
             {/* ============================================================== */}
             {/* RESULTS TAB                                                    */}
             {/* ============================================================== */}
-            <TabsContent value="results" className="flex-1 overflow-hidden flex flex-col mt-0">
+            <TabsContent value="results" className="flex-1 h-full min-h-0 overflow-hidden mt-0 data-[state=active]:flex data-[state=active]:flex-col">
               {isSearching ? (
-                <div className="space-y-3 overflow-y-auto pr-2 pb-4">
+                <div className="space-y-3 overflow-y-auto flex-1 pr-2 pb-4">
                   {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="border-2 border-zinc-100 rounded-lg p-5">
                       <Skeleton className="h-5 w-3/4 mb-3" />
@@ -514,7 +514,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
                 </div>
               ) : searchData?.data && searchData.data.length > 0 ? (
                 <>
-                  <ScrollArea className="flex-1 pr-2 pb-4">
+                  <div className="flex-1 overflow-y-auto pr-2 pb-4">
                     <div className="space-y-3">
                       {searchData.data.map((result, index) => (
                         <div
@@ -630,7 +630,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
                         </div>
                       ))}
                     </div>
-                  </ScrollArea>
+                  </div>
 
                   {/* Pagination — Z footer: info (left) → nav (right) */}
                   {searchData.pagination.totalPages > 1 && (
@@ -728,8 +728,8 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
             {/* ============================================================== */}
             {/* SOURCES TAB                                                    */}
             {/* ============================================================== */}
-            <TabsContent value="sources" className="flex-1 overflow-hidden mt-0">
-              <ScrollArea className="h-full pr-2 pb-4">
+            <TabsContent value="sources" className="flex-1 h-full min-h-0 overflow-hidden mt-0 data-[state=active]:flex data-[state=active]:flex-col">
+              <div className="flex-1 overflow-y-auto pr-2 pb-4">
                 {sourcesLoading ? (
                   <div className="space-y-3">
                     {[1, 2, 3, 4, 5].map((i) => (
@@ -748,14 +748,16 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
                 ) : (
                   renderSourceStatus()
                 )}
-              </ScrollArea>
+              </div>
             </TabsContent>
 
             {/* ============================================================== */}
             {/* STATUS LOGS TAB                                                */}
             {/* ============================================================== */}
-            <TabsContent value="status" className="flex-1 overflow-hidden mt-0">
-              {renderStatusLogs()}
+            <TabsContent value="status" className="flex-1 h-full min-h-0 overflow-hidden mt-0 data-[state=active]:flex data-[state=active]:flex-col">
+              <div className="flex-1 overflow-y-auto pr-2 pb-4">
+                {renderStatusLogs()}
+              </div>
             </TabsContent>
           </Tabs>
         </div>

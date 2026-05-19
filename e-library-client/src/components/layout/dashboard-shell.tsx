@@ -34,10 +34,15 @@ import {
     ChevronDown,
     User as UserIcon,
     ShieldCheck,
+    Database,
+    Globe,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { AdminSidebar } from "./admin-sidebar";
 import Sidebar from "./studsidebar";
+import { DiscoverySearchModal } from "@/components/modals/DiscoverySearchModal";
+import { useDiscoveryStore } from "@/stores/discoveryStore";
+import { useDiscoverySources } from "@/hooks/useDiscovery";
 
 interface DashboardShellProps {
     children: ReactNode;
@@ -55,6 +60,23 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
     const { isLoading: userLoading } = useUser();
     const [mounted, setMounted] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
+    const [searchMode, setSearchMode] = useState<"others" | "scholar">("others");
+    const [discoveryOpen, setDiscoveryOpen] = useState(false);
+    
+    const { setSelectedSources } = useDiscoveryStore();
+    const { data: sourcesData } = useDiscoverySources();
+
+    const handleSearchClick = () => {
+        if (searchMode === "scholar") {
+            setSelectedSources(["googleScholar"]);
+            setDiscoveryOpen(true);
+        } else {
+            if (sourcesData?.data) {
+                setSelectedSources(sourcesData.data.map(s => s.id).filter(id => id !== "googleScholar"));
+            }
+            setSearchOpen(true);
+        }
+    };
 
     useEffect(() => {
         setMounted(true);
@@ -116,16 +138,33 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
 
                         {/* Integrated Search Bar Trigger — students only */}
                         {!isAdmin && (
-                            <div className="relative group max-w-md w-full">
+                            <div className="relative group max-w-md w-full flex items-center">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button className="flex items-center gap-1.5 px-3 h-10 bg-zinc-50 border border-zinc-200 border-r-0 rounded-l text-[10px] font-black uppercase tracking-wider text-zinc-600 hover:bg-zinc-100 hover:text-blue-900 transition-colors">
+                                            {searchMode === "scholar" ? <Globe className="w-3.5 h-3.5"/> : <Database className="w-3.5 h-3.5"/>}
+                                            <span className="hidden sm:inline">{searchMode === "scholar" ? "Scholar" : "Others"}</span>
+                                            <ChevronDown className="w-3 h-3 ml-0.5 opacity-50" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start" className="w-40 rounded-xl border-2 border-zinc-100">
+                                        <DropdownMenuItem onClick={() => setSearchMode("others")} className="text-[10px] font-black uppercase tracking-wider cursor-pointer h-9">
+                                            <Database className="w-3.5 h-3.5 mr-2 text-zinc-400"/> Others
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setSearchMode("scholar")} className="text-[10px] font-black uppercase tracking-wider cursor-pointer h-9">
+                                            <Globe className="w-3.5 h-3.5 mr-2 text-blue-500"/> Google Scholar
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                                 <button
-                                    onClick={() => setSearchOpen(true)}
+                                    onClick={handleSearchClick}
                                     aria-label="Search resources, books, or courses"
-                                    className="w-full flex items-center gap-3 px-4 h-10 bg-white border border-zinc-100 rounded text-zinc-400 hover:border-zinc-200 transition-all text-sm group"
+                                    className="flex-1 flex items-center gap-3 px-4 h-10 bg-white border border-zinc-200 rounded-r text-zinc-400 hover:border-zinc-300 transition-all text-sm group"
                                 >
-                                    <Search className="w-4 h-4 text-zinc-400 group-hover:text-zinc-600" />
-                                    <span className="flex-1 text-left hidden sm:inline">Search resources, books, or courses...</span>
-                                    <span className="flex-1 text-left sm:hidden">Search...</span>
-                                    <div className="hidden md:flex items-center gap-1 px-1.5 py-0.5 rounded border border-zinc-200 bg-white text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">
+                                    <Search className="w-4 h-4 text-zinc-400 group-hover:text-blue-900 transition-colors" />
+                                    <span className="flex-1 text-left hidden sm:inline text-zinc-400 group-hover:text-zinc-600">Search resources, books, or courses...</span>
+                                    <span className="flex-1 text-left sm:hidden text-zinc-400">Search...</span>
+                                    <div className="hidden md:flex items-center gap-1 px-1.5 py-0.5 rounded border border-zinc-200 bg-zinc-50 text-[10px] font-bold text-zinc-400 uppercase tracking-tighter group-hover:border-zinc-300 transition-colors">
                                         <Command className="w-2.5 h-2.5" />
                                         <span>K</span>
                                     </div>
@@ -261,6 +300,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                     </div>
 
                     <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
+                    <DiscoverySearchModal open={discoveryOpen} onOpenChange={setDiscoveryOpen} />
                 </header>
 
 

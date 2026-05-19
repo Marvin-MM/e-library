@@ -13,7 +13,9 @@ export const discoveryApi = {
         q: params.q,
         page: params.page || 1,
         limit: params.limit || 20,
-        ...(params.source && { source: params.source }),
+        ...(params.source && {
+          source: Array.isArray(params.source) ? params.source.join(',') : params.source
+        }),
       },
     });
     return response.data;

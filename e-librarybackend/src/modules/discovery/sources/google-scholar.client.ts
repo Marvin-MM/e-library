@@ -1,118 +1,117 @@
 // src/modules/discovery/sources/google-scholar.client.ts
 /**
  * Google Scholar Client
- * Uses SerpAPI for reliable Google Scholar search results
- * Requires SERPAPI_KEY environment variable
- * 
- * SerpAPI provides structured results from Google Scholar including:
- * - Title, authors, publication info
- * - Citations count
- * - PDF links when available
- * - Full text links
+ * Uses Serper API for reliable Google Scholar search results
+ * Requires SERPER_API_KEY environment variable
  */
 
+import axios from 'axios';
 import type { DiscoverySearchQuery, DiscoveryResult } from '../types.js';
 import { logger } from '../../../shared/utils/logger.js';
 
-interface SerpAPIScholarResult {
+interface SerperScholarResult {
     title: string;
     link: string;
     snippet: string;
-    publication_info?: {
-        authors?: { name: string; link?: string }[];
-        summary?: string;
-    };
-    inline_links?: {
-        serpapi_cite_link?: string;
-        cited_by?: { total: number; link: string };
-        versions?: { total: number; link: string };
-        related_pages_link?: string;
-    };
-    resources?: {
-        title: string;
-        file_format: string;
-        link: string;
-    }[];
+    publicationInfo?: string;
+    year?: number;
+    citedBy?: number;
+    date?: string;
+    attributes?: Record<string, string>;
 }
 
-interface SerpAPIResponse {
-    organic_results?: SerpAPIScholarResult[];
-    search_information?: {
-        total_results?: number;
-        query_displayed?: string;
+interface SerperResponse {
+    organic?: SerperScholarResult[];
+    searchParameters?: {
+        q: string;
     };
-    error?: string;
+    message?: string; // For errors
 }
 
 export class GoogleScholarClient {
     private apiKey: string | undefined;
-    private baseUrl = 'https://serpapi.com/search';
+    private baseUrl = 'https://google.serper.dev/scholar';
 
     constructor() {
-        this.apiKey = process.env.SERPAPI_KEY;
+        this.apiKey = process.env.SERPER_API_KEY;
     }
 
     async search(query: DiscoverySearchQuery): Promise<{ results: DiscoveryResult[]; total: number }> {
         if (!this.apiKey) {
-            logger.warn('SERPAPI_KEY not configured - Google Scholar search disabled');
+            logger.warn('SERPER_API_KEY not configured - Google Scholar search disabled');
             return { results: [], total: 0 };
         }
 
         const { q, page = 1, limit = 20 } = query;
-        const start = (page - 1) * limit;
 
         try {
-            const params = new URLSearchParams({
-                engine: 'google_scholar',
-                q: q,
-                api_key: this.apiKey,
-                start: start.toString(),
-                num: Math.min(limit, 20).toString(), // SerpAPI max is 20
-            });
+            const response = await axios.post<SerperResponse>(
+                this.baseUrl,
+                {
+                    q: q,
+                    page: page,
+                    num: Math.min(limit, 20)
+                },
+                {
+                    headers: {
+                        'X-API-KEY': this.apiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    timeout: 15000,
+                }
+            );
 
-            const response = await fetch(`${this.baseUrl}?${params.toString()}`);
+            const data = response.data;
 
-            if (!response.ok) {
-                throw new Error(`SerpAPI request failed: ${response.status} ${response.statusText}`);
+            if (data.message) {
+                logger.warn('Serper API returned message', { message: data.message });
             }
 
-            const data = await response.json() as SerpAPIResponse;
+            const results: DiscoveryResult[] = (data.organic || []).map((item) => {
+                // Extract year from publication info if year field is missing
+                let publishedDate = item.year?.toString() || item.date;
+                if (!publishedDate && item.publicationInfo) {
+                    const yearMatch = item.publicationInfo.match(/\b(19|20)\d{2}\b/);
+                    if (yearMatch) {
+                        publishedDate = yearMatch[0];
+                    }
+                }
+                if (!publishedDate && item.attributes?.['Date']) {
+                    publishedDate = item.attributes['Date'];
+                }
 
-            if (data.error) {
-                logger.warn('SerpAPI returned error', { error: data.error });
-                return { results: [], total: 0 };
-            }
-
-            const results: DiscoveryResult[] = (data.organic_results || []).map((item) => {
-                // Extract year from publication info if available
-                const yearMatch = item.publication_info?.summary?.match(/\b(19|20)\d{2}\b/);
-                const publishedDate = yearMatch ? yearMatch[0] : undefined;
-
-                // Get PDF/Full text URL if available
-                const pdfResource = item.resources?.find(r =>
-                    r.file_format?.toLowerCase() === 'pdf' ||
-                    r.title?.toLowerCase().includes('pdf')
-                );
+                // Extract authors from publicationInfo (usually everything before the first hyphen)
+                let authors: string[] = [];
+                if (item.publicationInfo) {
+                    const authorPart = item.publicationInfo.split('-')[0];
+                    if (authorPart) {
+                        authors = authorPart.split(',').map(a => a.trim()).filter(Boolean);
+                    }
+                } else if (item.attributes?.['Related People'] || item.attributes?.['Founders']) {
+                    // Fallback for standard search schema
+                    const peopleStr = item.attributes['Related People'] || item.attributes['Founders'] || '';
+                    authors = peopleStr.split(/(?:,|;|\s(?=[A-Z]))/).map(a => a.trim()).filter(Boolean);
+                }
 
                 return {
-                    id: `gs-${Buffer.from(item.link).toString('base64').slice(0, 20)}`,
-                    title: item.title,
-                    authors: item.publication_info?.authors?.map(a => a.name) || [],
+                    id: `gs-${Buffer.from(item.link || '').toString('base64').slice(0, 20)}`,
+                    title: item.title || 'Untitled',
+                    authors,
                     description: item.snippet,
                     source: 'googleScholar' as const,
                     url: item.link,
-                    pdfUrl: pdfResource?.link,
+                    pdfUrl: item.link?.toLowerCase().endsWith('.pdf') ? item.link : undefined,
                     publishedDate,
-                    citedBy: item.inline_links?.cited_by?.total,
+                    citedBy: item.citedBy,
                 };
             });
 
-            // SerpAPI doesn't always return total, estimate from result set
-            const total = data.search_information?.total_results || results.length;
+            // Serper doesn't always provide total results easily for scholar, we estimate from length
+            const total = results.length;
 
             return { results, total };
-        } catch (error) {
-            logger.warn('Google Scholar search failed', { error });
+        } catch (error: any) {
+            logger.warn('Google Scholar search failed', { error: error.message || error });
             return { results: [], total: 0 };
         }
     }
