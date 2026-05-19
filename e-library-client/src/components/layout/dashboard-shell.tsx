@@ -271,7 +271,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                         </Link>
                                     </DropdownMenuItem>
 
-                                    {!isAdmin && (
+                                    {/* {!isAdmin && (
                                         <DropdownMenuItem asChild className="rounded-lg h-11 cursor-pointer focus:bg-emerald-50 focus:text-emerald-700 transition-all">
                                             <Link href="/students/library" className="flex items-center w-full px-2">
                                                 <div className="w-8 h-8 rounded-md bg-zinc-50 flex items-center justify-center mr-3">
@@ -283,7 +283,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                                 </div>
                                             </Link>
                                         </DropdownMenuItem>
-                                    )}
+                                    )} */}
                                 </div>
 
                                 <div className="p-1.5 border-t border-zinc-50 bg-zinc-50/30">

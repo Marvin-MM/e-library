@@ -33,7 +33,7 @@ const menuGroups = [
         title: "Home",
         items: [
             { id: "/dashboard", label: "Discover", icon: Film },
-            { id: "/students/library", label: "My Library", icon: Library },
+            { id: "/students/favourites", label: "My Library", icon: Library },
         ],
     },
     {
@@ -43,7 +43,7 @@ const menuGroups = [
             { id: "/journals", label: "Journals", icon: BookOpen },
             { id: "/resources", label: "Resources", icon: Library },
             { id: "/catalog", label: "Catalog", icon: BookOpen },
-            { id: "/students/favourites", label: "Favourites", icon: Heart },
+            // { id: "/students/favourites", label: "Favourites", icon: Heart },
         ],
     },
 ];

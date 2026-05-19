@@ -13,6 +13,7 @@ import {
     Layers,
     MoveRight,
     Search,
+    ExternalLink,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -50,6 +51,12 @@ const SOURCES = [
     { name: "OpenAlex",       count: "2.3M", accent: "bg-blue-600"   },
     { name: "DOAJ Repository", count: "890K", accent: "bg-emerald-500" },
     { name: "CORE Academic",   count: "1.4M", accent: "bg-violet-500"  },
+];
+
+const EXTERNAL_LINKS = [
+    { name: "Research4Life Portal", url: "https://portal.research4life.org/", accent: "bg-orange-500" },
+    { name: "AGORA Database", url: "https://agora.research4life.org/", accent: "bg-green-500" },
+    { name: "ARDI Database", url: "https://ardi.research4life.org/", accent: "bg-indigo-500" },
 ];
 
 // ── Heatmap config ───────────────────────────────────────────────────────────
@@ -216,50 +223,57 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Global Discovery */}
-                    <div className="bg-white border-2 border-zinc-100 rounded-lg p-5 shadow-sm flex flex-col justify-between gap-5">
-                        <div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="w-7 h-7 rounded-md bg-zinc-50 border-2 border-zinc-100 flex items-center justify-center">
-                                    <Layers className="w-3.5 h-3.5 text-zinc-600" />
-                                </div>
-                                <div>
-                                    <h2 className="text-xs font-black text-zinc-900 tracking-tight">
-                                        Global Discovery
-                                    </h2>
-                                    <p className="text-[9px] uppercase tracking-widest font-bold text-zinc-400">
-                                        Live source index
-                                    </p>
-                                </div>
+                    <div className="bg-white border-2 border-zinc-100 rounded-lg p-5 shadow-sm flex flex-col gap-4 lg:h-[340px] max-h-[400px]">
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                            <div className="w-7 h-7 rounded-md bg-zinc-50 border-2 border-zinc-100 flex items-center justify-center">
+                                <Layers className="w-3.5 h-3.5 text-zinc-600" />
                             </div>
-
-                            <div className="flex flex-col gap-2">
-                                {SOURCES.map((src) => (
-                                    <div
-                                        key={src.name}
-                                        className="flex items-center justify-between p-3 bg-zinc-50 border-2 border-zinc-100 rounded-lg group hover:border-zinc-900 hover:bg-zinc-900 transition-all duration-200 cursor-pointer"
-                                    >
-                                        <div className="flex items-center gap-2.5">
-                                            <span className={`w-1.5 h-6 rounded-full ${src.accent} opacity-80 group-hover:opacity-100`} />
-                                            <span className="text-xs font-bold text-zinc-700 group-hover:text-white transition-colors">
-                                                {src.name}
-                                            </span>
-                                        </div>
-                                        <span className="text-xs font-black text-zinc-400 group-hover:text-zinc-300 tabular-nums transition-colors">
-                                            {src.count}
-                                        </span>
-                                    </div>
-                                ))}
+                            <div>
+                                <h2 className="text-xs font-black text-zinc-900 tracking-tight">
+                                    Global Discovery
+                                </h2>
+                                <p className="text-[9px] uppercase tracking-widest font-bold text-zinc-400">
+                                    External Portals & Live Index
+                                </p>
                             </div>
                         </div>
 
-                        <Button
-                            variant="ghost"
-                            className="w-full justify-between text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 group hover:bg-zinc-50 px-0 h-8 border-t-2 border-zinc-100 rounded-none"
-                            onClick={() => router.push("/students/library")}
-                        >
-                            Explore all libraries
-                            <MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Button>
+                        <div className="flex flex-col gap-2 overflow-y-auto pr-1 flex-1 min-h-0 pb-1">
+                            {EXTERNAL_LINKS.map((link) => (
+                                <a
+                                    key={link.name}
+                                    href={link.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-between p-2 bg-zinc-50 border-2 border-zinc-100 rounded-lg group hover:border-blue-900 hover:bg-blue-900 transition-all duration-200 flex-shrink-0"
+                                >
+                                    <div className="flex items-center gap-2.5">
+                                        <span className={`w-1.5 h-6 rounded-full ${link.accent} opacity-80 group-hover:opacity-100`} />
+                                        <span className="text-xs font-bold text-zinc-700 group-hover:text-white transition-colors">
+                                            {link.name}
+                                        </span>
+                                    </div>
+                                    <ExternalLink className="w-3.5 h-3.5 text-zinc-400 group-hover:text-blue-200 transition-colors" />
+                                </a>
+                            ))}
+
+                            {SOURCES.map((src) => (
+                                <div
+                                    key={src.name}
+                                    className="flex items-center justify-between p-2 bg-zinc-50 border-2 border-zinc-100 rounded-lg group hover:border-zinc-900 hover:bg-zinc-900 transition-all duration-200 cursor-pointer flex-shrink-0"
+                                >
+                                    <div className="flex items-center gap-2.5">
+                                        <span className={`w-1.5 h-6 rounded-full ${src.accent} opacity-80 group-hover:opacity-100`} />
+                                        <span className="text-xs font-bold text-zinc-700 group-hover:text-white transition-colors">
+                                            {src.name}
+                                        </span>
+                                    </div>
+                                    <span className="text-[10px] font-black uppercase text-zinc-400 group-hover:text-zinc-300 tabular-nums transition-colors">
+                                        {src.count}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </motion.div>
 
