@@ -65,7 +65,7 @@ const fadeUp = (delay = 0) => ({
 function MetaRow({ label, value }: { label: string; value: React.ReactNode }) {
     return (
         <div className="flex items-center justify-between gap-4 py-2.5 border-b border-zinc-50 last:border-0">
-            <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 shrink-0">{label}</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 shrink-0">{label}</span>
             <span className="text-xs font-bold text-zinc-900 text-right">{value}</span>
         </div>
     );
@@ -87,7 +87,7 @@ function SideCard({
         <div className="bg-white border-2 border-zinc-100 rounded-lg overflow-hidden">
             <div className={`flex items-center gap-2 px-4 py-3 border-b-2 border-zinc-100 ${accent ? "bg-blue-900" : "bg-zinc-50/70"}`}>
                 <Icon className={`w-3.5 h-3.5 ${accent ? "text-blue-300" : "text-zinc-400"}`} />
-                <h4 className={`text-[9px] font-black uppercase tracking-widest ${accent ? "text-blue-100" : "text-zinc-600"}`}>
+                <h4 className={`text-[9px] font-bold uppercase tracking-widest ${accent ? "text-blue-100" : "text-zinc-600"}`}>
                     {title}
                 </h4>
             </div>
@@ -100,12 +100,12 @@ function SideCard({
 function ApprovalBadge({ status }: { status: string }) {
     const map: Record<string, { icon: React.ElementType; cls: string }> = {
         APPROVED: { icon: CheckCircle2, cls: "bg-emerald-50 text-emerald-700 border-emerald-100" },
-        PENDING:  { icon: Clock,        cls: "bg-amber-50  text-amber-600  border-amber-100"  },
-        REJECTED: { icon: ShieldAlert,  cls: "bg-red-50    text-red-500    border-red-100"    },
+        PENDING: { icon: Clock, cls: "bg-amber-50  text-amber-600  border-amber-100" },
+        REJECTED: { icon: ShieldAlert, cls: "bg-red-50    text-red-500    border-red-100" },
     };
     const { icon: Icon, cls } = map[status] ?? map.PENDING;
     return (
-        <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${cls}`}>
+        <span className={`inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border ${cls}`}>
             <Icon className="w-3 h-3" />
             {status}
         </span>
@@ -125,10 +125,10 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
     const { toggleFavourite } = useResourceStore();
     const { isStaffOrAdmin } = useRole();
 
-    const [isFavorite, setIsFavorite]             = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
     const [isCheckingFavorite, setIsCheckingFavorite] = useState(true);
-    const [previewUrl, setPreviewUrl]             = useState<string | null>(null);
-    const [isPreviewOpen, setIsPreviewOpen]       = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -196,7 +196,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                     <AlertTriangle className="w-7 h-7 text-zinc-300" />
                 </div>
                 <div className="text-center">
-                    <p className="text-sm font-black uppercase tracking-tight text-zinc-400 mb-1">Resource Not Found</p>
+                    <p className="text-sm font-bold uppercase tracking-tight text-zinc-400 mb-1">Resource Not Found</p>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-300 max-w-xs mx-auto">
                         This resource doesn't exist, was removed, or requires specific permissions.
                     </p>
@@ -204,7 +204,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                 <Button
                     asChild
                     variant="outline"
-                    className="h-9 px-5 text-[10px] font-black uppercase tracking-widest border-2 border-zinc-100 hover:border-zinc-300 text-zinc-500 hover:text-zinc-900"
+                    className="h-9 px-5 text-[10px] font-bold uppercase tracking-widest border-2 border-zinc-100 hover:border-zinc-300 text-zinc-500 hover:text-zinc-900"
                 >
                     <Link href="/resources">
                         <ArrowLeft className="w-3.5 h-3.5 mr-2" />
@@ -217,14 +217,14 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
 
     // ── Derived state ────────────────────────────────────────────────────────
     const isDownloadable = resource.accessType === "DOWNLOADABLE";
-    const isCampusOnly   = resource.accessType === "CAMPUS_ONLY";
-    const isViewOnly     = resource.accessType === "VIEW_ONLY";
+    const isCampusOnly = resource.accessType === "CAMPUS_ONLY";
+    const isViewOnly = resource.accessType === "VIEW_ONLY";
     const hasDigitalFile = !!(resource.cloudinaryUrl || resource.s3Key);
-    const fileFormat     = resource.fileType?.includes("pdf")
+    const fileFormat = resource.fileType?.includes("pdf")
         ? "PDF"
         : resource.fileType?.includes("document")
-        ? "DOCX"
-        : "FILE";
+            ? "DOCX"
+            : "FILE";
 
     return (
         <>
@@ -232,7 +232,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
             <Dialog open={isPreviewOpen} onOpenChange={(o) => { setIsPreviewOpen(o); if (!o) setPreviewUrl(null); }}>
                 <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0 overflow-hidden border-0 shadow-2xl">
                     <DialogHeader className="px-5 py-3.5 border-b-2 border-zinc-100 shrink-0 bg-white z-10">
-                        <DialogTitle className="text-sm font-black text-blue-900 flex items-center gap-2 truncate">
+                        <DialogTitle className="text-sm font-bold text-blue-900 flex items-center gap-2 truncate">
                             <Eye className="w-4 h-4 shrink-0" />
                             {resource.title}
                         </DialogTitle>
@@ -247,7 +247,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                         ) : (
                             <div className="flex flex-col items-center justify-center w-full h-full gap-3">
                                 <Loader2 className="w-7 h-7 animate-spin text-blue-900" />
-                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 animate-pulse">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 animate-pulse">
                                     Loading secure viewer…
                                 </p>
                             </div>
@@ -264,7 +264,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                     <Button
                         variant="ghost"
                         asChild
-                        className="p-0 h-auto gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-900 hover:bg-transparent hover:text-zinc-900"
+                        className="p-0 h-auto gap-1.5 text-[10px] font-bold uppercase tracking-widest text-blue-900 hover:bg-transparent hover:text-zinc-900"
                     >
                         <Link href="/resources">
                             <ArrowLeft className="w-3 h-3" />
@@ -274,7 +274,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
 
                     <div className="flex items-center gap-2">
                         {isStaffOrAdmin && (
-                            <Button className="h-8 px-4 rounded-lg bg-zinc-900 hover:bg-blue-900 text-white font-black text-[9px] uppercase tracking-widest transition-colors gap-1.5">
+                            <Button className="h-8 px-4 rounded-lg bg-zinc-900 hover:bg-blue-900 text-white font-bold text-[9px] uppercase tracking-widest transition-colors gap-1.5">
                                 <FileText className="w-3 h-3" />
                                 Edit Metadata
                             </Button>
@@ -283,11 +283,10 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                             variant="outline"
                             onClick={handleToggleFavorite}
                             disabled={isCheckingFavorite}
-                            className={`h-8 px-4 rounded-lg font-black text-[9px] uppercase tracking-widest border-2 transition-all ${
-                                isFavorite
+                            className={`h-8 px-4 rounded-lg font-bold text-[9px] uppercase tracking-widest border-2 transition-all ${isFavorite
                                     ? "border-red-200 text-red-600 bg-red-50 hover:bg-white"
                                     : "border-zinc-100 text-zinc-400 hover:text-red-500 hover:border-red-100"
-                            }`}
+                                }`}
                         >
                             <Heart className={`w-3 h-3 mr-1.5 ${isFavorite ? "fill-red-500" : ""}`} />
                             {isFavorite ? "Saved" : "Save"}
@@ -310,12 +309,12 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                             ) : (
                                 <div className="w-full h-full flex flex-col items-center justify-center text-zinc-200">
                                     <ImageIcon className="w-10 h-10 mb-1.5" />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">No Cover</span>
+                                    <span className="text-[9px] font-bold uppercase tracking-widest">No Cover</span>
                                 </div>
                             )}
                             {/* Access type badge */}
                             <div className="absolute top-2 left-2">
-                                <span className="text-[8px] font-black uppercase tracking-widest text-blue-900 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full border border-zinc-100 shadow-sm">
+                                <span className="text-[8px] font-bold uppercase tracking-widest text-blue-900 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full border border-zinc-100 shadow-sm">
                                     {toLabel(resource.accessType)}
                                 </span>
                             </div>
@@ -325,7 +324,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                     {/* Title block */}
                     <motion.div {...fadeUp(0.06)} className="flex-1 flex flex-col justify-center gap-3 py-1">
                         <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-blue-900 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full">
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-blue-900 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full">
                                 {toLabel(resource.category) || "General"}
                             </span>
                             <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
@@ -336,7 +335,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                             )}
                         </div>
 
-                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-900 tracking-tight leading-tight">
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zinc-900 tracking-tight leading-tight">
                             {resource.title}
                         </h1>
 
@@ -350,14 +349,14 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                         {/* Stats — visible on all screens here, not hidden on mobile */}
                         <div className="flex items-center gap-3 mt-1">
                             <div className="bg-white border-2 border-zinc-100 rounded-lg px-4 py-2.5 text-center">
-                                <p className="text-[9px] uppercase font-black tracking-widest text-zinc-400">Downloads</p>
-                                <p className="text-xl font-black text-blue-900 tabular-nums leading-tight">
+                                <p className="text-[9px] uppercase font-bold tracking-widest text-zinc-400">Downloads</p>
+                                <p className="text-xl font-bold text-blue-900 tabular-nums leading-tight">
                                     {(resource.downloadCount ?? 0).toLocaleString()}
                                 </p>
                             </div>
                             <div className="bg-white border-2 border-zinc-100 rounded-lg px-4 py-2.5 text-center">
-                                <p className="text-[9px] uppercase font-black tracking-widest text-zinc-400">Views</p>
-                                <p className="text-xl font-black text-zinc-900 tabular-nums leading-tight">
+                                <p className="text-[9px] uppercase font-bold tracking-widest text-zinc-400">Views</p>
+                                <p className="text-xl font-bold text-zinc-900 tabular-nums leading-tight">
                                     {(resource.viewCount ?? 0).toLocaleString()}
                                 </p>
                             </div>
@@ -374,7 +373,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                         <Button
                             onClick={handleDownload}
                             disabled={isDownloading}
-                            className="bg-blue-900 hover:bg-zinc-900 text-white h-10 px-6 font-black text-[10px] uppercase tracking-widest rounded-lg transition-colors gap-2"
+                            className="bg-blue-900 hover:bg-zinc-900 text-white h-10 px-6 font-bold text-[10px] uppercase tracking-widest rounded-lg transition-colors gap-2"
                         >
                             {isDownloading
                                 ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -388,7 +387,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                             onClick={handlePreview}
                             disabled={isGettingPreview}
                             variant="outline"
-                            className="border-2 border-zinc-100 h-10 px-6 font-black text-[10px] uppercase tracking-widest rounded-lg text-zinc-600 hover:text-blue-900 hover:border-blue-200 transition-all gap-2"
+                            className="border-2 border-zinc-100 h-10 px-6 font-bold text-[10px] uppercase tracking-widest rounded-lg text-zinc-600 hover:text-blue-900 hover:border-blue-200 transition-all gap-2"
                         >
                             {isGettingPreview
                                 ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -401,7 +400,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                         <div className="flex items-center gap-3 bg-zinc-50 border-2 border-zinc-100 rounded-lg px-4 py-2.5">
                             <Library className="h-4 w-4 text-blue-900 shrink-0" />
                             <div>
-                                <p className="text-[9px] font-black uppercase tracking-widest text-blue-900 leading-none">
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-blue-900 leading-none">
                                     Physical Asset
                                 </p>
                                 <p className="text-xs font-bold text-zinc-700 mt-0.5">
@@ -419,7 +418,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                                 : <User className="w-4 h-4 text-zinc-300" />}
                         </div>
                         <div className="min-w-0">
-                            <p className="text-[9px] font-black uppercase tracking-widest text-blue-900 leading-none mb-0.5">
+                            <p className="text-[9px] font-bold uppercase tracking-widest text-blue-900 leading-none mb-0.5">
                                 Contributor
                             </p>
                             <p className="text-xs font-bold text-zinc-700 truncate max-w-[120px]">
@@ -446,7 +445,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                     <div className="lg:col-span-2 bg-white border-2 border-zinc-100 rounded-lg overflow-hidden">
                         <div className="flex items-center gap-2 px-5 py-3.5 border-b-2 border-zinc-100 bg-zinc-50/50">
                             <Info className="w-3.5 h-3.5 text-zinc-400" />
-                            <h3 className="text-[9px] font-black uppercase tracking-widest text-zinc-600">
+                            <h3 className="text-[9px] font-bold uppercase tracking-widest text-zinc-600">
                                 Summary
                             </h3>
                         </div>
@@ -467,7 +466,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
 
                             {resource.tags?.length > 0 && (
                                 <div className="mt-6 pt-5 border-t-2 border-zinc-50">
-                                    <h4 className="text-[9px] font-black tracking-widest text-blue-900 uppercase mb-3 flex items-center gap-1.5">
+                                    <h4 className="text-[9px] font-bold tracking-widest text-blue-900 uppercase mb-3 flex items-center gap-1.5">
                                         <Tag className="h-3 h-3" />
                                         Tags
                                     </h4>
@@ -497,7 +496,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                                     : <User className="w-5 h-5 text-zinc-300" />}
                             </div>
                             <div className="min-w-0">
-                                <p className="text-[9px] font-black uppercase tracking-widest text-blue-900 leading-none mb-1">
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-blue-900 leading-none mb-1">
                                     Contributed By
                                 </p>
                                 <p className="text-sm font-bold text-zinc-900 truncate">
@@ -513,18 +512,18 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                         {isCampusOnly && (
                             <SideCard title="Location Details" icon={MapPin} accent>
                                 <MetaRow label="Campus Area" value={resource.physicalLocation ?? "N/A"} />
-                                <MetaRow label="Shelf"       value={resource.shelfNumber ?? "N/A"} />
+                                <MetaRow label="Shelf" value={resource.shelfNumber ?? "N/A"} />
                                 <MetaRow
                                     label="Copies"
                                     value={
-                                        <span className="text-[9px] font-black text-blue-900 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                                        <span className="text-[9px] font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
                                             {resource.copies ?? 1}
                                         </span>
                                     }
                                 />
                                 {resource.availabilityNotes && (
                                     <div className="py-2.5 border-t border-zinc-50 mt-1">
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 block mb-1">
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 block mb-1">
                                             Librarian Notes
                                         </span>
                                         <p className="text-[11px] font-bold text-zinc-600 leading-snug">
@@ -541,14 +540,14 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                                 <MetaRow
                                     label="Format"
                                     value={
-                                        <span className="text-[9px] font-black text-blue-900 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                                        <span className="text-[9px] font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
                                             {fileFormat}
                                         </span>
                                     }
                                 />
-                                <MetaRow label="Size"    value={formatFileSize(resource.fileSize)} />
+                                <MetaRow label="Size" value={formatFileSize(resource.fileSize)} />
                                 <MetaRow label="Storage" value={
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500">
+                                    <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">
                                         {resource.storageType ?? "Secure"}
                                     </span>
                                 } />
@@ -590,7 +589,7 @@ export default function ResourceDetailPage({ params }: ResourceDetailPageProps) 
                                                 <BookOpen className="w-3.5 h-3.5 text-zinc-300 group-hover:text-blue-600 transition-colors" />
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="text-[9px] font-black tracking-widest uppercase text-blue-900 leading-none mb-0.5">
+                                                <p className="text-[9px] font-bold tracking-widest uppercase text-blue-900 leading-none mb-0.5">
                                                     {cr.course.code}
                                                 </p>
                                                 <p className="text-xs font-bold text-zinc-700 truncate group-hover:text-blue-900 transition-colors">

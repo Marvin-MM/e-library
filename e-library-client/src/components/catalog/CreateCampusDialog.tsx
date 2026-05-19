@@ -81,7 +81,7 @@ export function CreateCampusDialog() {
 
             <DialogContent className="max-w-md" aria-describedby="campus-dialog-description">
                 <DialogHeader>
-                    <DialogTitle className="text-lg font-black text-blue-900 uppercase tracking-tight">
+                    <DialogTitle className="text-lg font-bold text-blue-900 uppercase tracking-tight">
                         Register Campus
                     </DialogTitle>
                     <DialogDescription id="campus-dialog-description" className="sr-only">

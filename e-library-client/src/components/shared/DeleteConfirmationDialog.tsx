@@ -58,8 +58,8 @@ export function DeleteConfirmationDialog({
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent 
-                className="max-w-md border-2 border-zinc-100" 
+            <DialogContent
+                className="max-w-md border-2 border-zinc-100"
                 onClick={(e) => e.stopPropagation()}
             >
                 <DialogHeader className="space-y-3">
@@ -67,7 +67,7 @@ export function DeleteConfirmationDialog({
                         <AlertTriangle className="w-6 h-6 text-red-600" />
                     </div> */}
                     <div className="space-y-1">
-                        <DialogTitle className="text-lg font-black text-zinc-900 uppercase tracking-tight">
+                        <DialogTitle className="text-lg font-bold text-zinc-900 uppercase tracking-tight">
                             {title}
                         </DialogTitle>
                         <DialogDescription className="text-xs font-bold text-zinc-500 uppercase tracking-widest leading-relaxed">
@@ -92,7 +92,7 @@ export function DeleteConfirmationDialog({
                     <Button
                         onClick={handleConfirm}
                         disabled={isDeleting}
-                        className="bg-red-600 hover:bg-zinc-900 text-white font-black uppercase tracking-widest text-xs h-11 px-4 shadow-lg shadow-red-200"
+                        className="bg-red-600 hover:bg-zinc-900 text-white font-bold uppercase tracking-widest text-xs h-11 px-4 shadow-lg shadow-red-200"
                     >
                         {isDeleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                         {confirmText}

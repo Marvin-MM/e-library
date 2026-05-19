@@ -246,7 +246,7 @@ export default function DissertationDetailPage({ params }: DissertationDetailPag
                     className="flex flex-col justify-center gap-3"
                 >
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] font-black uppercase text-blue-900 bg-blue-50 px-2 py-1 rounded">
+                        <span className="text-[10px] font-bold uppercase text-blue-900 bg-blue-50 px-2 py-1 rounded">
                             Thesis
                         </span>
                         <span className="text-[10px] font-bold uppercase text-zinc-400">
@@ -254,7 +254,7 @@ export default function DissertationDetailPage({ params }: DissertationDetailPag
                         </span>
                     </div>
 
-                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-900 leading-tight">
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zinc-900 leading-tight">
                         {resource.title}
                     </h1>
 
@@ -300,7 +300,7 @@ export default function DissertationDetailPage({ params }: DissertationDetailPag
                     <div className="flex items-center gap-3 bg-zinc-50 border-2 border-zinc-100 px-5 py-3 rounded">
                         <MapPin className="h-4 w-4 text-blue-900 shrink-0" />
                         <div>
-                            <p className="text-[10px] font-black uppercase text-blue-900">Physical Archive</p>
+                            <p className="text-[10px] font-bold uppercase text-blue-900">Physical Archive</p>
                             <p className="text-sm font-bold text-zinc-900">{resource.physicalLocation}</p>
                         </div>
                     </div>
@@ -332,7 +332,7 @@ export default function DissertationDetailPage({ params }: DissertationDetailPag
 
                         {resource.tags && resource.tags.length > 0 && (
                             <div className="pt-6 border-t-2 border-zinc-50">
-                                <h4 className="text-[10px] font-black text-blue-900 uppercase mb-3 flex items-center gap-2">
+                                <h4 className="text-[10px] font-bold text-blue-900 uppercase mb-3 flex items-center gap-2">
                                     <Tag className="h-3 h-3" /> Keywords
                                 </h4>
                                 <div className="flex gap-2 flex-wrap">
@@ -355,7 +355,7 @@ export default function DissertationDetailPage({ params }: DissertationDetailPag
                 <div className="space-y-4">
                     <div className="bg-white border-2 border-zinc-100 rounded overflow-hidden">
                         <div className="px-5 py-4 border-b-2 border-zinc-50">
-                            <h4 className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">
+                            <h4 className="text-[10px] font-bold uppercase text-zinc-400 tracking-widest">
                                 Academic Details
                             </h4>
                         </div>

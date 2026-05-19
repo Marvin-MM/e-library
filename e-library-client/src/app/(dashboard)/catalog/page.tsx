@@ -93,12 +93,12 @@ function BookDetailDialog({
                   <div className="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center">
                     <BookMarked className="w-3.5 h-3.5 text-blue-300" />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-300">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-blue-300">
                     Library Catalog
                   </span>
                 </div>
 
-                <DialogTitle className="text-xl font-black text-white leading-tight tracking-tight mb-1">
+                <DialogTitle className="text-xl font-bold text-white leading-tight tracking-tight mb-1">
                   {isLoading ? (
                     <Skeleton className="h-7 w-3/4 bg-white/10" />
                   ) : (
@@ -116,7 +116,7 @@ function BookDetailDialog({
               {/* Availability summary pill */}
               {!isLoading && book && totalCopies > 0 && (
                 <div className="shrink-0 text-center bg-white/10 border border-white/10 rounded-xl px-4 py-3 backdrop-blur-sm">
-                  <p className="text-2xl font-black text-white leading-none">{totalAvailable}</p>
+                  <p className="text-2xl font-bold text-white leading-none">{totalAvailable}</p>
                   <p className="text-[10px] font-bold text-blue-200/70 uppercase tracking-wider mt-0.5">of {totalCopies}</p>
                   <p className="text-[10px] font-bold text-blue-200/70 uppercase tracking-wider">available</p>
                 </div>
@@ -157,7 +157,7 @@ function BookDetailDialog({
               <div id="book-detail-description">
                 {book.description && (
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2">About this book</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">About this book</p>
                     <p className="text-sm text-zinc-600 leading-relaxed">
                       {book.description}
                     </p>
@@ -167,7 +167,7 @@ function BookDetailDialog({
 
               {/* Campus Locations */}
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-3 flex items-center gap-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-3 flex items-center gap-1.5">
                   <MapPin className="w-3 h-3" /> Campus Availability
                 </p>
 
@@ -200,7 +200,7 @@ function BookDetailDialog({
 
                         <div className="flex items-center gap-3 shrink-0">
                           <div className="text-right hidden sm:block">
-                            <p className="text-xs font-black text-zinc-900">
+                            <p className="text-xs font-bold text-zinc-900">
                               {loc.availableCopies}
                               <span className="text-zinc-300 font-bold">/{loc.totalCopies}</span>
                             </p>
@@ -372,7 +372,7 @@ export default function CatalogPage() {
             <BookMarked className="w-3 h-3" />
             Library System
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight leading-tight">
             Book Catalog
           </h1>
           <p className="text-zinc-400 text-sm">

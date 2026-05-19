@@ -241,7 +241,7 @@ export default function CourseDissertationDetail({ params }: CourseDissertationD
           className="flex-1 flex flex-col justify-center gap-3 min-w-0"
         >
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-wider text-blue-900 bg-blue-50 px-3 py-1 rounded-full">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-900 bg-blue-50 px-3 py-1 rounded-full">
               {resource.category}
             </span>
             <span className="text-[10px] font-bold text-zinc-400">
@@ -249,7 +249,7 @@ export default function CourseDissertationDetail({ params }: CourseDissertationD
             </span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-900 leading-tight tracking-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zinc-900 leading-tight tracking-tight">
             {resource.title}
           </h1>
 
@@ -305,7 +305,7 @@ export default function CourseDissertationDetail({ params }: CourseDissertationD
             <div className="flex items-center gap-3 bg-zinc-50 border border-zinc-100 px-5 py-3 rounded-lg ml-auto">
               <MapPin className="h-4 w-4 text-blue-900 shrink-0" />
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-blue-900 leading-none mb-0.5">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-blue-900 leading-none mb-0.5">
                   Physical Hardcopy
                 </p>
                 <p className="text-sm font-bold text-zinc-900 leading-tight">{resource.physicalLocation}</p>
@@ -344,7 +344,7 @@ export default function CourseDissertationDetail({ params }: CourseDissertationD
 
             {resource.tags && resource.tags.length > 0 && (
               <div className="mt-8 pt-6 border-t border-zinc-50">
-                <h4 className="text-[10px] font-black tracking-widest text-blue-900 uppercase mb-3 flex items-center gap-2">
+                <h4 className="text-[10px] font-bold tracking-widest text-blue-900 uppercase mb-3 flex items-center gap-2">
                   <Tag className="h-3 w-3" /> Core Competencies
                 </h4>
                 <div className="flex gap-2 flex-wrap">
@@ -367,7 +367,7 @@ export default function CourseDissertationDetail({ params }: CourseDissertationD
         <div className="flex flex-col gap-5">
           {/* Metadata */}
           <div className="bg-white border border-zinc-100 rounded-xl shadow-sm p-5">
-            <h4 className="text-[10px] font-black tracking-widest uppercase text-zinc-500 mb-3 pb-2 border-b border-zinc-50">
+            <h4 className="text-[10px] font-bold tracking-widest uppercase text-zinc-500 mb-3 pb-2 border-b border-zinc-50">
               Defense Metadata
             </h4>
             <MetaRow icon={Calendar} label="Year" value={resource.publicationYear} />
@@ -378,7 +378,7 @@ export default function CourseDissertationDetail({ params }: CourseDissertationD
           {resource.courses && resource.courses.length > 0 && (
             <div className="bg-white border border-zinc-100 rounded-xl shadow-sm overflow-hidden">
               <div className="px-5 py-4 border-b border-zinc-50">
-                <h4 className="text-[10px] font-black tracking-widest uppercase text-zinc-500">
+                <h4 className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">
                   Academic Context
                 </h4>
               </div>
@@ -390,7 +390,7 @@ export default function CourseDissertationDetail({ params }: CourseDissertationD
                         <BookOpen className="w-4 h-4 text-zinc-300 group-hover:text-blue-700 transition-colors" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[10px] font-black tracking-widest uppercase text-blue-900 leading-none mb-0.5">
+                        <p className="text-[10px] font-bold tracking-widest uppercase text-blue-900 leading-none mb-0.5">
                           {cr.course.code}
                         </p>
                         <p className="text-xs font-bold text-zinc-800 truncate group-hover:text-blue-900 transition-colors">

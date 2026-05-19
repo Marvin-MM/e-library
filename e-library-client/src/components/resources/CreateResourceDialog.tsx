@@ -38,9 +38,9 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 // ── Constants ────────────────────────────────────────────────────────────────
-const CATEGORIES       = ["BOOK", "JOURNAL", "PAPER", "MAGAZINE", "OTHER"] as const;
-const RESOURCE_TYPES   = ["BOOK", "JOURNAL", "MAGAZINE", "MODULE_NOTES", "PAST_PAPER", "LECTURE_SLIDE", "LAB_MANUAL", "ASSIGNMENT", "OTHER"] as const;
-const ACCESS_TYPES     = ["VIEW_ONLY", "DOWNLOADABLE", "CAMPUS_ONLY"] as const;
+const CATEGORIES = ["BOOK", "JOURNAL", "PAPER", "MAGAZINE", "OTHER"] as const;
+const RESOURCE_TYPES = ["BOOK", "JOURNAL", "MAGAZINE", "MODULE_NOTES", "PAST_PAPER", "LECTURE_SLIDE", "LAB_MANUAL", "ASSIGNMENT", "OTHER"] as const;
+const ACCESS_TYPES = ["VIEW_ONLY", "DOWNLOADABLE", "CAMPUS_ONLY"] as const;
 const CAMPUS_LOCATIONS = ["MAIN_CAMPUS", "MARKET_PLAZA", "ONLINE"] as const;
 
 /** Converts SNAKE_CASE enum values to "Snake Case" labels */
@@ -49,19 +49,19 @@ const toLabel = (s: string) =>
 
 // ── Default form values ──────────────────────────────────────────────────────
 const DEFAULT_VALUES = {
-    title:           "",
-    authors:         "",
-    description:     "",
-    category:        "BOOK",
-    resourceType:    "BOOK",
-    department:      "",
-    courseId:        "",          // empty string = no course linked
+    title: "",
+    authors: "",
+    description: "",
+    category: "BOOK",
+    resourceType: "BOOK",
+    department: "",
+    courseId: "",          // empty string = no course linked
     publicationYear: new Date().getFullYear().toString(),
-    accessType:      "DOWNLOADABLE",
-    campusLocation:  "ONLINE",
+    accessType: "DOWNLOADABLE",
+    campusLocation: "ONLINE",
     physicalLocation: "",
-    shelfNumber:     "",
-    copies:          "1",
+    shelfNumber: "",
+    copies: "1",
 } as const;
 
 // ── File drop zone ────────────────────────────────────────────────────────────
@@ -87,7 +87,7 @@ function DropZone({ id, label, accept, acceptLabel, file, icon: Icon, onFileChan
 
     return (
         <div className="space-y-1.5">
-            <Label htmlFor={id} className="text-xs font-black uppercase tracking-widest text-zinc-600">
+            <Label htmlFor={id} className="text-xs font-bold uppercase tracking-widest text-zinc-600">
                 {label}
             </Label>
             <label
@@ -100,8 +100,8 @@ function DropZone({ id, label, accept, acceptLabel, file, icon: Icon, onFileChan
                     dragging
                         ? "border-blue-400 bg-blue-50"
                         : file
-                        ? "border-emerald-200 bg-emerald-50/50"
-                        : "border-zinc-200 bg-zinc-50 hover:border-zinc-300 hover:bg-zinc-100/50"
+                            ? "border-emerald-200 bg-emerald-50/50"
+                            : "border-zinc-200 bg-zinc-50 hover:border-zinc-300 hover:bg-zinc-100/50"
                 )}
             >
                 {file ? (
@@ -116,7 +116,7 @@ function DropZone({ id, label, accept, acceptLabel, file, icon: Icon, onFileChan
                         <button
                             type="button"
                             onClick={(e) => { e.preventDefault(); onFileChange(null); }}
-                            className="text-[9px] font-black uppercase tracking-widest text-red-400 hover:text-red-600 flex items-center gap-1"
+                            className="text-[9px] font-bold uppercase tracking-widest text-red-400 hover:text-red-600 flex items-center gap-1"
                         >
                             <X className="w-3 h-3" /> Remove
                         </button>
@@ -150,7 +150,7 @@ function DropZone({ id, label, accept, acceptLabel, file, icon: Icon, onFileChan
 function SectionHeading({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex items-center gap-3 border-t-2 border-zinc-100 pt-5 mt-1">
-            <span className="text-[10px] font-black uppercase tracking-widest text-blue-900">{children}</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-blue-900">{children}</span>
             <div className="flex-1 h-px bg-blue-50" />
         </div>
     );
@@ -164,8 +164,8 @@ interface CreateResourceDialogProps {
 }
 
 export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResourceDialogProps = {}) {
-    const [open, setOpen]           = useState(false);
-    const [file, setFile]           = useState<File | null>(null);
+    const [open, setOpen] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
     const [coverImage, setCoverImage] = useState<File | null>(null);
 
     const { mutate: createResource, isPending: isCreating } = useCreateResource();
@@ -179,8 +179,8 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
         },
     });
 
-    const accessType        = watch("accessType");
-    const isCampusOnly      = (accessType as string) === "CAMPUS_ONLY";
+    const accessType = watch("accessType");
+    const isCampusOnly = (accessType as string) === "CAMPUS_ONLY";
     const selectedDepartment = watch("department");
 
     const { data: coursesData, isLoading: isCoursesLoading } = useCourses(
@@ -235,7 +235,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
-                <Button className="h-10 px-5 rounded-lg bg-blue-900 hover:bg-zinc-900 text-white font-black text-[10px] uppercase tracking-widest transition-colors gap-2">
+                <Button className="h-10 px-5 rounded-lg bg-blue-900 hover:bg-zinc-900 text-white font-bold text-[10px] uppercase tracking-widest transition-colors gap-2">
                     <CloudUpload className="w-4 h-4" />
                     Upload New
                 </Button>
@@ -246,7 +246,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                 <DialogHeader className="px-6 pt-6 pb-4 border-b-2 border-zinc-100 sticky top-0 bg-white z-10">
                     <div className="flex items-start justify-between">
                         <div>
-                            <DialogTitle className="text-xl font-black text-blue-900 tracking-tight">
+                            <DialogTitle className="text-xl font-bold text-blue-900 tracking-tight">
                                 Add New Resource
                             </DialogTitle>
                             <DialogDescription className="text-xs font-bold text-zinc-400 mt-0.5 max-w-sm">
@@ -261,7 +261,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                     {/* ── Core info ── */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5 sm:col-span-2">
-                            <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">
+                            <Label className="text-xs font-bold uppercase tracking-widest text-zinc-600">
                                 Title <span className="text-red-400">*</span>
                             </Label>
                             <Input
@@ -272,7 +272,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                         </div>
 
                         <div className="space-y-1.5 sm:col-span-2">
-                            <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">
+                            <Label className="text-xs font-bold uppercase tracking-widest text-zinc-600">
                                 Authors <span className="text-red-400">*</span>
                                 <span className="text-[9px] font-bold text-zinc-400 normal-case tracking-normal ml-2">comma-separated</span>
                             </Label>
@@ -285,7 +285,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
 
                         {/* Department */}
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-black uppercase tracking-widest text-zinc-600 flex items-center gap-1.5">
+                            <Label className="text-xs font-bold uppercase tracking-widest text-zinc-600 flex items-center gap-1.5">
                                 <Building2 className="w-3 h-3 text-zinc-400" /> Department
                             </Label>
                             <Select
@@ -306,7 +306,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
 
                         {/* Course — cascades from department */}
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-black uppercase tracking-widest text-zinc-600 flex items-center gap-1.5">
+                            <Label className="text-xs font-bold uppercase tracking-widest text-zinc-600 flex items-center gap-1.5">
                                 <BookOpen className="w-3 h-3 text-zinc-400" /> Course
                                 <span className="text-[9px] font-bold text-zinc-400 normal-case tracking-normal">optional</span>
                             </Label>
@@ -322,7 +322,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                                     <SelectItem value="none" className="text-xs font-bold text-zinc-400">No course linked</SelectItem>
                                     {courses.map((course) => (
                                         <SelectItem key={course.id} value={course.id} className="text-xs font-bold">
-                                            <span className="font-black text-blue-900 mr-2">{course.code}</span>
+                                            <span className="font-bold text-blue-900 mr-2">{course.code}</span>
                                             {course.name}
                                         </SelectItem>
                                     ))}
@@ -333,7 +333,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                         {/* Category */}
                         {!forcedCategory && (
                             <div className="space-y-1.5">
-                                <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Category</Label>
+                                <Label className="text-xs font-bold uppercase tracking-widest text-zinc-600">Category</Label>
                                 <Select onValueChange={(v) => setValue("category", v as any)} defaultValue="BOOK">
                                     <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                         <SelectValue />
@@ -350,7 +350,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                         {/* Resource type */}
                         {!forcedType && (
                             <div className="space-y-1.5">
-                                <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Resource Type</Label>
+                                <Label className="text-xs font-bold uppercase tracking-widest text-zinc-600">Resource Type</Label>
                                 <Select onValueChange={(v) => setValue("resourceType", v as any)} defaultValue="BOOK">
                                     <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                         <SelectValue />
@@ -366,7 +366,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
 
                         {/* Publication year */}
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Publication Year</Label>
+                            <Label className="text-xs font-bold uppercase tracking-widest text-zinc-600">Publication Year</Label>
                             <Input
                                 type="number"
                                 {...register("publicationYear")}
@@ -379,7 +379,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
 
                     {/* Description */}
                     <div className="space-y-1.5">
-                        <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Description</Label>
+                        <Label className="text-xs font-bold uppercase tracking-widest text-zinc-600">Description</Label>
                         <Textarea
                             {...register("description")}
                             placeholder="Brief overview of the resource…"
@@ -392,7 +392,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Access Type</Label>
+                            <Label className="text-xs font-bold uppercase tracking-widest text-zinc-600">Access Type</Label>
                             <Select onValueChange={(v) => setValue("accessType", v as any)} defaultValue="DOWNLOADABLE">
                                 <SelectTrigger className="bg-zinc-50 border-2 border-zinc-100 focus:ring-0 focus:border-blue-300 h-11">
                                     <SelectValue />
@@ -406,7 +406,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                         </div>
 
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-black uppercase tracking-widest text-zinc-600">Campus Location</Label>
+                            <Label className="text-xs font-bold uppercase tracking-widest text-zinc-600">Campus Location</Label>
                             <Select
                                 onValueChange={(v) => setValue("campusLocation", v as any)}
                                 defaultValue="ONLINE"
@@ -431,7 +431,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                     {isCampusOnly && (
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-blue-50/40 border-2 border-blue-100 rounded-lg p-4">
                             <div className="space-y-1.5 sm:col-span-2">
-                                <Label className="text-xs font-black uppercase tracking-widest text-blue-800">
+                                <Label className="text-xs font-bold uppercase tracking-widest text-blue-800">
                                     Physical Location <span className="text-red-400">*</span>
                                 </Label>
                                 <Input
@@ -441,7 +441,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <Label className="text-xs font-black uppercase tracking-widest text-blue-800">Shelf No.</Label>
+                                <Label className="text-xs font-bold uppercase tracking-widest text-blue-800">Shelf No.</Label>
                                 <Input
                                     {...register("shelfNumber")}
                                     placeholder="CS-402"
@@ -449,7 +449,7 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <Label className="text-xs font-black uppercase tracking-widest text-blue-800">Copies Available</Label>
+                                <Label className="text-xs font-bold uppercase tracking-widest text-blue-800">Copies Available</Label>
                                 <Input
                                     type="number"
                                     {...register("copies")}
@@ -490,14 +490,14 @@ export function CreateResourceDialog({ forcedType, forcedCategory }: CreateResou
                             type="button"
                             variant="ghost"
                             onClick={() => handleOpenChange(false)}
-                            className="font-black text-[10px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 border-2 border-zinc-100 hover:border-zinc-200 h-10 px-5"
+                            className="font-bold text-[10px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 border-2 border-zinc-100 hover:border-zinc-200 h-10 px-5"
                         >
                             Cancel
                         </Button>
                         <Button
                             type="submit"
                             disabled={isCreating}
-                            className="bg-blue-900 text-white hover:bg-zinc-900 font-black text-[10px] uppercase tracking-widest h-10 px-8 transition-colors"
+                            className="bg-blue-900 text-white hover:bg-zinc-900 font-bold text-[10px] uppercase tracking-widest h-10 px-8 transition-colors"
                         >
                             {isCreating ? (
                                 <>

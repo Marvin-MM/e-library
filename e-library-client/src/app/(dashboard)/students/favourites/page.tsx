@@ -149,7 +149,7 @@ export default function FavouritesPage() {
                                                             </div>
                                                         )}
                                                         <div className="absolute top-2 right-2">
-                                                            <span className="text-[8px] font-black uppercase text-red-600 bg-white/90 backdrop-blur px-2 py-0.5 rounded border border-zinc-100 shadow-sm">
+                                                            <span className="text-[8px] font-bold uppercase text-red-600 bg-white/90 backdrop-blur px-2 py-0.5 rounded border border-zinc-100 shadow-sm">
                                                                 {resource.type || 'DOC'}
                                                             </span>
                                                         </div>
@@ -183,7 +183,7 @@ export default function FavouritesPage() {
                                                     </div>
                                                     <div className="flex items-center gap-1.5 text-zinc-300 group-hover:text-red-600 transition-colors">
                                                         <Download className="w-3 h-3" />
-                                                        <span className="text-[10px] font-black">{resource.downloadCount}</span>
+                                                        <span className="text-[10px] font-bold">{resource.downloadCount}</span>
                                                     </div>
                                                 </div>
                                             </div>

@@ -141,17 +141,17 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                             <div className="relative group max-w-md w-full flex items-center">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <button className="flex items-center gap-1.5 px-3 h-10 bg-zinc-50 border border-zinc-200 border-r-0 rounded-l text-[10px] font-black uppercase tracking-wider text-zinc-600 hover:bg-zinc-100 hover:text-blue-900 transition-colors">
+                                        <button className="flex items-center gap-1.5 px-3 h-10 bg-zinc-50 border border-zinc-200 border-r-0 rounded-l text-[10px] font-bold uppercase tracking-wider text-zinc-600 hover:bg-zinc-100 hover:text-blue-900 transition-colors">
                                             {searchMode === "scholar" ? <Globe className="w-3.5 h-3.5"/> : <Database className="w-3.5 h-3.5"/>}
                                             <span className="hidden sm:inline">{searchMode === "scholar" ? "Scholar" : "Others"}</span>
                                             <ChevronDown className="w-3 h-3 ml-0.5 opacity-50" />
                                         </button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="start" className="w-40 rounded-xl border-2 border-zinc-100">
-                                        <DropdownMenuItem onClick={() => setSearchMode("others")} className="text-[10px] font-black uppercase tracking-wider cursor-pointer h-9">
+                                        <DropdownMenuItem onClick={() => setSearchMode("others")} className="text-[10px] font-bold uppercase tracking-wider cursor-pointer h-9">
                                             <Database className="w-3.5 h-3.5 mr-2 text-zinc-400"/> Others
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setSearchMode("scholar")} className="text-[10px] font-black uppercase tracking-wider cursor-pointer h-9">
+                                        <DropdownMenuItem onClick={() => setSearchMode("scholar")} className="text-[10px] font-bold uppercase tracking-wider cursor-pointer h-9">
                                             <Globe className="w-3.5 h-3.5 mr-2 text-blue-500"/> Google Scholar
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -159,7 +159,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                 <button
                                     onClick={handleSearchClick}
                                     aria-label="Search resources, books, or courses"
-                                    className="flex-1 flex items-center gap-3 px-4 h-10 bg-white border border-zinc-200 rounded-r text-zinc-400 hover:border-zinc-300 transition-all text-sm group"
+                                    className="flex-1 flex items-center gap-3 px-4 h-10 bg-white border border-zinc-200 rounded-r text-zinc-400 hover:border-zinc-300 transition-all text-xs group"
                                 >
                                     <Search className="w-4 h-4 text-zinc-400 group-hover:text-blue-900 transition-colors" />
                                     <span className="flex-1 text-left hidden sm:inline text-zinc-400 group-hover:text-zinc-600">Search resources, books, or courses...</span>
@@ -234,18 +234,18 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                     <div className="flex items-center gap-4 relative z-10">
                                         <Avatar className="h-12 w-12 border-2 border-white shadow-md">
                                             <AvatarImage src={user.avatar} />
-                                            <AvatarFallback className="bg-zinc-100 text-zinc-900 font-black uppercase text-sm">
+                                            <AvatarFallback className="bg-zinc-100 text-zinc-900 font-bold uppercase text-sm">
                                                 {getInitials(`${user.name}`)}
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col min-w-0">
-                                            <p className="text-sm font-black text-zinc-900 truncate tracking-tight">{user.name}</p>
+                                            <p className="text-sm font-bold text-zinc-900 truncate tracking-tight">{user.name}</p>
                                             <p className="text-[11px] font-medium text-zinc-400 truncate">{user.email}</p>
                                             
                                             <div className="mt-2.5 flex">
                                                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-zinc-100 rounded-full shadow-sm">
                                                     <ShieldCheck className="w-3 h-3 text-blue-600" />
-                                                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">
+                                                    <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-600">
                                                         {user.role} Account
                                                     </span>
                                                 </div>
@@ -255,7 +255,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                 </div>
 
                                 <div className="p-1.5">
-                                    <DropdownMenuLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                    <DropdownMenuLabel className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
                                         Manage Account
                                     </DropdownMenuLabel>
                                     
@@ -289,7 +289,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                 <div className="p-1.5 border-t border-zinc-50 bg-zinc-50/30">
                                     <DropdownMenuItem
                                         onClick={() => logout()}
-                                        className="rounded-lg h-11 cursor-pointer text-rose-600 focus:text-rose-700 focus:bg-rose-50 font-black transition-all px-4"
+                                        className="rounded-lg h-11 cursor-pointer text-rose-600 focus:text-rose-700 focus:bg-rose-50 font-bold transition-all px-4"
                                     >
                                         <LogOut className="mr-3 h-4 w-4" />
                                         <span className="uppercase tracking-widest text-[11px]">Sign Out</span>

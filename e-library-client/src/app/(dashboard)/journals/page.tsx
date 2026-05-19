@@ -66,7 +66,7 @@ function JournalCard({ doc, index }: { doc: any; index: number }) {
 
         {/* Type badge */}
         <div className="absolute top-2 left-2 z-20">
-          <span className="text-[8px] font-black uppercase tracking-widest text-blue-900 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full border border-zinc-100 shadow-sm">
+          <span className="text-[8px] font-bold uppercase tracking-widest text-blue-900 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full border border-zinc-100 shadow-sm">
             {doc.resourceType?.replace(/_/g, ' ') ?? "DOC"}
           </span>
         </div>
@@ -169,9 +169,9 @@ export default function JournalsPage() {
         >
           {/* Staff/Admin Upload Button */}
           {isStaffOrAdmin && (
-             <div className="mt-3 sm:mt-0 flex shrink-0 self-stretch items-center">
-                 <CreateResourceDialog forcedType="JOURNAL" forcedCategory="JOURNAL" />
-             </div>
+            <div className="mt-3 sm:mt-0 flex shrink-0 self-stretch items-center">
+              <CreateResourceDialog forcedType="JOURNAL" forcedCategory="JOURNAL" />
+            </div>
           )}
         </motion.div>
       </div>

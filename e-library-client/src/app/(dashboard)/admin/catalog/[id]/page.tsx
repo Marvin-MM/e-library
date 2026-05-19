@@ -116,15 +116,14 @@ export default function BookDetailPage({ params }: CatalogDetailProps) {
                     className="flex-1 flex flex-col justify-center gap-3"
                 >
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-blue-900 bg-blue-50 px-2 py-1 rounded">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-900 bg-blue-50 px-2 py-1 rounded">
                             Physical Book
                         </span>
                         <span
-                            className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded ${
-                                totalAvailable > 0
+                            className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded ${totalAvailable > 0
                                     ? "bg-emerald-50 text-emerald-700"
                                     : "bg-red-50 text-red-600"
-                            }`}
+                                }`}
                         >
                             {totalAvailable > 0
                                 ? `${totalAvailable} ${totalAvailable === 1 ? "Copy" : "Copies"} Available`
@@ -132,7 +131,7 @@ export default function BookDetailPage({ params }: CatalogDetailProps) {
                         </span>
                     </div>
 
-                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-zinc-900 leading-tight tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zinc-900 leading-tight tracking-tight">
                         {book.title}
                     </h1>
 
@@ -200,15 +199,14 @@ export default function BookDetailPage({ params }: CatalogDetailProps) {
                                         className="p-3.5 rounded bg-zinc-50 hover:bg-zinc-100 transition-colors border-2 border-transparent hover:border-zinc-100 flex flex-col gap-2"
                                     >
                                         <div className="flex items-center justify-between gap-2">
-                                            <span className="text-xs font-black uppercase text-blue-900 leading-tight">
+                                            <span className="text-xs font-bold uppercase text-blue-900 leading-tight">
                                                 {loc.name}
                                             </span>
                                             <span
-                                                className={`text-[9px] font-black tracking-widest px-2 py-0.5 rounded shrink-0 ${
-                                                    loc.availableCopies > 0
+                                                className={`text-[9px] font-bold tracking-widest px-2 py-0.5 rounded shrink-0 ${loc.availableCopies > 0
                                                         ? "bg-emerald-100 text-emerald-800"
                                                         : "bg-red-100 text-red-700"
-                                                }`}
+                                                    }`}
                                             >
                                                 {loc.availableCopies}/{loc.totalCopies}
                                             </span>

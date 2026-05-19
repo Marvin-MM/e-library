@@ -199,7 +199,7 @@ export function CreateDissertationDialog() {
 
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader className="border-b-2 border-zinc-100 pb-4 mb-2">
-                    <DialogTitle className="text-xl font-black text-blue-900 tracking-tight">
+                    <DialogTitle className="text-xl font-bold text-blue-900 tracking-tight">
                         Publish New Dissertation
                     </DialogTitle>
                     <DialogDescription className="font-bold text-zinc-500 text-sm">
@@ -291,7 +291,7 @@ export function CreateDissertationDialog() {
                                             <SelectItem value="none">No Course Linked</SelectItem>
                                             {courses.map((course) => (
                                                 <SelectItem key={course.id} value={course.id}>
-                                                    <span className="font-black text-blue-900 mr-2">{course.code}</span>
+                                                    <span className="font-bold text-blue-900 mr-2">{course.code}</span>
                                                     {course.name}
                                                 </SelectItem>
                                             ))}
@@ -338,7 +338,7 @@ export function CreateDissertationDialog() {
 
                     {/* ── ACCESS & STORAGE ── */}
                     <div className="border-t-2 border-zinc-100 pt-6 space-y-4">
-                        <p className="text-[10px] font-black uppercase text-blue-900 tracking-widest">
+                        <p className="text-[10px] font-bold uppercase text-blue-900 tracking-widest">
                             Access &amp; Storage Parameters
                         </p>
 

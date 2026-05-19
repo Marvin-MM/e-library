@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { 
-    useNotifications, 
-    useUnreadCount, 
-    useMarkAsRead, 
-    useMarkAllAsRead, 
-    useDeleteNotification 
+import {
+    useNotifications,
+    useUnreadCount,
+    useMarkAsRead,
+    useMarkAllAsRead,
+    useDeleteNotification
 } from "@/hooks/useNotifications";
 import { cn } from "@/lib/utils";
 
@@ -30,9 +30,9 @@ import {
 
 export function NotificationsPopover() {
     const [open, setOpen] = useState(false);
-    
+
     const { data: notificationsData, isLoading } = useNotifications({ limit: 20 });
-    
+
     // UPDATED: The refactored hook now directly returns the number
     const { data: unreadCount = 0 } = useUnreadCount();
 
@@ -84,18 +84,18 @@ export function NotificationsPopover() {
                     <span className="sr-only">Notifications</span>
                 </Button>
             </PopoverTrigger>
-            
+
             {/* UPDATED: Styled to match your global app theme */}
             <PopoverContent className="w-80 p-0 border-2 border-zinc-100 shadow-xl rounded-xl overflow-hidden" align="end">
                 <div className="flex items-center justify-between p-4 bg-zinc-50/80 border-b-2 border-zinc-100">
-                    <h4 className="font-black text-sm uppercase tracking-widest text-zinc-900">Notifications</h4>
+                    <h4 className="font-bold text-sm uppercase tracking-widest text-zinc-900">Notifications</h4>
                     {unreadCount > 0 && (
                         <Badge className="bg-blue-900 hover:bg-blue-900 text-white text-[10px] font-bold px-2 py-0 uppercase tracking-widest">
                             {unreadCount} New
                         </Badge>
                     )}
                 </div>
-                
+
                 <div className="px-2 py-1 flex justify-end bg-white">
                     <Button
                         variant="ghost"
@@ -108,9 +108,9 @@ export function NotificationsPopover() {
                         Mark all as read
                     </Button>
                 </div>
-                
+
                 <Separator className="bg-zinc-100" />
-                
+
                 <ScrollArea className="h-[350px] bg-white">
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center h-full text-zinc-400 gap-3">
@@ -149,7 +149,7 @@ export function NotificationsPopover() {
                                                 {notification.title}
                                             </span>
                                         </div>
-                                        
+
                                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur rounded">
                                             {!notification.read && (
                                                 <Button
@@ -173,14 +173,14 @@ export function NotificationsPopover() {
                                             </Button>
                                         </div>
                                     </div>
-                                    
+
                                     <p className={cn(
                                         "text-[11px] leading-relaxed line-clamp-2 pr-6",
                                         notification.read ? "text-zinc-500 font-medium" : "text-zinc-700 font-semibold"
                                     )}>
                                         {notification.message}
                                     </p>
-                                    
+
                                     <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
                                         {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                                     </p>

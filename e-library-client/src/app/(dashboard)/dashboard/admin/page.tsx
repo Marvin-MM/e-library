@@ -118,13 +118,12 @@ function TrendBadge({ value, label }: { value: number; label?: string }) {
     const isFlat = value === 0;
     return (
         <div
-            className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${
-                isFlat
+            className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${isFlat
                     ? "bg-zinc-50 border-zinc-200 text-zinc-400"
                     : isUp
-                    ? "bg-emerald-50 border-emerald-100 text-emerald-600"
-                    : "bg-red-50 border-red-100 text-red-500"
-            }`}
+                        ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                        : "bg-red-50 border-red-100 text-red-500"
+                }`}
         >
             {isFlat ? (
                 <Minus className="w-3 h-3" />
@@ -154,8 +153,8 @@ function RoleIcon({ role }: { role: string }) {
 
 // ─── Role color map ──────────────────────────────────────────────────────────
 const ROLE_META: Record<string, { bar: string; bg: string; border: string }> = {
-    ADMIN:   { bar: "bg-red-400",     bg: "bg-red-50",     border: "border-red-100" },
-    STAFF:   { bar: "bg-blue-400",    bg: "bg-blue-50",    border: "border-blue-100" },
+    ADMIN: { bar: "bg-red-400", bg: "bg-red-50", border: "border-red-100" },
+    STAFF: { bar: "bg-blue-400", bg: "bg-blue-50", border: "border-blue-100" },
     STUDENT: { bar: "bg-emerald-400", bg: "bg-emerald-50", border: "border-emerald-100" },
 };
 
@@ -174,10 +173,10 @@ export default function AdminDashboardPage() {
     // Fake sparkline seeds — replace with real time-series from your API
     // e.g. metrics?.users?.trend — an array of daily counts for the last 7 days
     const sparkData = {
-        users:     metrics?.users?.trend     ?? [120, 132, 128, 145, 139, 160, metrics?.users?.total ?? 160],
+        users: metrics?.users?.trend ?? [120, 132, 128, 145, 139, 160, metrics?.users?.total ?? 160],
         resources: metrics?.resources?.trend ?? [80, 84, 90, 87, 95, 100, metrics?.resources?.total ?? 100],
         downloads: metrics?.downloads?.trend ?? [200, 215, 190, 240, 260, 230, metrics?.downloads?.total ?? 230],
-        requests:  metrics?.requests?.trend  ?? [5, 8, 3, 12, 7, 9, metrics?.requests?.pending ?? 9],
+        requests: metrics?.requests?.trend ?? [5, 8, 3, 12, 7, 9, metrics?.requests?.pending ?? 9],
     };
 
     const stats = [
@@ -242,7 +241,7 @@ export default function AdminDashboardPage() {
             {/* ── Header ── */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
                 <div>
-                    <h2 className="text-xl font-black tracking-tight text-zinc-900 uppercase">
+                    <h2 className="text-xl font-bold tracking-tight text-zinc-900 uppercase">
                         Command Center
                     </h2>
                     <p className="text-[10px] uppercase tracking-widest text-zinc-400 font-bold mt-0.5">
@@ -286,7 +285,7 @@ export default function AdminDashboardPage() {
                                     </>
                                 ) : (
                                     <>
-                                        <p className="text-2xl font-black text-zinc-900 leading-none mb-1">
+                                        <p className="text-2xl font-bold text-zinc-900 leading-none mb-1">
                                             {stat.value.toLocaleString()}
                                         </p>
                                         <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
@@ -307,7 +306,7 @@ export default function AdminDashboardPage() {
                 {/* Platform Demographics */}
                 <div className="flex flex-col bg-white border-2 border-zinc-100 rounded-lg shadow-sm overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3 border-b-2 border-zinc-100 bg-zinc-50/50">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-700 flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-700 flex items-center gap-2">
                             <Users className="h-3.5 w-3.5 text-zinc-400" />
                             Platform Demographics
                         </h3>
@@ -346,13 +345,13 @@ export default function AdminDashboardPage() {
                                                 <div className="p-1.5 bg-white rounded border border-zinc-200 shadow-sm">
                                                     <RoleIcon role={role} />
                                                 </div>
-                                                <span className="text-xs font-black uppercase tracking-widest text-zinc-700">
+                                                <span className="text-xs font-bold uppercase tracking-widest text-zinc-700">
                                                     {role}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <span className="text-[10px] font-bold text-zinc-400">{pct}%</span>
-                                                <span className="text-base font-black text-zinc-900 tabular-nums">
+                                                <span className="text-base font-bold text-zinc-900 tabular-nums">
                                                     {Number(count).toLocaleString()}
                                                 </span>
                                             </div>
@@ -376,7 +375,7 @@ export default function AdminDashboardPage() {
                 {/* Top Searches */}
                 <div className="flex flex-col bg-white border-2 border-zinc-100 rounded-lg shadow-sm overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3 border-b-2 border-zinc-100 bg-zinc-50/50">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-700 flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-700 flex items-center gap-2">
                             <Search className="h-3.5 w-3.5 text-zinc-400" />
                             Trending Search Terms
                         </h3>
@@ -403,8 +402,8 @@ export default function AdminDashboardPage() {
                                             weight > 0.8
                                                 ? "text-sm px-3 py-1.5"
                                                 : weight > 0.5
-                                                ? "text-xs px-2.5 py-1"
-                                                : "text-[10px] px-2 py-1";
+                                                    ? "text-xs px-2.5 py-1"
+                                                    : "text-[10px] px-2 py-1";
                                         return (
                                             <div
                                                 key={i}
@@ -412,7 +411,7 @@ export default function AdminDashboardPage() {
                                                 style={{ opacity: 0.5 + weight * 0.5 }}
                                             >
                                                 {term.query}
-                                                <span className="text-[9px] font-black bg-white text-blue-500 px-1.5 py-0.5 rounded-full border border-blue-100">
+                                                <span className="text-[9px] font-bold bg-white text-blue-500 px-1.5 py-0.5 rounded-full border border-blue-100">
                                                     {term.count}
                                                 </span>
                                             </div>
@@ -430,7 +429,7 @@ export default function AdminDashboardPage() {
             {/* ── Most Engaged Resources ── */}
             <div className="flex flex-col bg-white border-2 border-zinc-100 rounded-lg shadow-sm overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 border-b-2 border-zinc-100 bg-zinc-50/50">
-                    <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-700 flex items-center gap-2">
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-700 flex items-center gap-2">
                         <BarChart3 className="h-3.5 w-3.5 text-zinc-400" />
                         Most Engaged Resources
                     </h3>
@@ -469,7 +468,7 @@ export default function AdminDashboardPage() {
                             >
                                 {/* Rank badge */}
                                 <div className="w-9 h-9 flex items-center justify-center border-2 border-zinc-100 bg-white rounded-lg shrink-0 group-hover:border-blue-200 group-hover:bg-blue-50 transition-colors">
-                                    <span className="text-[10px] font-black text-zinc-400 group-hover:text-blue-600">
+                                    <span className="text-[10px] font-bold text-zinc-400 group-hover:text-blue-600">
                                         #{index + 1}
                                     </span>
                                 </div>
@@ -502,7 +501,7 @@ export default function AdminDashboardPage() {
                                                     Math.round(
                                                         (resource.downloadCount /
                                                             (metrics.resources.topResources[0]?.downloadCount || 1)) *
-                                                            100
+                                                        100
                                                     )
                                                 )}%`,
                                             }}

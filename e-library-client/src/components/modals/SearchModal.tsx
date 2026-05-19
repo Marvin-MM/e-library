@@ -126,7 +126,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               {/* Z top-left: Title + Tabs */}
               <DialogHeader className="space-y-1 flex-shrink-0">
-                <DialogTitle className="text-2xl font-black text-blue-900 tracking-tight flex items-center gap-2">
+                <DialogTitle className="text-2xl font-bold text-blue-900 tracking-tight flex items-center gap-2">
                   <Search className="h-5 w-5" />
                   Search
                 </DialogTitle>
@@ -258,7 +258,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                     {resultsError && !loadingResults && (
                       <div className="border-2 border-red-100 rounded-lg p-8 text-center">
                         <Search className="h-10 w-10 text-red-400 mx-auto mb-3" />
-                        <h3 className="text-sm font-black uppercase  text-zinc-700 mb-2">Search Error</h3>
+                        <h3 className="text-sm font-bold uppercase  text-zinc-700 mb-2">Search Error</h3>
                         <p className="text-xs text-zinc-500 mb-4">
                           Something went wrong. Please try again.
                         </p>
@@ -358,7 +358,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                                 <Search className="h-8 w-8 text-zinc-300" />
                               </div>
                               <div>
-                                <h3 className="text-sm font-black uppercase  text-zinc-700 mb-1">No results</h3>
+                                <h3 className="text-sm font-bold uppercase  text-zinc-700 mb-1">No results</h3>
                                 <p className="text-xs text-zinc-400 max-w-sm">
                                   Nothing matched &ldquo;{debouncedQuery}&rdquo;. Try different keywords or request this resource.
                                 </p>
@@ -394,7 +394,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                     <div className="p-4 bg-zinc-50 rounded-xl inline-block mb-4">
                       <Search className="h-10 w-10 text-zinc-300" />
                     </div>
-                    <h3 className="text-sm font-black uppercase  text-zinc-700 mb-2">Start searching</h3>
+                    <h3 className="text-sm font-bold uppercase  text-zinc-700 mb-2">Start searching</h3>
                     <p className="text-xs text-zinc-400 max-w-sm mx-auto">
                       Enter at least 2 characters to search local resources
                     </p>
@@ -414,7 +414,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                       <div className="p-3 bg-blue-50 rounded-lg inline-block">
                         <Globe className="h-8 w-8 text-blue-900" />
                       </div>
-                      <h3 className="text-xl font-black text-blue-900 tracking-tight">
+                      <h3 className="text-xl font-bold text-blue-900 tracking-tight">
                         Search Millions of Academic Resources
                       </h3>
                       <p className="text-sm text-zinc-500 max-w-md">
@@ -527,7 +527,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
               )}
             </div>
             <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase  text-zinc-400">
-              Press <kbd className="px-1.5 py-0.5 bg-zinc-100 rounded text-[9px] font-black tracking-wider ml-1">Esc</kbd> <span className="ml-1">to close</span>
+              Press <kbd className="px-1.5 py-0.5 bg-zinc-100 rounded text-[9px] font-bold tracking-wider ml-1">Esc</kbd> <span className="ml-1">to close</span>
             </span>
           </div>
         </DialogContent>

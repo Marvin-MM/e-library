@@ -96,14 +96,14 @@ export default function ResourcesPage() {
             >
                 <div className="flex flex-col gap-2">
                     <div className="flex flex-wrap items-center gap-2">
-                        <span className="flex items-center gap-1.5 text-blue-900 font-black text-[10px] uppercase tracking-widest bg-blue-50 border border-blue-100 px-3 py-1 rounded-full">
+                        <span className="flex items-center gap-1.5 text-blue-900 font-bold text-[10px] uppercase tracking-widest bg-blue-50 border border-blue-100 px-3 py-1 rounded-full">
                             <FileText className="w-3 h-3" />
                             Knowledge Base
                         </span>
                         <Button
                             asChild
                             variant="outline"
-                            className="h-6 px-3 text-[9px] font-black uppercase tracking-widest rounded-full border-2 border-zinc-100 text-zinc-400 hover:text-red-500 hover:border-red-100 transition-colors"
+                            className="h-6 px-3 text-[9px] font-bold uppercase tracking-widest rounded-full border-2 border-zinc-100 text-zinc-400 hover:text-red-500 hover:border-red-100 transition-colors"
                         >
                             <Link href="/students/favourites">
                                 <Heart className="w-3 h-3 mr-1" />
@@ -111,7 +111,7 @@ export default function ResourcesPage() {
                             </Link>
                         </Button>
                     </div>
-                    <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
+                    <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">
                         Resource Library
                     </h1>
                     <p className="text-sm text-zinc-400 max-w-sm">
@@ -121,8 +121,8 @@ export default function ResourcesPage() {
 
                 <div className="flex items-center gap-3 self-start">
                     <div className="bg-white border-2 border-zinc-100 rounded-lg px-5 py-3 text-center shadow-sm">
-                        <p className="text-[9px] uppercase font-black tracking-widest text-zinc-400">Total</p>
-                        <p className="text-2xl font-black text-blue-900 tabular-nums leading-tight">
+                        <p className="text-[9px] uppercase font-bold tracking-widest text-zinc-400">Total</p>
+                        <p className="text-2xl font-bold text-blue-900 tabular-nums leading-tight">
                             {isLoading ? "—" : (pagination?.total ?? 0).toLocaleString()}
                         </p>
                     </div>
@@ -205,7 +205,7 @@ export default function ResourcesPage() {
             {/* ── Active filter chips ─────────────────────────────────────── */}
             {hasActiveFilters && (
                 <motion.div {...fadeUp(0.1)} className="flex items-center gap-2 flex-wrap -mt-2">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Filtering:</span>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Filtering:</span>
                     {filters.search && (
                         <FilterChip label={`"${filters.search}"`} onRemove={() => setFilters({ search: undefined, page: 1 })} />
                     )}
@@ -217,7 +217,7 @@ export default function ResourcesPage() {
                     )}
                     <button
                         onClick={resetFilters}
-                        className="text-[9px] font-black uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors"
+                        className="text-[9px] font-bold uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors"
                     >
                         Clear all
                     </button>
@@ -229,7 +229,7 @@ export default function ResourcesPage() {
 
                 {/* Grid header + pagination */}
                 <div className="flex items-center justify-between px-5 py-3.5 border-b-2 border-zinc-100 bg-zinc-50/50">
-                    <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-600 flex items-center gap-2">
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 flex items-center gap-2">
                         <BookOpen className="w-3.5 h-3.5 text-zinc-400" />
                         {isLoading
                             ? "Loading…"
@@ -247,7 +247,7 @@ export default function ResourcesPage() {
                             >
                                 <ChevronLeft className="w-3.5 h-3.5" />
                             </Button>
-                            <span className="text-[10px] font-black text-blue-900 px-2 tabular-nums">
+                            <span className="text-[10px] font-bold text-blue-900 px-2 tabular-nums">
                                 {currentPage} / {pagination.totalPages}
                             </span>
                             <Button
@@ -293,7 +293,7 @@ export default function ResourcesPage() {
                         <div className="flex flex-col items-center justify-center py-20 gap-4 text-zinc-300">
                             <BoxSelect className="w-10 h-10" />
                             <div className="text-center">
-                                <p className="text-sm font-black text-zinc-400 uppercase tracking-tight mb-1">No Records Found</p>
+                                <p className="text-sm font-bold text-zinc-400 uppercase tracking-tight mb-1">No Records Found</p>
                                 <p className="text-[10px] font-bold uppercase tracking-widest max-w-[200px] mx-auto">
                                     {hasActiveFilters
                                         ? "Your filters didn't match anything."
@@ -304,7 +304,7 @@ export default function ResourcesPage() {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="text-[10px] font-black uppercase tracking-widest border-2 border-zinc-100 text-zinc-500 hover:border-zinc-300 hover:text-zinc-900 h-8 px-4"
+                                    className="text-[10px] font-bold uppercase tracking-widest border-2 border-zinc-100 text-zinc-500 hover:border-zinc-300 hover:text-zinc-900 h-8 px-4"
                                     onClick={resetFilters}
                                 >
                                     Reset Filters
@@ -322,11 +322,11 @@ export default function ResourcesPage() {
                             size="sm"
                             onClick={() => setFilters({ page: Math.max(1, currentPage - 1) })}
                             disabled={!pagination.hasPrev}
-                            className="h-8 px-3 text-[10px] font-black uppercase tracking-widest border-2 border-zinc-100 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 disabled:opacity-30 rounded-md"
+                            className="h-8 px-3 text-[10px] font-bold uppercase tracking-widest border-2 border-zinc-100 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 disabled:opacity-30 rounded-md"
                         >
                             <ChevronLeft className="w-3 h-3 mr-1" /> Prev
                         </Button>
-                        <span className="text-[10px] font-black text-zinc-400 tabular-nums px-3">
+                        <span className="text-[10px] font-bold text-zinc-400 tabular-nums px-3">
                             Page {currentPage} of {pagination.totalPages}
                         </span>
                         <Button
@@ -334,7 +334,7 @@ export default function ResourcesPage() {
                             size="sm"
                             onClick={() => setFilters({ page: currentPage + 1 })}
                             disabled={!pagination.hasNext}
-                            className="h-8 px-3 text-[10px] font-black uppercase tracking-widest border-2 border-zinc-100 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 disabled:opacity-30 rounded-md"
+                            className="h-8 px-3 text-[10px] font-bold uppercase tracking-widest border-2 border-zinc-100 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 disabled:opacity-30 rounded-md"
                         >
                             Next <ChevronRight className="w-3 h-3 ml-1" />
                         </Button>
@@ -348,7 +348,7 @@ export default function ResourcesPage() {
 // ── Filter chip ──────────────────────────────────────────────────────────────
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
     return (
-        <span className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 text-blue-700 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
+        <span className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 text-blue-700 text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full">
             {label}
             <button onClick={onRemove} className="text-blue-400 hover:text-blue-700 transition-colors" aria-label="Remove filter">
                 <X className="w-2.5 h-2.5" />
@@ -398,7 +398,7 @@ function ResourceCard({
 
                     {/* Type badge */}
                     <div className="absolute top-2 left-2">
-                        <span className="text-[8px] font-black uppercase tracking-widest text-blue-900 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full border border-zinc-100 shadow-sm">
+                        <span className="text-[8px] font-bold uppercase tracking-widest text-blue-900 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full border border-zinc-100 shadow-sm">
                             {resource.resourceType?.replace(/_/g, ' ') ?? "DOC"}
                         </span>
                     </div>
@@ -406,7 +406,7 @@ function ResourceCard({
                     {/* Pending badge */}
                     {resource.approvalStatus === 'PENDING' && (
                         <div className="absolute top-2 right-2">
-                            <span className="text-[8px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 shadow-sm">
+                            <span className="text-[8px] font-bold uppercase tracking-widest text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 shadow-sm">
                                 Pending
                             </span>
                         </div>
@@ -420,7 +420,7 @@ function ResourceCard({
                             <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 truncate max-w-[110px]">
                                 {resource.department}
                             </span>
-                            <span className="text-[9px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">
                                 {resource.category}
                             </span>
                         </div>
@@ -481,7 +481,7 @@ function ResourceCard({
                         ) : (
                             <div className="flex items-center gap-1 text-zinc-300 group-hover:text-blue-600 transition-colors">
                                 <Download className="w-3 h-3" />
-                                <span className="text-[9px] font-black tabular-nums">
+                                <span className="text-[9px] font-bold tabular-nums">
                                     {resource.downloadCount}
                                 </span>
                             </div>

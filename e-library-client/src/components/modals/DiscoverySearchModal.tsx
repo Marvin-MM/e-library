@@ -315,7 +315,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
           <div className="p-4 bg-zinc-50 rounded-xl inline-block mb-4">
             <Clock className="h-8 w-8 text-zinc-300" />
           </div>
-          <h3 className="text-sm font-black uppercase  text-zinc-700 mb-2">No logs yet</h3>
+          <h3 className="text-sm font-bold uppercase  text-zinc-700 mb-2">No logs yet</h3>
           <p className="text-xs text-zinc-400">Run a search to see source status logs</p>
         </div>
       );
@@ -324,46 +324,46 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
     return (
       <div className="space-y-2 h-full overflow-y-auto pr-2 pb-4">
         {logs.map((log, index) => (
-            <div
-              key={index}
-              className={cn(
-                "border-2 border-zinc-100 rounded-lg p-4 border-l-4 transition-all",
-                getSourceBorderColor(log.source)
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      "text-[9px] font-bold uppercase ",
-                      log.status === "success" && "border-green-200 text-green-700 bg-green-50",
-                      log.status === "error" && "border-red-200 text-red-700 bg-red-50",
-                      log.status === "loading" && "border-blue-200 text-blue-700 bg-blue-50"
-                    )}
-                  >
-                    {log.status}
-                  </Badge>
-                  <div>
-                    <p className="text-sm font-bold text-zinc-800">{log.source.toUpperCase()}</p>
-                    <p className="text-[10px] font-bold uppercase  text-zinc-400">
-                      {log.results} results found
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] text-zinc-400">
-                    Total: {log.total.toLocaleString()}
-                  </p>
-                  {log.error && (
-                    <p className="text-[10px] text-red-500 max-w-[200px] truncate">
-                      {log.error}
-                    </p>
+          <div
+            key={index}
+            className={cn(
+              "border-2 border-zinc-100 rounded-lg p-4 border-l-4 transition-all",
+              getSourceBorderColor(log.source)
+            )}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-[9px] font-bold uppercase ",
+                    log.status === "success" && "border-green-200 text-green-700 bg-green-50",
+                    log.status === "error" && "border-red-200 text-red-700 bg-red-50",
+                    log.status === "loading" && "border-blue-200 text-blue-700 bg-blue-50"
                   )}
+                >
+                  {log.status}
+                </Badge>
+                <div>
+                  <p className="text-sm font-bold text-zinc-800">{log.source.toUpperCase()}</p>
+                  <p className="text-[10px] font-bold uppercase  text-zinc-400">
+                    {log.results} results found
+                  </p>
                 </div>
               </div>
+              <div className="text-right">
+                <p className="text-[10px] text-zinc-400">
+                  Total: {log.total.toLocaleString()}
+                </p>
+                {log.error && (
+                  <p className="text-[10px] text-red-500 max-w-[200px] truncate">
+                    {log.error}
+                  </p>
+                )}
+              </div>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
     );
   };
@@ -375,7 +375,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
         <div className="border-b-2 border-zinc-100 px-6 pt-6 pb-4">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
             <DialogHeader className="space-y-1">
-              <DialogTitle className="text-2xl font-black text-blue-900 tracking-tight flex items-center gap-2">
+              <DialogTitle className="text-2xl font-bold text-blue-900 tracking-tight flex items-center gap-2">
                 <Globe className="h-5 w-5" />
                 Academic Discovery
               </DialogTitle>
@@ -500,7 +500,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
                   <div className="p-3 bg-red-50 rounded-xl inline-block mb-4">
                     <AlertCircle className="h-8 w-8 text-red-400" />
                   </div>
-                  <h3 className="text-sm font-black uppercase  text-zinc-700 mb-2">Search Failed</h3>
+                  <h3 className="text-sm font-bold uppercase  text-zinc-700 mb-2">Search Failed</h3>
                   <p className="text-xs text-zinc-400 mb-4">
                     Unable to connect to academic repositories.
                   </p>
@@ -668,7 +668,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
                   <div className="p-4 bg-zinc-50 rounded-xl inline-block mb-4">
                     <Search className="h-8 w-8 text-zinc-300" />
                   </div>
-                  <h3 className="text-sm font-black uppercase  text-zinc-700 mb-2">No results</h3>
+                  <h3 className="text-sm font-bold uppercase  text-zinc-700 mb-2">No results</h3>
                   <p className="text-xs text-zinc-400 text-center mb-5 max-w-md">
                     No academic resources found for &ldquo;{debouncedSearch}&rdquo;. Try different keywords or adjust source filters.
                   </p>
@@ -696,7 +696,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
                     <div className="p-4 bg-zinc-50 rounded-xl inline-block mb-4">
                       <Database className="h-8 w-8 text-zinc-300" />
                     </div>
-                    <h3 className="text-sm font-black uppercase  text-zinc-700 mb-2">
+                    <h3 className="text-sm font-bold uppercase  text-zinc-700 mb-2">
                       Search Academic Resources
                     </h3>
                     <p className="text-xs text-zinc-400 mb-6 max-w-md">
@@ -769,7 +769,7 @@ export function DiscoverySearchModal({ open, onOpenChange }: DiscoverySearchModa
             Open Access Academic Resources
           </span>
           <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase  text-zinc-400">
-            Press <kbd className="px-1.5 py-0.5 bg-zinc-100 rounded text-[9px] font-black tracking-wider ml-1">Esc</kbd> <span className="ml-1">to close</span>
+            Press <kbd className="px-1.5 py-0.5 bg-zinc-100 rounded text-[9px] font-bold tracking-wider ml-1">Esc</kbd> <span className="ml-1">to close</span>
           </span>
         </div>
       </DialogContent>

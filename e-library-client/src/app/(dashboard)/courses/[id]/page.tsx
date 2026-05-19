@@ -70,10 +70,10 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
     // Client-side module filtering (they're fetched all at once with limit:50)
     const modules = moduleSearch.trim()
         ? allModules.filter(
-              (m) =>
-                  m.name.toLowerCase().includes(moduleSearch.toLowerCase()) ||
-                  m.code.toLowerCase().includes(moduleSearch.toLowerCase())
-          )
+            (m) =>
+                m.name.toLowerCase().includes(moduleSearch.toLowerCase()) ||
+                m.code.toLowerCase().includes(moduleSearch.toLowerCase())
+        )
         : allModules;
 
     // ── Loading skeleton ───────────────────────────────────────────────────
@@ -144,7 +144,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                         </Link>
                     </Button>
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] font-black uppercase text-blue-900 bg-blue-50 px-2 py-1 rounded">
+                        <span className="text-[10px] font-bold uppercase text-blue-900 bg-blue-50 px-2 py-1 rounded">
                             {course.code}
                         </span>
                         <span className="text-[10px] font-bold uppercase text-zinc-400">
@@ -260,7 +260,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                                             className="bg-white border-2 border-zinc-100 rounded p-5 hover:border-blue-900 transition-colors group flex flex-col justify-between min-h-[160px]"
                                         >
                                             <div className="flex justify-between items-start mb-3">
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-900 bg-blue-50 px-2 py-1 rounded">
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-blue-900 bg-blue-50 px-2 py-1 rounded">
                                                     {module.code}
                                                 </span>
                                                 {isStaffOrAdmin && (
@@ -290,7 +290,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                                                 )}
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="text-sm font-black text-zinc-900 leading-snug mb-1.5 group-hover:text-blue-900 transition-colors">
+                                                <h4 className="text-sm font-bold text-zinc-900 leading-snug mb-1.5 group-hover:text-blue-900 transition-colors">
                                                     {module.name}
                                                 </h4>
                                                 <p className="text-[11px] font-bold text-zinc-500 line-clamp-2 leading-relaxed">
@@ -358,7 +358,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                                             <div className="bg-white border-2 border-zinc-100 rounded p-5 flex flex-col justify-between hover:border-blue-900 transition-colors h-full min-h-[160px]">
                                                 <div>
                                                     <div className="flex items-center justify-between mb-3">
-                                                        <span className="text-[10px] font-black uppercase text-blue-900 bg-blue-50 px-2 py-0.5 rounded tracking-widest">
+                                                        <span className="text-[10px] font-bold uppercase text-blue-900 bg-blue-50 px-2 py-0.5 rounded tracking-widest">
                                                             {resource.type ?? "Resource"}
                                                         </span>
                                                         <Download className="w-3.5 h-3.5 text-zinc-300 group-hover:text-blue-900 transition-colors" />

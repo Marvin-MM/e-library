@@ -34,13 +34,13 @@ const fadeUp = (delay = 0) => ({
 function StatusBadge({ status }: { status: string }) {
     const upper = status?.toUpperCase();
     const map: Record<string, string> = {
-        PENDING:   "bg-amber-50 text-amber-600 border-amber-100",
-        APPROVED:  "bg-emerald-50 text-emerald-600 border-emerald-100",
-        REJECTED:  "bg-red-50 text-red-500 border-red-100",
+        PENDING: "bg-amber-50 text-amber-600 border-amber-100",
+        APPROVED: "bg-emerald-50 text-emerald-600 border-emerald-100",
+        REJECTED: "bg-red-50 text-red-500 border-red-100",
         FULFILLED: "bg-blue-50 text-blue-600 border-blue-100",
     };
     return (
-        <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${map[upper] ?? "bg-zinc-50 text-zinc-400 border-zinc-100"}`}>
+        <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${map[upper] ?? "bg-zinc-50 text-zinc-400 border-zinc-100"}`}>
             {status}
         </span>
     );
@@ -48,9 +48,9 @@ function StatusBadge({ status }: { status: string }) {
 
 // ── Discovery sources ────────────────────────────────────────────────────────
 const SOURCES = [
-    { name: "OpenAlex",       count: "2.3M", accent: "bg-blue-600"   },
+    { name: "OpenAlex", count: "2.3M", accent: "bg-blue-600" },
     { name: "DOAJ Repository", count: "890K", accent: "bg-emerald-500" },
-    { name: "CORE Academic",   count: "1.4M", accent: "bg-violet-500"  },
+    { name: "CORE Academic", count: "1.4M", accent: "bg-violet-500" },
 ];
 
 const EXTERNAL_LINKS = [
@@ -74,7 +74,7 @@ function buildHeatmapSeries() {
 
 const HEATMAP_OPTIONS: ApexCharts.ApexOptions = {
     chart: {
-        toolbar:    { show: false },
+        toolbar: { show: false },
         fontFamily: "inherit",
         animations: { enabled: true, speed: 700 },
     },
@@ -86,9 +86,9 @@ const HEATMAP_OPTIONS: ApexCharts.ApexOptions = {
             useFillColorAsStroke: false,
             colorScale: {
                 ranges: [
-                    { from: 0,  to: 15, name: "low",    color: "#f4f4f5" },
+                    { from: 0, to: 15, name: "low", color: "#f4f4f5" },
                     { from: 16, to: 35, name: "medium", color: "#dbeafe" },
-                    { from: 36, to: 60, name: "high",   color: "#1e3a8a" },
+                    { from: 36, to: 60, name: "high", color: "#1e3a8a" },
                 ],
             },
         },
@@ -96,12 +96,12 @@ const HEATMAP_OPTIONS: ApexCharts.ApexOptions = {
     xaxis: {
         labels: { style: { colors: "#a1a1aa", fontSize: "9px", fontWeight: "700" } },
         axisBorder: { show: false },
-        axisTicks:  { show: false },
+        axisTicks: { show: false },
     },
     yaxis: {
         labels: { style: { colors: "#a1a1aa", fontSize: "9px", fontWeight: "700" } },
     },
-    grid:   { padding: { top: 0, right: 0, bottom: 0, left: -8 } },
+    grid: { padding: { top: 0, right: 0, bottom: 0, left: -8 } },
     legend: { show: false },
     tooltip: {
         theme: "light",
@@ -138,7 +138,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
                     <motion.div {...fadeUp(0)}>
-                        <h1 className="text-xl font-black text-zinc-900 tracking-tight">
+                        <h1 className="text-xl font-bold text-zinc-900 tracking-tight">
                             Hello, {firstName} 👋
                         </h1>
                         <p className="text-sm text-zinc-400 mt-0.5 max-w-xs">
@@ -150,14 +150,14 @@ export default function DashboardPage() {
                         {/* Stats pill */}
                         <div className="flex items-stretch bg-white border-2 border-zinc-100 rounded-lg overflow-hidden shadow-sm">
                             <div className="px-4 py-2.5 border-r-2 border-zinc-100 text-center">
-                                <p className="text-[9px] uppercase font-black tracking-widest text-zinc-400">Requests</p>
-                                <p className="text-lg font-black text-blue-900 tabular-nums leading-tight">
+                                <p className="text-[9px] uppercase font-bold tracking-widest text-zinc-400">Requests</p>
+                                <p className="text-lg font-bold text-blue-900 tabular-nums leading-tight">
                                     {requestsLoading ? "—" : requestCount}
                                 </p>
                             </div>
                             <div className="px-4 py-2.5 text-center">
-                                <p className="text-[9px] uppercase font-black tracking-widest text-zinc-400">Downloads</p>
-                                <p className="text-lg font-black text-zinc-900 tabular-nums leading-tight">
+                                <p className="text-[9px] uppercase font-bold tracking-widest text-zinc-400">Downloads</p>
+                                <p className="text-lg font-bold text-zinc-900 tabular-nums leading-tight">
                                     {downloadCount}
                                 </p>
                             </div>
@@ -187,7 +187,7 @@ export default function DashboardPage() {
                                     <Activity className="w-3.5 h-3.5 text-zinc-600" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xs font-black text-zinc-900 tracking-tight">
+                                    <h2 className="text-base font-bold text-zinc-900 tracking-tight">
                                         Request Activity
                                     </h2>
                                     <p className="text-[9px] uppercase tracking-widest font-bold text-zinc-400">
@@ -229,7 +229,7 @@ export default function DashboardPage() {
                                 <Layers className="w-3.5 h-3.5 text-zinc-600" />
                             </div>
                             <div>
-                                <h2 className="text-xs font-black text-zinc-900 tracking-tight">
+                                <h2 className="text-base font-bold text-zinc-900 tracking-tight">
                                     Global Discovery
                                 </h2>
                                 <p className="text-[9px] uppercase tracking-widest font-bold text-zinc-400">
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                                             {src.name}
                                         </span>
                                     </div>
-                                    <span className="text-[10px] font-black uppercase text-zinc-400 group-hover:text-zinc-300 tabular-nums transition-colors">
+                                    <span className="text-[10px] font-bold uppercase text-zinc-400 group-hover:text-zinc-300 tabular-nums transition-colors">
                                         {src.count}
                                     </span>
                                 </div>
@@ -283,14 +283,14 @@ export default function DashboardPage() {
                     className="bg-white border-2 border-zinc-100 rounded-lg shadow-sm overflow-hidden"
                 >
                     <div className="flex items-center justify-between px-5 py-3.5 border-b-2 border-zinc-100 bg-zinc-50/50">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-700 flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-700 flex items-center gap-2">
                             <GitPullRequest className="w-3.5 h-3.5 text-zinc-400" />
                             Recent Active Requests
                         </h3>
                         {requestCount > 3 && (
                             <Link
                                 href="/requests"
-                                className="text-[9px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-900 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
+                                className="text-[9px] font-bold uppercase tracking-widest text-blue-600 hover:text-blue-900 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
                             >
                                 View all {requestCount}
                             </Link>
@@ -321,7 +321,7 @@ export default function DashboardPage() {
                                 >
                                     <div>
                                         <div className="flex items-center justify-between mb-2.5">
-                                            <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">
+                                            <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">
                                                 {item.category}
                                             </span>
                                             <StatusBadge status={item.status} />
@@ -349,11 +349,11 @@ export default function DashboardPage() {
                     {!requestsLoading && recentRequests.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-14 gap-3 text-zinc-300">
                             <GitPullRequest className="w-8 h-8" />
-                            <p className="text-[10px] font-black uppercase tracking-widest">No requests yet</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest">No requests yet</p>
                             <Button
                                 size="sm"
                                 variant="outline"
-                                className="mt-1 text-[10px] font-black uppercase tracking-widest border-2 border-zinc-100 text-zinc-500 hover:text-zinc-900 hover:border-zinc-300 h-8 px-4"
+                                className="mt-1 text-[10px] font-bold uppercase tracking-widest border-2 border-zinc-100 text-zinc-500 hover:text-zinc-900 hover:border-zinc-300 h-8 px-4"
                                 onClick={() => setSearchOpen(true)}
                             >
                                 Find a resource

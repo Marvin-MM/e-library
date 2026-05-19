@@ -60,7 +60,7 @@ export default function CatalogPage() {
                         <Library className="w-3 h-3" />
                         Physical Library Catalog
                     </div>
-                    <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">
                         University Library
                     </h1>
                     <p className="text-zinc-500 text-sm max-w-sm">
@@ -75,8 +75,8 @@ export default function CatalogPage() {
                     className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0"
                 >
                     <div className="bg-white border-2 border-zinc-100 flex items-center justify-between sm:flex-col sm:justify-center px-4 py-2 sm:px-5 sm:py-2.5 rounded text-center">
-                        <p className="text-[10px] uppercase font-black tracking-widest text-zinc-400">Total Books</p>
-                        <p className="text-xl font-black text-blue-900">{pagination?.total ?? 0}</p>
+                        <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-400">Total Books</p>
+                        <p className="text-xl font-bold text-blue-900">{pagination?.total ?? 0}</p>
                     </div>
                     {isAdmin && (
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
@@ -89,7 +89,7 @@ export default function CatalogPage() {
 
             {/* ── CAMPUS FILTER ──
                 Interactive controls to filter the book grid by campus. */}
-            
+
             {/* Mobile / Tablet Select Dropdown */}
             <div className="block lg:hidden mb-1">
                 <Select value={campusId} onValueChange={(val) => { setCampusId(val); setPage(1); }}>
@@ -108,7 +108,7 @@ export default function CatalogPage() {
                                     <div className="flex items-center gap-2">
                                         <MapPin className="w-3.5 h-3.5" /> {campus.name}
                                     </div>
-                                    <span className="text-[9px] px-1.5 py-0.5 rounded font-black bg-zinc-100 text-zinc-400">{campus.code}</span>
+                                    <span className="text-[9px] px-1.5 py-0.5 rounded font-bold bg-zinc-100 text-zinc-400">{campus.code}</span>
                                 </div>
                             </SelectItem>
                         ))}
@@ -121,11 +121,10 @@ export default function CatalogPage() {
                 {/* "All" pill */}
                 <button
                     onClick={() => { setCampusId("all"); setPage(1); }}
-                    className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded border-2 text-xs font-black uppercase tracking-wider transition-colors ${
-                        campusId === "all"
+                    className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded border-2 text-xs font-bold uppercase tracking-wider transition-colors ${campusId === "all"
                             ? "bg-blue-900 border-blue-900 text-white"
                             : "bg-white border-zinc-100 text-zinc-600 hover:border-blue-900 hover:text-blue-900"
-                    }`}
+                        }`}
                 >
                     <Library className="w-3.5 h-3.5" />
                     All Campuses
@@ -133,25 +132,24 @@ export default function CatalogPage() {
 
                 {isLoadingCampuses
                     ? Array.from({ length: 3 }).map((_, i) => (
-                          <Skeleton key={i} className="h-10 w-40 rounded shrink-0" />
-                      ))
+                        <Skeleton key={i} className="h-10 w-40 rounded shrink-0" />
+                    ))
                     : campuses.map((campus) => (
-                          <button
-                              key={campus.id}
-                              onClick={() => handleCampusClick(campus.id)}
-                              className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded border-2 text-xs font-black uppercase tracking-wider transition-colors ${
-                                  campusId === campus.id
-                                      ? "bg-blue-900 border-blue-900 text-white"
-                                      : "bg-white border-zinc-100 text-zinc-600 hover:border-blue-900 hover:text-blue-900"
-                              }`}
-                          >
-                              <MapPin className="w-3.5 h-3.5" />
-                              {campus.name}
-                              <span className={`text-[9px] px-1.5 py-0.5 rounded font-black ${campusId === campus.id ? "bg-white/20 text-white" : "bg-zinc-100 text-zinc-400"}`}>
-                                  {campus.code}
-                              </span>
-                          </button>
-                      ))}
+                        <button
+                            key={campus.id}
+                            onClick={() => handleCampusClick(campus.id)}
+                            className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded border-2 text-xs font-bold uppercase tracking-wider transition-colors ${campusId === campus.id
+                                    ? "bg-blue-900 border-blue-900 text-white"
+                                    : "bg-white border-zinc-100 text-zinc-600 hover:border-blue-900 hover:text-blue-900"
+                                }`}
+                        >
+                            <MapPin className="w-3.5 h-3.5" />
+                            {campus.name}
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${campusId === campus.id ? "bg-white/20 text-white" : "bg-zinc-100 text-zinc-400"}`}>
+                                {campus.code}
+                            </span>
+                        </button>
+                    ))}
             </div>
 
             {/* ── SEARCH BAR ── */}
@@ -269,7 +267,7 @@ export default function CatalogPage() {
                                         </div>
 
                                         <div className="flex-1">
-                                            <h4 className="text-sm font-black text-zinc-900 line-clamp-2 leading-snug group-hover:text-blue-900 transition-colors">
+                                            <h4 className="text-sm font-bold text-zinc-900 line-clamp-2 leading-snug group-hover:text-blue-900 transition-colors">
                                                 {book.title}
                                             </h4>
                                             <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-1">
@@ -279,11 +277,10 @@ export default function CatalogPage() {
 
                                         <div className="pt-3 border-t-2 border-zinc-50">
                                             <span
-                                                className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded ${
-                                                    (book.locations?.length ?? 0) > 0
+                                                className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded ${(book.locations?.length ?? 0) > 0
                                                         ? "bg-emerald-50 text-emerald-700"
                                                         : "bg-red-50 text-red-600"
-                                                }`}
+                                                    }`}
                                             >
                                                 {(book.locations?.length ?? 0) > 0 ? "Stocked on Campus" : "Out of Stock"}
                                             </span>

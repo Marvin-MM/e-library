@@ -127,7 +127,7 @@ export function ManageModuleDialog({
 
             <DialogContent className="max-w-md border-2 border-zinc-100 shadow-xl">
                 <DialogHeader className="border-b-2 border-zinc-50 pb-4 mb-2">
-                    <DialogTitle className="text-lg font-black text-blue-900 uppercase tracking-tight">
+                    <DialogTitle className="text-lg font-bold text-blue-900 uppercase tracking-tight">
                         {isEditMode ? "Modify Module" : "Create Course Module"}
                     </DialogTitle>
                 </DialogHeader>
@@ -145,9 +145,8 @@ export function ManageModuleDialog({
                             id="code"
                             {...register("code")}
                             placeholder="e.g. MOD-01"
-                            className={`bg-zinc-50 focus-visible:ring-blue-900 font-bold h-11 ${
-                                errors.code ? "border-red-400" : ""
-                            }`}
+                            className={`bg-zinc-50 focus-visible:ring-blue-900 font-bold h-11 ${errors.code ? "border-red-400" : ""
+                                }`}
                         />
                         {errors.code && (
                             <p className="text-[10px] font-bold text-red-500">{errors.code.message}</p>
@@ -166,9 +165,8 @@ export function ManageModuleDialog({
                             id="name"
                             {...register("name")}
                             placeholder="e.g. Introduction to Programming"
-                            className={`bg-zinc-50 focus-visible:ring-blue-900 font-bold h-11 ${
-                                errors.name ? "border-red-400" : ""
-                            }`}
+                            className={`bg-zinc-50 focus-visible:ring-blue-900 font-bold h-11 ${errors.name ? "border-red-400" : ""
+                                }`}
                         />
                         {errors.name && (
                             <p className="text-[10px] font-bold text-red-500">{errors.name.message}</p>
@@ -187,9 +185,8 @@ export function ManageModuleDialog({
                             id="description"
                             {...register("description")}
                             placeholder="Brief overview of the module..."
-                            className={`resize-none bg-zinc-50 focus-visible:ring-blue-900 min-h-[96px] text-sm ${
-                                errors.description ? "border-red-400" : ""
-                            }`}
+                            className={`resize-none bg-zinc-50 focus-visible:ring-blue-900 min-h-[96px] text-sm ${errors.description ? "border-red-400" : ""
+                                }`}
                         />
                         {errors.description && (
                             <p className="text-[10px] font-bold text-red-500">{errors.description.message}</p>

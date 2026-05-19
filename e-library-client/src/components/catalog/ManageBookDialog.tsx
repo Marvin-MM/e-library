@@ -161,7 +161,7 @@ export function ManageBookDialog({ initialData, triggerType = "button" }: Manage
 
             <DialogContent className="max-w-xl" aria-describedby="book-dialog-description">
                 <DialogHeader>
-                    <DialogTitle className="text-lg font-black text-blue-900 uppercase tracking-tight">
+                    <DialogTitle className="text-lg font-bold text-blue-900 uppercase tracking-tight">
                         {isEditMode ? "Update Book Details" : "Catalog New Physical Book"}
                     </DialogTitle>
                     <DialogDescription id="book-dialog-description" className="sr-only">

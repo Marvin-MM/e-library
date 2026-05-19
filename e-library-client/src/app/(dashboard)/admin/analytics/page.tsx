@@ -32,10 +32,10 @@ import { motion } from "framer-motion";
 const PALETTE = ["#1e3a8a", "#3b82f6", "#93c5fd", "#1d4ed8", "#60a5fa", "#bfdbfe"];
 
 const DATE_RANGES = [
-    { value: "7",   label: "Last 7 Days"   },
-    { value: "30",  label: "Last 30 Days"  },
-    { value: "90",  label: "Last 3 Months" },
-    { value: "365", label: "Last Year"     },
+    { value: "7", label: "Last 7 Days" },
+    { value: "30", label: "Last 30 Days" },
+    { value: "90", label: "Last 3 Months" },
+    { value: "365", label: "Last Year" },
 ];
 
 const CHART_TOOLTIP_STYLE = {
@@ -150,13 +150,12 @@ function TrendBadge({ value, label }: { value: number; label?: string }) {
     const isFlat = value === 0;
     return (
         <div
-            className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
-                isFlat
+            className={`inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${isFlat
                     ? "bg-zinc-50 border-zinc-200 text-zinc-400"
                     : isUp
-                    ? "bg-emerald-50 border-emerald-100 text-emerald-600"
-                    : "bg-red-50 border-red-100 text-red-500"
-            }`}
+                        ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                        : "bg-red-50 border-red-100 text-red-500"
+                }`}
         >
             {isFlat ? (
                 <Minus className="w-2.5 h-2.5" />
@@ -174,7 +173,7 @@ function TrendBadge({ value, label }: { value: number; label?: string }) {
 function ChartShell({ title, children, loading }: { title: string; children: React.ReactNode; loading: boolean }) {
     return (
         <div className="flex flex-col gap-3">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 border-l-2 border-zinc-300 pl-2.5">
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 border-l-2 border-zinc-300 pl-2.5">
                 {title}
             </h4>
             <div className="h-[260px] w-full bg-zinc-50/50 border-2 border-zinc-100 rounded-lg p-4">
@@ -188,24 +187,24 @@ function KpiCard({
     title, value, sub, icon: Icon, color, bg, spark, delta, loading,
 }: {
     title: string; value?: number; sub?: string;
-    icon: React.ElementType; color: string; bg: string; 
+    icon: React.ElementType; color: string; bg: string;
     spark?: number[]; delta?: number; loading: boolean;
 }) {
     return (
         <div className="bg-white border-2 border-zinc-100 rounded-lg p-5 flex flex-col gap-3 hover:border-zinc-200 hover:shadow-sm transition-all">
             <div className="flex items-center justify-between">
-                <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">{title}</p>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">{title}</p>
                 <div className={`p-2 rounded-lg border-2 ${bg}`}>
                     <Icon className={`h-3.5 w-3.5 ${color}`} />
                 </div>
             </div>
-            
+
             <div className="flex items-end justify-between">
                 <div className="space-y-1">
                     {loading ? (
                         <Skeleton className="h-7 w-20 rounded" />
                     ) : (
-                        <p className="text-2xl font-black text-zinc-900 leading-none tabular-nums">
+                        <p className="text-2xl font-bold text-zinc-900 leading-none tabular-nums">
                             {(value ?? 0).toLocaleString()}
                         </p>
                     )}
@@ -247,14 +246,14 @@ export default function AnalyticsPage() {
         return { startDate: start.toISOString(), endDate: end.toISOString() };
     }, [dateRange]);
 
-    const { data: overview,      isLoading: overviewLoading }      = useAnalyticsOverview();
-    const { data: requestStats,  isLoading: requestStatsLoading }  = useRequestStats();
-    const { data: dlTrends,      isLoading: dlLoading }            = useDownloadTrends(dateParams.startDate, dateParams.endDate, { enabled: activeTab === "trends" });
-    const { data: userTrends,    isLoading: userTrendsLoading }     = useUserTrends(dateParams.startDate, dateParams.endDate, { enabled: activeTab === "trends" });
-    const { data: topResources,  isLoading: topResourcesLoading }  = useTopResources(10, { enabled: activeTab === "content" });
-    const { data: topSearches,   isLoading: topSearchesLoading }   = useTopSearchTerms(10, { enabled: activeTab === "content" });
-    const { data: userRoles,     isLoading: rolesLoading }         = useUsersByRole({ enabled: activeTab === "distribution" });
-    const { data: resCats,       isLoading: catsLoading }          = useResourcesByCategory({ enabled: activeTab === "distribution" });
+    const { data: overview, isLoading: overviewLoading } = useAnalyticsOverview();
+    const { data: requestStats, isLoading: requestStatsLoading } = useRequestStats();
+    const { data: dlTrends, isLoading: dlLoading } = useDownloadTrends(dateParams.startDate, dateParams.endDate, { enabled: activeTab === "trends" });
+    const { data: userTrends, isLoading: userTrendsLoading } = useUserTrends(dateParams.startDate, dateParams.endDate, { enabled: activeTab === "trends" });
+    const { data: topResources, isLoading: topResourcesLoading } = useTopResources(10, { enabled: activeTab === "content" });
+    const { data: topSearches, isLoading: topSearchesLoading } = useTopSearchTerms(10, { enabled: activeTab === "content" });
+    const { data: userRoles, isLoading: rolesLoading } = useUsersByRole({ enabled: activeTab === "distribution" });
+    const { data: resCats, isLoading: catsLoading } = useResourcesByCategory({ enabled: activeTab === "distribution" });
 
     const overviewData = overview?.data;
 
@@ -269,44 +268,44 @@ export default function AnalyticsPage() {
     })) ?? [];
 
     const kpiCards = [
-        { 
-            title: "Total Users",       
-            value: overviewData?.totalUsers,       
-            sub: `${overviewData?.activeUsers ?? 0} active`,   
-            icon: Users,     
-            color: "text-blue-600",   
-            bg: "bg-blue-50 border-blue-100",     
+        {
+            title: "Total Users",
+            value: overviewData?.totalUsers,
+            sub: `${overviewData?.activeUsers ?? 0} active`,
+            icon: Users,
+            color: "text-blue-600",
+            bg: "bg-blue-50 border-blue-100",
             loading: overviewLoading,
             spark: userChartData.map(d => d.users),
             delta: 12
         },
-        { 
-            title: "Total Resources",   
-            value: overviewData?.totalResources,   
-            icon: FileText,  
-            color: "text-emerald-600", 
-            bg: "bg-emerald-50 border-emerald-100", 
+        {
+            title: "Total Resources",
+            value: overviewData?.totalResources,
+            icon: FileText,
+            color: "text-emerald-600",
+            bg: "bg-emerald-50 border-emerald-100",
             loading: overviewLoading,
             spark: [80, 84, 88, 85, 92, 98, 100],
             delta: 5
         },
-        { 
-            title: "Total Downloads",    
-            value: overviewData?.totalDownloads,   
-            icon: Download,  
-            color: "text-purple-600",  
-            bg: "bg-purple-50 border-purple-100",   
+        {
+            title: "Total Downloads",
+            value: overviewData?.totalDownloads,
+            icon: Download,
+            color: "text-purple-600",
+            bg: "bg-purple-50 border-purple-100",
             loading: overviewLoading,
             spark: dlChartData.map(d => d.downloads),
             delta: -3
         },
-        { 
-            title: "Requests Balance",  
-            value: requestStats?.data?.pending,    
-            sub: `${requestStats?.data?.resolved ?? 0} resolved`, 
-            icon: ClipboardList, 
-            color: "text-orange-600", 
-            bg: "bg-orange-50 border-orange-100", 
+        {
+            title: "Requests Balance",
+            value: requestStats?.data?.pending,
+            sub: `${requestStats?.data?.resolved ?? 0} resolved`,
+            icon: ClipboardList,
+            color: "text-orange-600",
+            bg: "bg-orange-50 border-orange-100",
             loading: requestStatsLoading,
             spark: [5, 8, 3, 12, 7, 9, 6],
             delta: 8
@@ -319,7 +318,7 @@ export default function AnalyticsPage() {
             {/* ── Header ── */}
             <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h2 className="text-xl font-black tracking-tight text-zinc-900 uppercase">Analytics</h2>
+                    <h2 className="text-xl font-bold tracking-tight text-zinc-900 uppercase">Analytics</h2>
                     <p className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 mt-0.5">
                         Platform usage metrics &amp; growth patterns
                     </p>
@@ -328,10 +327,10 @@ export default function AnalyticsPage() {
                 <div className="flex items-center gap-2 self-start sm:self-auto">
                     <div className="flex items-center gap-2 px-3 py-2.5 bg-white border-2 border-zinc-100 rounded-lg">
                         <Calendar className="h-3.5 w-3.5 text-zinc-400" />
-                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Range</span>
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">Range</span>
                     </div>
                     <Select value={dateRange} onValueChange={setDateRange}>
-                        <SelectTrigger className="w-[150px] h-10 border-2 border-zinc-100 bg-white rounded-lg focus:ring-0 text-[10px] font-black uppercase tracking-widest text-zinc-600 hover:border-zinc-200 transition-colors">
+                        <SelectTrigger className="w-[150px] h-10 border-2 border-zinc-100 bg-white rounded-lg focus:ring-0 text-[10px] font-bold uppercase tracking-widest text-zinc-600 hover:border-zinc-200 transition-colors">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="border-2 border-zinc-100 shadow-xl rounded-lg">
@@ -360,14 +359,14 @@ export default function AnalyticsPage() {
                     <div className="flex items-center justify-between px-5 py-3 border-b-2 border-zinc-100 bg-zinc-50/50 flex-wrap gap-3">
                         <TabsList className="bg-white border-2 border-zinc-200 h-9 p-1 rounded-lg gap-0.5 shadow-none">
                             {[
-                                { value: "trends",       icon: TrendingUp,   label: "Trends"       },
+                                { value: "trends", icon: TrendingUp, label: "Trends" },
                                 { value: "distribution", icon: PieChartIcon, label: "Distribution" },
-                                { value: "content",      icon: FileText,     label: "Content"      },
+                                { value: "content", icon: FileText, label: "Content" },
                             ].map(({ value, icon: Icon, label }) => (
                                 <TabsTrigger
                                     key={value}
                                     value={value}
-                                    className="text-[9px] uppercase font-black tracking-widest data-[state=active]:bg-blue-900 data-[state=active]:text-white transition-all h-full px-3.5 rounded-md gap-1.5"
+                                    className="text-[9px] uppercase font-bold tracking-widest data-[state=active]:bg-blue-900 data-[state=active]:text-white transition-all h-full px-3.5 rounded-md gap-1.5"
                                 >
                                     <Icon className="h-3 w-3" /> {label}
                                 </TabsTrigger>
@@ -453,7 +452,7 @@ export default function AnalyticsPage() {
 
                                 {/* Top resources */}
                                 <div className="flex flex-col gap-3">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 border-l-2 border-zinc-300 pl-2.5">
+                                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 border-l-2 border-zinc-300 pl-2.5">
                                         Most Popular Resources
                                     </h4>
                                     <div className="bg-zinc-50/50 border-2 border-zinc-100 rounded-lg overflow-hidden divide-y divide-zinc-100/60">
@@ -468,12 +467,12 @@ export default function AnalyticsPage() {
                                                     className="flex items-center justify-between px-4 py-3.5 hover:bg-white transition-colors group"
                                                 >
                                                     <div className="flex items-center gap-3 min-w-0">
-                                                        <span className="text-[9px] font-black text-blue-900 bg-blue-50 border border-blue-100 w-6 h-6 flex items-center justify-center rounded-md shrink-0">
+                                                        <span className="text-[9px] font-bold text-blue-900 bg-blue-50 border border-blue-100 w-6 h-6 flex items-center justify-center rounded-md shrink-0">
                                                             {i + 1}
                                                         </span>
                                                         <span className="text-xs font-bold text-zinc-700 truncate">{resource.title}</span>
                                                     </div>
-                                                    <span className="text-[10px] font-black text-zinc-900 bg-white border-2 border-zinc-100 px-2 py-0.5 rounded-md ml-3 shrink-0 tabular-nums group-hover:border-blue-200 transition-colors">
+                                                    <span className="text-[10px] font-bold text-zinc-900 bg-white border-2 border-zinc-100 px-2 py-0.5 rounded-md ml-3 shrink-0 tabular-nums group-hover:border-blue-200 transition-colors">
                                                         {resource.count} <span className="text-[8px] text-zinc-400">hits</span>
                                                     </span>
                                                 </div>
@@ -486,11 +485,11 @@ export default function AnalyticsPage() {
 
                                 {/* Top searches */}
                                 <div className="flex flex-col gap-3">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 border-l-2 border-zinc-300 pl-2.5">
+                                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 border-l-2 border-zinc-300 pl-2.5">
                                         Top Search Terms
                                     </h4>
                                     <div className="bg-white border-2 border-zinc-100 rounded-lg overflow-hidden">
-                                        <div className="grid grid-cols-12 px-4 py-2.5 bg-zinc-50/70 border-b-2 border-zinc-100 text-[9px] font-black uppercase tracking-widest text-zinc-400">
+                                        <div className="grid grid-cols-12 px-4 py-2.5 bg-zinc-50/70 border-b-2 border-zinc-100 text-[9px] font-bold uppercase tracking-widest text-zinc-400">
                                             <div className="col-span-8">Query</div>
                                             <div className="col-span-4 text-right">Volume</div>
                                         </div>
@@ -508,7 +507,7 @@ export default function AnalyticsPage() {
                                                                 &ldquo;{term.item}&rdquo;
                                                             </span>
                                                         </div>
-                                                        <div className="col-span-4 text-right font-mono text-[11px] font-black text-blue-900 tabular-nums">
+                                                        <div className="col-span-4 text-right font-mono text-[11px] font-bold text-blue-900 tabular-nums">
                                                             {term.count.toLocaleString()}
                                                         </div>
                                                     </div>
@@ -532,7 +531,7 @@ function EmptyState({ icon: Icon, label }: { icon: React.ElementType; label: str
     return (
         <div className="flex flex-col items-center justify-center py-12 gap-2 text-zinc-300">
             <Icon className="h-7 w-7" />
-            <p className="text-[9px] font-black uppercase tracking-widest">{label}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest">{label}</p>
         </div>
     );
 }

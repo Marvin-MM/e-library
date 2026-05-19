@@ -1,14 +1,7 @@
 import "@/styles/globals.css";
 import { Providers } from "./providers";
 import type { Metadata, Viewport } from "next";
-import { Outfit } from "next/font/google";
 import { cn } from "@/lib/utils";
-
-const outfit = Outfit({
-    subsets: ['latin'],
-    variable: '--font-outfit',
-    display: 'swap',
-});
 
 export const viewport: Viewport = {
     width: 'device-width',
@@ -32,7 +25,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={cn(outfit.variable, "min-h-screen bg-zinc-50 font-sans antialiased")}>
+            <body className="min-h-screen bg-zinc-50 font-sans antialiased">
                 {/* Skip to main content — critical for keyboard/screen reader accessibility */}
                 <a href="#main-content" className="skip-nav">
                     Skip to main content
