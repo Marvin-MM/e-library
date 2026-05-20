@@ -1,5 +1,6 @@
 allowBuilds:
   sharp: true
+  unrs-resolver: true
 minimumReleaseAgeExclude:
   - ajv@6.12.3
   - cross-spawn@6.0.6
