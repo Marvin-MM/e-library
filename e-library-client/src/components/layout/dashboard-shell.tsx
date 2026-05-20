@@ -36,6 +36,7 @@ import {
     ShieldCheck,
     Database,
     Globe,
+    Sparkles,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { AdminSidebar } from "./admin-sidebar";
@@ -62,7 +63,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchMode, setSearchMode] = useState<"others" | "scholar">("others");
     const [discoveryOpen, setDiscoveryOpen] = useState(false);
-    
+
     const { setSelectedSources } = useDiscoveryStore();
     const { data: sourcesData } = useDiscoverySources();
 
@@ -138,33 +139,33 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
 
                         {/* Integrated Search Bar Trigger — students only */}
                         {!isAdmin && (
-                            <div className="relative group max-w-md w-full flex items-center">
+                            <div className="relative group w-auto sm:max-w-md sm:w-full flex items-center flex-shrink-0 sm:flex-shrink">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <button className="flex items-center gap-1.5 px-3 h-10 bg-zinc-50 border border-zinc-200 border-r-0 rounded-l text-[10px] font-bold uppercase tracking-wider text-zinc-600 hover:bg-zinc-100 hover:text-blue-900 transition-colors">
-                                            {searchMode === "scholar" ? <Globe className="w-3.5 h-3.5"/> : <Database className="w-3.5 h-3.5"/>}
+                                        <button className="flex items-center justify-center gap-1.5 px-2.5 sm:px-3 h-10 bg-zinc-50 border border-zinc-200 border-r-0 rounded-l text-[10px] font-bold uppercase tracking-wider text-zinc-600 hover:bg-zinc-100 hover:text-blue-900 transition-colors">
+                                            {searchMode === "scholar" ? <Globe className="w-3.5 h-3.5" /> : <Database className="w-3.5 h-3.5" />}
                                             <span className="hidden sm:inline">{searchMode === "scholar" ? "Scholar" : "Others"}</span>
-                                            <ChevronDown className="w-3 h-3 ml-0.5 opacity-50" />
+                                            <ChevronDown className="w-3 h-3 ml-0 sm:ml-0.5 opacity-50" />
                                         </button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="start" className="w-40 rounded-xl border-2 border-zinc-100">
                                         <DropdownMenuItem onClick={() => setSearchMode("others")} className="text-[10px] font-bold uppercase tracking-wider cursor-pointer h-9">
-                                            <Database className="w-3.5 h-3.5 mr-2 text-zinc-400"/> Others
+                                            <Database className="w-3.5 h-3.5 mr-2 text-zinc-400" /> Others
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onClick={() => setSearchMode("scholar")} className="text-[10px] font-bold uppercase tracking-wider cursor-pointer h-9">
-                                            <Globe className="w-3.5 h-3.5 mr-2 text-blue-500"/> Google Scholar
+                                            <Globe className="w-3.5 h-3.5 mr-2 text-blue-500" /> Google Scholar
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                                 <button
                                     onClick={handleSearchClick}
                                     aria-label="Search resources, books, or courses"
-                                    className="flex-1 flex items-center gap-3 px-4 h-10 bg-white border border-zinc-200 rounded-r text-zinc-400 hover:border-zinc-300 transition-all text-xs group"
+                                    className="flex items-center justify-center sm:justify-start gap-3 px-0 sm:px-4 h-10 w-10 sm:w-auto sm:flex-1 bg-white border border-zinc-200 rounded-r text-zinc-400 hover:border-zinc-300 transition-all text-xs group"
                                 >
                                     <Search className="w-4 h-4 text-zinc-400 group-hover:text-blue-900 transition-colors" />
-                                    <span className="flex-1 text-left hidden sm:inline text-zinc-400 group-hover:text-zinc-600">Search resources, books, or courses...</span>
-                                    <span className="flex-1 text-left sm:hidden text-zinc-400">Search...</span>
-                                    <div className="hidden md:flex items-center gap-1 px-1.5 py-0.5 rounded border border-zinc-200 bg-zinc-50 text-[10px] font-bold text-zinc-400 uppercase tracking-tighter group-hover:border-zinc-300 transition-colors">
+                                    <span className="flex-1 text-left hidden lg:inline text-zinc-400 group-hover:text-zinc-600 truncate">Search resources, books, or courses...</span>
+                                    <span className="flex-1 text-left hidden sm:inline lg:hidden text-zinc-400 truncate">Search...</span>
+                                    <div className="hidden lg:flex items-center gap-1 px-1.5 py-0.5 rounded border border-zinc-200 bg-zinc-50 text-[10px] font-bold text-zinc-400 uppercase tracking-tighter group-hover:border-zinc-300 transition-colors">
                                         <Command className="w-2.5 h-2.5" />
                                         <span>K</span>
                                     </div>
@@ -182,6 +183,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                     asChild
                                     className={cn(
                                         "h-9 px-4 rounded flex items-center gap-2 font-semibold text-sm transition-all",
+                                        "hidden md:flex",
                                         pathname === "/requests"
                                             ? "bg-blue-50 text-blue-900 shadow-sm border border-blue-100/50"
                                             : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
@@ -192,17 +194,39 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                         <span className="hidden lg:inline">My Requests</span>
                                     </Link>
                                 </Button>
-                                <div className="h-4 w-px bg-zinc-200 mx-1 hidden sm:block" />
+                                <div className="h-4 w-px bg-zinc-200 mx-1 hidden md:block" />
                             </>
                         )}
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-9 w-9 rounded-lg hover:bg-zinc-50 border border-zinc-100 text-zinc-500 hover:text-blue-600 transition-all flex items-center justify-center shrink-0"
+                                    aria-label="AI Assistant"
+                                >
+                                    <Sparkles className="w-4 h-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48 p-4 rounded-xl border-2 border-zinc-100 bg-white text-center shadow-2xl">
+                                <div className="flex flex-col items-center gap-1.5">
+                                    <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                                        <Sparkles className="w-4 h-4 text-blue-600 animate-pulse" />
+                                    </div>
+                                    <p className="text-xs font-bold text-zinc-900 uppercase tracking-wide">AI Research Copilot</p>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 bg-zinc-50 px-2 py-0.5 rounded border border-zinc-100">Coming Soon</span>
+                                </div>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
 
                         <NotificationsPopover />
                         {/* User Profile Menu */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button 
-                                    variant="ghost" 
-                                    className="rounded-full hover:bg-zinc-50 border border-zinc-100 pl-1 pr-3 py-1 h-10 gap-2.5 transition-all group"
+                                <Button
+                                    variant="ghost"
+                                    className="rounded-full hover:bg-zinc-50 border border-zinc-100 pl-1 pr-3 py-1 h-10 gap-2 transition-all group"
                                 >
                                     <div className="relative">
                                         <Avatar className="h-8 w-8 border border-white shadow-sm ring-1 ring-zinc-100">
@@ -224,9 +248,9 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                     <ChevronDown className="w-3.5 h-3.5 text-zinc-400 group-data-[state=open]:rotate-180 transition-transform" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            
-                            <DropdownMenuContent 
-                                align="end" 
+
+                            <DropdownMenuContent
+                                align="end"
                                 className="w-72 p-0 rounded-xl mt-2 border-2 border-zinc-100 bg-white shadow-2xl shadow-zinc-200/50 overflow-hidden animate-in slide-in-from-top-2 duration-300"
                             >
                                 <div className="bg-gradient-to-br from-zinc-50 to-white px-5 py-2 border-b border-zinc-100 relative overflow-hidden">
@@ -241,7 +265,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                         <div className="flex flex-col min-w-0">
                                             <p className="text-sm font-bold text-zinc-900 truncate tracking-tight">{user.name}</p>
                                             <p className="text-[11px] font-medium text-zinc-400 truncate">{user.email}</p>
-                                            
+
                                             <div className="mt-2.5 flex">
                                                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-zinc-100 rounded-full shadow-sm">
                                                     <ShieldCheck className="w-3 h-3 text-blue-600" />
@@ -258,7 +282,21 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                     <DropdownMenuLabel className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
                                         Manage Account
                                     </DropdownMenuLabel>
-                                    
+
+                                    {!isAdmin && (
+                                        <DropdownMenuItem asChild className="rounded-lg h-11 cursor-pointer focus:bg-emerald-50 focus:text-emerald-700 transition-all">
+                                            <Link href="/requests" className="flex items-center w-full px-2">
+                                                <div className="w-8 h-8 rounded-md bg-zinc-50 flex items-center justify-center mr-3">
+                                                    <GitPullRequest className="h-4 w-4 text-zinc-500" />
+                                                </div>
+                                                <div className="flex flex-col gap-0">
+                                                    <span className="font-bold text-sm tracking-tight">My Requests</span>
+                                                    <span className="text-[10px] text-zinc-400">View your requests</span>
+                                                </div>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    )}
+
                                     <DropdownMenuItem asChild className="rounded-lg h-11 cursor-pointer focus:bg-blue-50 focus:text-blue-700 transition-all">
                                         <Link href="/settings" className="flex items-center w-full px-2">
                                             <div className="w-8 h-8 rounded-md bg-zinc-50 flex items-center justify-center mr-3 group-focus:bg-blue-100/50 transition-colors">
@@ -271,19 +309,6 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
                                         </Link>
                                     </DropdownMenuItem>
 
-                                    {/* {!isAdmin && (
-                                        <DropdownMenuItem asChild className="rounded-lg h-11 cursor-pointer focus:bg-emerald-50 focus:text-emerald-700 transition-all">
-                                            <Link href="/students/library" className="flex items-center w-full px-2">
-                                                <div className="w-8 h-8 rounded-md bg-zinc-50 flex items-center justify-center mr-3">
-                                                    <UserIcon className="h-4 w-4 text-zinc-500" />
-                                                </div>
-                                                <div className="flex flex-col gap-0">
-                                                    <span className="font-bold text-sm tracking-tight">My Profile</span>
-                                                    <span className="text-[10px] text-zinc-400">View your library status</span>
-                                                </div>
-                                            </Link>
-                                        </DropdownMenuItem>
-                                    )} */}
                                 </div>
 
                                 <div className="p-1.5 border-t border-zinc-50 bg-zinc-50/30">

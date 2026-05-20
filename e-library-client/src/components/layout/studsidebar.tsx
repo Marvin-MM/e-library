@@ -103,7 +103,7 @@ export default function Sidebar() {
             {sidebarOpen && (
                 <div
                     onClick={() => setSidebarOpen(false)}
-                    className="fixed inset-0 z-40 bg-black/20 lg:hidden"
+                    className="fixed inset-0 z-[60] bg-black/20 lg:hidden"
                     aria-hidden="true"
                 />
             )}
@@ -112,7 +112,7 @@ export default function Sidebar() {
             <aside
                 aria-label="Student navigation"
                 className={cn(
-                    "flex flex-col h-screen border-r border-zinc-200 fixed inset-y-0 left-0 overflow-hidden z-50 bg-white shadow-sm w-64",
+                    "flex flex-col h-screen border-r border-zinc-200 fixed inset-y-0 left-0 overflow-hidden z-[70] bg-white shadow-sm w-64",
                     "transition-transform duration-200 ease-in-out",
                     sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                 )}

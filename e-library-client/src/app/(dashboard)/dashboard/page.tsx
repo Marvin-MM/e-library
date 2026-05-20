@@ -5,15 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRole } from "@/hooks/useAuth";
 import { useMyRequests } from "@/hooks/useRequests";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
     Activity,
     ChevronRight,
     GitPullRequest,
     Layers,
     MoveRight,
+    PlayCircle,
     Search,
     ExternalLink,
+    X,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -22,6 +24,10 @@ import { useEffect, useMemo, useState } from "react";
 
 // ── Dynamic import: avoids SSR crash ─────────────────────────────────────────
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+const ArtPlayer = dynamic(
+    () => import("@/components/ui/art-player").then((mod) => mod.ArtPlayerComponent),
+    { ssr: false, loading: () => <Skeleton className="w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl" /> }
+);
 
 // ── Stagger animation variants ───────────────────────────────────────────────
 const fadeUp = (delay = 0) => ({
@@ -114,6 +120,7 @@ export default function DashboardPage() {
     const router = useRouter();
     const { user, isAdmin } = useRole();
     const [searchOpen, setSearchOpen] = useState(false);
+    const [isVideoOpen, setIsVideoOpen] = useState(true);
     const { data: myRequests, isLoading: requestsLoading } = useMyRequests();
 
     // Redirect admins — keep consistent with your auth guard pattern
@@ -146,7 +153,23 @@ export default function DashboardPage() {
                         </p>
                     </motion.div>
 
-                    <motion.div {...fadeUp(0.07)} className="flex items-center gap-3 self-start sm:self-auto">
+                    <motion.div {...fadeUp(0.07)} className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
+                        {/* Watch VC Message Pill (shown only when closed) */}
+                        {!isVideoOpen && (
+                            <button 
+                                onClick={() => setIsVideoOpen(true)}
+                                className="flex items-stretch bg-white border-2 border-zinc-100 rounded-lg overflow-hidden shadow-sm hover:border-blue-200 group transition-colors text-left"
+                            >
+                                <div className="px-3 sm:px-4 py-2.5 border-r-2 border-zinc-100 flex flex-col justify-center bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                                    <PlayCircle className="w-5 h-5 text-blue-600 mx-auto" />
+                                </div>
+                                <div className="px-3 sm:px-4 py-2.5 flex flex-col justify-center">
+                                    <p className="text-[9px] uppercase font-bold tracking-widest text-zinc-400 group-hover:text-blue-600/70 transition-colors">Message</p>
+                                    <p className="text-xs font-bold text-zinc-900 leading-tight">Watch VC</p>
+                                </div>
+                            </button>
+                        )}
+
                         {/* Stats pill */}
                         <div className="flex items-stretch bg-white border-2 border-zinc-100 rounded-lg overflow-hidden shadow-sm">
                             <div className="px-4 py-2.5 border-r-2 border-zinc-100 text-center">
@@ -173,6 +196,64 @@ export default function DashboardPage() {
                         </Button>
                     </motion.div>
                 </div>
+
+                {/* ── Hero Video Section ─────────────────────────────────── */}
+                <AnimatePresence>
+                    {isVideoOpen && (
+                        <motion.div 
+                            {...fadeUp(0.09)}
+                            exit={{ opacity: 0, height: 0, scaleY: 0.9, marginTop: -24 }}
+                            transition={{ duration: 0.3 }}
+                            className="relative w-full rounded-2xl overflow-hidden shadow-md border-2 border-zinc-100 bg-zinc-950 isolate group origin-top"
+                        >
+                            <button 
+                                onClick={() => setIsVideoOpen(false)}
+                                className="absolute top-4 right-4 z-30 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white backdrop-blur-md transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 outline-none"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+
+                            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-transparent z-10 pointer-events-none transition-opacity duration-500 group-hover:opacity-0" />
+                    
+                    {/* ArtPlayer Container */}
+                    <div className="aspect-[16/9] md:aspect-[21/9] w-full relative z-0">
+                        <ArtPlayer 
+                            className="w-full h-full"
+                            option={{
+                                url: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
+                                poster: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2070&auto=format&fit=crop",
+                                volume: 0.5,
+                                isLive: false,
+                                muted: false,
+                                autoplay: false,
+                                pip: true,
+                                autoSize: true,
+                                autoMini: true,
+                                setting: true,
+                                loop: false,
+                                playbackRate: true,
+                                fullscreen: true,
+                                miniProgressBar: true,
+                                mutex: true,
+                                playsInline: true,
+                                theme: '#2563eb',
+                            }}
+                        />
+                    </div>
+                    
+                    {/* Overlay Content */}
+                    <div className="absolute top-0 left-0 p-6 sm:p-8 z-20 pointer-events-none transition-opacity duration-500 group-hover:opacity-0">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/90 text-white text-[10px] font-bold uppercase tracking-widest backdrop-blur-md mb-3 shadow-lg">
+                            <PlayCircle className="w-3.5 h-3.5" />
+                            Message from the VC
+                        </div>
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white max-w-xl leading-tight text-balance drop-shadow-md">
+                            Welcome to the next generation of academic discovery.
+                        </h2>
+                    </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 {/* ── Activity + Discovery ────────────────────────────────── */}
                 <motion.div

@@ -150,7 +150,7 @@ export default function RequestsPage() {
                                     </Select>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label className="text-sm font-semibold text-zinc-700">Priority</Label>
                                         <Select defaultValue="LOW" onValueChange={(v) => setValue("priority", v as any)}>
@@ -187,19 +187,19 @@ export default function RequestsPage() {
                             {errors.reason && <p className="text-xs text-red-500">{errors.reason.message}</p>}
                         </div>
 
-                        <div className="pt-4 flex justify-end gap-3">
+                        <div className="pt-6 sm:pt-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
                             <Button
                                 type="button"
                                 variant="outline"
                                 onClick={() => setIsCreating(false)}
-                                className="h-11 px-8 rounded border-zinc-200"
+                                className="h-11 px-8 rounded border-zinc-200 w-full sm:w-auto"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={isPending}
-                                className="h-11 px-10 rounded bg-blue-900 hover:bg-blue-800 text-white"
+                                className="h-11 px-10 rounded bg-blue-900 hover:bg-blue-800 text-white w-full sm:w-auto"
                             >
                                 {isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
                                 Submit Request
@@ -220,19 +220,19 @@ export default function RequestsPage() {
                     <p className="text-zinc-500 text-sm">Track your custom library requests and acquisitions.</p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="relative group">
+                <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
+                    <div className="relative group w-full sm:w-auto">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-zinc-900 transition-colors" />
                         <Input
                             placeholder="Search requests..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9 w-[260px] h-11 bg-white border-zinc-200 rounded shadow-none focus-visible:ring-1"
+                            className="pl-9 w-full sm:w-[260px] h-11 bg-white border-zinc-200 rounded shadow-none focus-visible:ring-1"
                         />
                     </div>
                     <Button
                         onClick={() => setIsCreating(true)}
-                        className="h-11 px-6 rounded bg-blue-900 hover:bg-blue-800 text-white"
+                        className="h-11 px-6 rounded bg-blue-900 hover:bg-blue-800 text-white w-full sm:w-auto shrink-0"
                     >
                         <Plus className="w-4 h-4 mr-2" />
                         New Request
@@ -277,40 +277,42 @@ export default function RequestsPage() {
                                 <motion.div
                                     key={request.id}
                                     whileHover={{ x: 4 }}
-                                    className="group flex flex-col md:flex-row items-center gap-6 p-5 bg-white border border-zinc-200 rounded hover:border-blue-900 transition-all cursor-default"
+                                    className="group flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-4 sm:p-5 bg-white border border-zinc-200 rounded hover:border-blue-900 transition-all cursor-default"
                                 >
-                                    {/* Status Indicator */}
-                                    <div className={`w-12 h-12 shrink-0 rounded flex items-center justify-center ${config.color}`}>
-                                        <StatusIcon className="w-6 h-6" />
-                                    </div>
-
-                                    {/* Content Area */}
-                                    <div className="flex-1 min-w-0 space-y-1">
-                                        <div className="flex items-center gap-3">
-                                            <h3 className="font-bold text-zinc-900 truncate group-hover:text-blue-900 transition-colors">
-                                                {request.title}
-                                            </h3>
-                                            <span className={`text-[12px] font-semibold px-2 py-0.5 rounded-full ${config.bg} ${config.color}`}>
-                                                {config.label}
-                                            </span>
+                                    <div className="flex items-start sm:items-center gap-4 flex-1 min-w-0 w-full">
+                                        {/* Status Indicator */}
+                                        <div className={`w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded flex items-center justify-center ${config.color} ${config.bg}`}>
+                                            <StatusIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                         </div>
-                                        <div className="flex items-center gap-4 text-xs text-zinc-400 font-medium">
-                                            <span className="flex items-center gap-1.5"><User className="w-3 h-3" /> {request.authors || "N/A"}</span>
-                                            <span>•</span>
-                                            <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> {formatDate(request.createdAt)}</span>
-                                            {request.status === "REJECTED" && (
-                                                <span className="text-red-600 font-bold animate-pulse">! Rejected</span>
-                                            )}
+
+                                        {/* Content Area */}
+                                        <div className="flex-1 min-w-0 space-y-1">
+                                            <div className="flex items-center gap-3">
+                                                <h3 className="font-bold text-zinc-900 truncate group-hover:text-blue-900 transition-colors">
+                                                    {request.title}
+                                                </h3>
+                                                <span className={`text-[10px] sm:text-[12px] font-semibold px-2 py-0.5 rounded-full ${config.bg} ${config.color} shrink-0`}>
+                                                    {config.label}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-zinc-400 font-medium">
+                                                <span className="flex items-center gap-1.5 truncate"><User className="w-3 h-3 shrink-0" /> <span className="truncate">{request.authors || "N/A"}</span></span>
+                                                <span className="hidden sm:inline">•</span>
+                                                <span className="flex items-center gap-1.5 shrink-0"><Calendar className="w-3 h-3 shrink-0" /> {formatDate(request.createdAt)}</span>
+                                                {request.status === "REJECTED" && (
+                                                    <span className="text-red-600 font-bold animate-pulse shrink-0">! Rejected</span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Right Side Info */}
-                                    <div className="flex items-center gap-8 shrink-0">
-                                        <div className="text-right hidden sm:block">
-                                            <p className="text-[10px] uppercase font-bold text-zinc-400 mb-1">Reason</p>
-                                            <p className="text-xs text-zinc-600 max-w-[200px] truncate">"{request.reason}"</p>
+                                    <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-8 w-full sm:w-auto shrink-0 mt-2 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-0 border-zinc-50">
+                                        <div className="text-left sm:text-right flex-1 sm:flex-none">
+                                            <p className="text-[10px] uppercase font-bold text-zinc-400 mb-0.5 sm:mb-1">Reason</p>
+                                            <p className="text-xs text-zinc-600 w-full sm:max-w-[200px] truncate">"{request.reason}"</p>
                                         </div>
-                                        <Button variant="ghost" size="icon" className="text-zinc-300 hover:text-blue-900">
+                                        <Button variant="ghost" size="icon" className="text-zinc-300 hover:text-blue-900 shrink-0">
                                             <ChevronRight className="w-5 h-5" />
                                         </Button>
                                     </div>
