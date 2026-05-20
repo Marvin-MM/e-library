@@ -1,0 +1,14 @@
+allowBuilds:
+  sharp: true
+minimumReleaseAgeExclude:
+  - ajv@6.12.3
+  - cross-spawn@6.0.6
+  - tmp@0.2.4
+  - ajv@6.14.0
+  - postcss@8.5.10
+overrides:
+  ajv@<6.12.3: ^6.12.3
+  ajv@<6.14.0: ^6.14.0
+  cross-spawn@<6.0.6: ^6.0.6
+  postcss@<8.5.10: ^8.5.10
+  tmp@<=0.2.3: ^0.2.4
